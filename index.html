@@ -60,10 +60,10 @@
         </div>
         <div><button class="hlink"><i class="fa-solid fa-cube"></i>Components<i class="fa-solid fa-chevron-down" style="font-size:10px"></i></button>
           <div class="drop">
-            <a href="playground-buttons.html"><i class="fa-solid fa-circle-dot fa-fw"></i>Buttons</a>
-            <a href="playground-modal.html"><i class="fa-solid fa-window-restore fa-fw"></i>Modal</a>
-            <a href="playground-dropdown.html"><i class="fa-solid fa-chevron-down fa-fw"></i>Dropdown</a>
-            <a href="playground-datepicker.html"><i class="fa-solid fa-calendar-days fa-fw"></i>Date picker</a>
+            <a href="playground-buttons.html"><i class="fa-solid fa-circle-dot fa-fw"></i><span data-i18n="buttons">Buttons</span></a>
+            <a href="playground-modal.html"><i class="fa-solid fa-window-restore fa-fw"></i><span data-i18n="modal">Modal</span></a>
+            <a href="playground-dropdown.html"><i class="fa-solid fa-chevron-down fa-fw"></i><span data-i18n="dropdown">Dropdown</span></a>
+            <a href="playground-datepicker.html"><i class="fa-solid fa-calendar-days fa-fw"></i><span data-i18n="datepicker">Date picker</span></a>
           </div>
         </div>
         <div><button class="hlink" onclick="App.go('login.html')"><i class="fa-solid fa-key"></i>Auth</button></div>
@@ -96,17 +96,17 @@
         <div style="display:flex;flex-wrap:wrap;align-items:center;gap:16px">
           <span class="tile" style="width:56px;height:56px;font-size:22px;border-radius:17px">A</span>
           <div style="min-width:220px">
-            <span class="eyebrow">Dashboard</span>
+            <span class="eyebrow" data-i18n="dashboard">Dashboard</span>
             <h1 data-i18n="welcome">Welcome back</h1>
             <p class="muted" style="margin:2px 0 0" data-i18n="welcomeSub">Everything is offline-ready. No CDN, no internet needed.</p>
           </div>
           <div style="flex:1"></div>
-          <span class="pill pill-ok"><span class="dot"></span>All systems live</span>
-          <span class="pill pill-neutral"><i class="fa-solid fa-users"></i>Team 8</span>
-          <span class="pill pill-info"><i class="fa-solid fa-list-check"></i>48 tasks</span>
+          <span class="pill pill-ok"><span class="dot"></span><span data-i18n="sysLive">All systems live</span></span>
+          <span class="pill pill-neutral"><i class="fa-solid fa-users"></i><span data-i18n="team">Team</span>&nbsp;8</span>
+          <span class="pill pill-info"><i class="fa-solid fa-list-check"></i>48&nbsp;<span data-i18n="tasks">tasks</span></span>
         </div>
         <div style="margin-top:16px">
-          <div style="display:flex;justify-content:space-between;font-size:12px" class="muted"><span><i class="fa-solid fa-gauge-high"></i> Monthly capacity</span><span>72%</span></div>
+          <div style="display:flex;justify-content:space-between;font-size:12px" class="muted"><span><i class="fa-solid fa-gauge-high"></i> <span data-i18n="capUse">Monthly capacity</span></span><span>72%</span></div>
           <div class="progress" style="margin-top:6px"><i data-bar="72"></i></div>
         </div>
       </section>
@@ -130,13 +130,13 @@
       <div class="grid cols-21" style="margin-top:16px">
         <div class="card" id="analytics" style="scroll-margin-top:calc(var(--topbar-h) + 12px)"><div class="section-head"><span class="tile t-ghost"><i class="fa-solid fa-chart-line"></i></span><h3 data-i18n="analytics">Analytics</h3><span style="flex:1"></span><span class="pill pill-ok"><span class="dot"></span><span data-i18n="live">Live</span></span></div>
           <svg width="100%" height="120" viewBox="0 0 560 120" preserveAspectRatio="none" role="img" aria-label="Traffic chart"><defs><linearGradient id="ag" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="var(--primary)" stop-opacity=".35"/><stop offset="1" stop-color="var(--primary)" stop-opacity="0"/></linearGradient></defs><path d="M0,95 L40,88 L80,92 L120,74 L160,78 L200,60 L240,64 L280,46 L320,52 L360,34 L400,40 L440,24 L480,30 L520,14 L560,18 L560,120 L0,120 Z" fill="url(#ag)"/><polyline points="0,95 40,88 80,92 120,74 160,78 200,60 240,64 280,46 320,52 360,34 400,40 440,24 480,30 520,14 560,18" fill="none" stroke="var(--primary)" stroke-width="2.5" stroke-linecap="round"/></svg>
-          <div class="btn-row"><span class="pill pill-neutral"><i class="fa-solid fa-eye"></i>128k views</span><span class="pill pill-neutral"><i class="fa-solid fa-user-plus"></i>4.2k signups</span><a class="btn btn-ghost btn-sm" href="playground-table.html"><i class="fa-solid fa-file-lines"></i><span data-i18n="reports">Reports</span></a></div>
+          <div class="btn-row"><span class="pill pill-neutral"><i class="fa-solid fa-eye"></i>128k&nbsp;<span data-i18n="viewsK">views</span></span><span class="pill pill-neutral"><i class="fa-solid fa-user-plus"></i>4.2k&nbsp;<span data-i18n="signupsK">signups</span></span><a class="btn btn-ghost btn-sm" href="playground-table.html"><i class="fa-solid fa-file-lines"></i><span data-i18n="reports">Reports</span></a></div>
         </div>
-        <div class="card"><div class="section-head"><span class="tile t-ghost"><i class="fa-solid fa-lock"></i></span><h3>Idle / lock</h3></div>
-          <p class="muted">Auto-lock minutes are configurable in settings (0 = off). Warning progress → lock screen.</p><button class="btn btn-ghost" data-act="settings"><i class="fa-solid fa-sliders"></i>Open settings</button></div>
+        <div class="card"><div class="section-head"><span class="tile t-ghost"><i class="fa-solid fa-lock"></i></span><h3 data-i18n="idleCard">Idle / lock</h3></div>
+          <p class="muted" data-i18n="idleP">Auto-lock minutes are configurable in settings (0 = off). Warning progress → lock screen.</p><button class="btn btn-ghost" data-act="settings"><i class="fa-solid fa-sliders"></i><span data-i18n="openSettings">Open settings</span></button></div>
       </div>
-      <div class="card" style="margin-top:16px"><div class="section-head"><span class="tile t-ghost"><i class="fa-solid fa-bolt"></i></span><h3>Activity</h3></div>
-        <p class="muted">Solid cards, pills, tiles, quiet buttons, Font Awesome icons — one accent, hairline borders.</p>
+      <div class="card" style="margin-top:16px"><div class="section-head"><span class="tile t-ghost"><i class="fa-solid fa-bolt"></i></span><h3 data-i18n="activity">Activity</h3></div>
+        <p class="muted" data-i18n="actP">Solid cards, pills, tiles, quiet buttons — one accent, hairline borders.</p>
         <div class="btn-row"><button class="btn btn-primary" onclick="toast.success('Saved',{description:'All changes stored locally'})"><i class="fa-solid fa-check"></i>Toast demo</button><button class="btn btn-ghost" onclick="Modal.open({title:'Hello',desc:'Radix-port modal',body:'<p>Focus-trapped, ESC + overlay dismiss, scroll-locked.</p>'})"><i class="fa-solid fa-window-restore"></i>Modal demo</button></div>
       </div>
     </main>
@@ -149,7 +149,7 @@
   <div style="display:flex;align-items:center;justify-content:space-between"><h3 style="margin:0"><i class="fa-solid fa-sliders"></i> <span data-i18n="settings">Theme settings</span></h3><button class="icon-btn" data-act="settings-close"><i class="fa-solid fa-xmark"></i></button></div>
   <div class="set-group"><span class="eyebrow" data-i18n="appearance">Appearance</span>
     <div class="set-row"><span data-i18n="theme">Theme</span><select id="setTheme"><option value="system" data-i18n="system">System default</option><option value="light" data-i18n="light">Light</option><option value="dark" data-i18n="dark">Dark</option></select></div>
-    <div class="set-row"><span data-i18n="quick">Quick</span><span><button class="btn btn-ghost btn-sm" data-theme-pick="light">Light</button> <button class="btn btn-ghost btn-sm" data-theme-pick="dark">Dark</button> <button class="btn btn-ghost btn-sm" data-theme-pick="system">Auto</button></span></div>
+    <div class="set-row"><span data-i18n="quick">Quick</span><span><button class="btn btn-ghost btn-sm" data-theme-pick="light"><span data-i18n="light">Light</span></button> <button class="btn btn-ghost btn-sm" data-theme-pick="dark"><span data-i18n="dark">Dark</span></button> <button class="btn btn-ghost btn-sm" data-theme-pick="system"><span data-i18n="auto">Auto</span></button></span></div>
     <div class="set-row"><span data-i18n="primary">Primary color</span><input type="color" id="setPrimary" value="#f59e0b"></div>
     <div class="set-row"><span data-i18n="swatches">Swatches</span><span class="swatches">
       <button class="swatch" data-color="#f59e0b" style="background:#f59e0b" aria-label="amber"></button>

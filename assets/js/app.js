@@ -6,7 +6,7 @@
    handlers (onclick=) die with the old DOM automatically. */
 (function(){
 "use strict";
-function setLang(l){ThemeStore.set({lang:l});if(window.I18N)I18N.apply(l);document.dispatchEvent(new CustomEvent("app:lang",{detail:{lang:l}}));}
+function setLang(l){ThemeStore.set({lang:l});Promise.resolve(window.I18N?I18N.apply(l):null).then(()=>document.dispatchEvent(new CustomEvent("app:lang",{detail:{lang:l}})));}
 function toastChanged(patch){
   if(patch.theme!==undefined&&window.Sonner)Sonner.setTheme(ThemeStore.effectiveTheme());
   if(patch.toasterPosition!==undefined&&window.Sonner)Sonner.setPosition(patch.toasterPosition);
@@ -38,6 +38,10 @@ function initShell(){
   teardown();
   ThemeStore.apply();
   const s=ThemeStore.get(); if(window.I18N)I18N.apply(s.lang);
+  // Element bindings must be idempotent: both DOMContentLoaded AND turbo:load
+  // fire on initial load, so initShell runs twice per page. Document/window
+  // listeners are removed by teardown(); element listeners are guarded below.
+  function bindOnce(el,key,fn){ if(!el)return; el.__ak=el.__ak||{}; if(el.__ak[key])return; el.__ak[key]=true; fn(el); }
   // sidebar accordion: expanding another collapses the rest (full mode)
   function placeMini(item){
     if(document.body.dataset.sidebar!=="mini")return;
@@ -55,7 +59,7 @@ function initShell(){
     const link=item.querySelector(":scope > .nav-link");
     const sub=item.querySelector(":scope > .nav-sub");
     if(!link||!sub)return;
-    link.addEventListener("click",e=>{
+    bindOnce(link,"nav",()=>link.addEventListener("click",e=>{
       e.preventDefault();
       const was=item.classList.contains("open");
       // collapse rest (both modes)
@@ -64,20 +68,20 @@ function initShell(){
       // mini waterfall: position popup next to the clicked item (viewport-anchored;
       // the mini rail is solid so fixed positioning resolves against the viewport)
       if(!was)placeMini(item);
-    });
+    }));
   });
   // horizontal top menu: click toggles (touch), hover still works on desktop
   document.querySelectorAll(".hmenu > div").forEach(wrap=>{
     const btn=wrap.querySelector(":scope > button.hlink"), drop=wrap.querySelector(":scope > .drop");
     if(!btn||!drop)return;
     btn.setAttribute("aria-expanded","false");
-    btn.addEventListener("click",e=>{
+    bindOnce(btn,"hdrop",()=>btn.addEventListener("click",e=>{
       e.stopPropagation();
       const was=wrap.classList.contains("open");
       document.querySelectorAll(".hmenu > div.open").forEach(o=>{o.classList.remove("open");o.querySelector(":scope > button.hlink").setAttribute("aria-expanded","false");});
       wrap.classList.toggle("open",!was);
       btn.setAttribute("aria-expanded",String(!was));
-    });
+    }));
   });
   onDoc(document,"click",e=>{if(!e.target.closest(".hmenu"))document.querySelectorAll(".hmenu > div.open").forEach(o=>o.classList.remove("open"));});
   // close mini popup on outside click
@@ -86,14 +90,14 @@ function initShell(){
     if(!e.target.closest(".sidebar .nav-item"))document.querySelectorAll(".sidebar .nav-item.open").forEach(o=>o.classList.remove("open"));
   });
   // hamburger
-  document.querySelectorAll("[data-act='nav']").forEach(b=>b.addEventListener("click",()=>document.body.classList.toggle("nav-open")));
+  document.querySelectorAll("[data-act='nav']").forEach(b=>bindOnce(b,"nav",()=>b.addEventListener("click",()=>document.body.classList.toggle("nav-open"))));
   // settings drawer (opposite of sidebar side)
   const drawer=document.getElementById("settingsDrawer"), scrim=document.getElementById("scrim");
   function openSettings(){ThemeStore.apply();if(drawer)drawer.classList.add("open");if(scrim)scrim.classList.add("show");}
   function closeSettings(){if(drawer)drawer.classList.remove("open");if(scrim)scrim.classList.remove("show");}
-  document.querySelectorAll("[data-act='settings']").forEach(b=>b.addEventListener("click",openSettings));
-  document.querySelectorAll("[data-act='settings-close']").forEach(b=>b.addEventListener("click",closeSettings));
-  if(scrim)scrim.addEventListener("click",()=>{closeSettings();document.body.classList.remove("nav-open");});
+  document.querySelectorAll("[data-act='settings']").forEach(b=>bindOnce(b,"set",()=>b.addEventListener("click",openSettings)));
+  document.querySelectorAll("[data-act='settings-close']").forEach(b=>bindOnce(b,"setx",()=>b.addEventListener("click",closeSettings)));
+  if(scrim)bindOnce(scrim,"scrim",()=>scrim.addEventListener("click",()=>{closeSettings();document.body.classList.remove("nav-open");}));
   // first load -> open up settings (per spec: pull menu opens on first load)
   try{if(!localStorage.getItem("adminkit.seen")){localStorage.setItem("adminkit.seen","1");setTimeout(openSettings,600);}}catch(e){}
   // controls

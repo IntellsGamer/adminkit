@@ -2,36 +2,36 @@
 <script src="assets/vendor/turbo/turbo.es2017-umd.min.js" defer></script><title>Login — AdminKit</title><link rel="stylesheet" href="assets/vendor/fontawesome/all.min.css"><link rel="stylesheet" href="assets/css/sonner.css"><link rel="stylesheet" href="assets/css/theme.css"><link rel="stylesheet" href="assets/css/components.css"></head>
 <body><div class="auth-wrap">
 <div class="auth-side">
-  <div><div class="brand" style="padding:0"><span class="brand-mark"><i class="fa-solid fa-layer-group"></i></span><span><b>AdminKit</b><br><small class="muted" style="color:rgba(255,255,255,.6)">Modern admin</small></span></div></div>
+  <div><div class="brand" style="padding:0"><span class="brand-mark"><i class="fa-solid fa-layer-group"></i></span><span><b>AdminKit</b><br><small class="muted" style="color:rgba(255,255,255,.6)" data-i18n="tagline">Modern admin</small></span></div></div>
   <div>
-    <span class="eyebrow" style="color:rgba(255,255,255,.55)">Why AdminKit</span>
-    <h2 style="color:#fff;font-size:30px;margin:6px 0 4px">Operations, minus<br>the busywork.</h2>
-    <div class="auth-feat"><span class="tile"><i class="fa-solid fa-bolt"></i></span><div><b>Fully offline</b><small>No CDN, no internet needed. Open and work.</small></div></div>
-    <div class="auth-feat"><span class="tile t-green"><i class="fa-solid fa-language"></i></span><div><b>English + Persian</b><small>Full RTL, Jalali calendar, Vazirmatn.</small></div></div>
-    <div class="auth-feat"><span class="tile t-blue"><i class="fa-solid fa-shield-halved"></i></span><div><b>Auto-lock + PIN</b><small>Idle detection with stay-or-leave guard.</small></div></div>
+    <span class="eyebrow" style="color:rgba(255,255,255,.55)" data-i18n="auWhy">Why AdminKit</span>
+    <h2 style="color:#fff;font-size:30px;margin:6px 0 4px" data-i18n="auH1">Operations, minus the busywork.</h2>
+    <div class="auth-feat"><span class="tile"><i class="fa-solid fa-bolt"></i></span><div><b data-i18n="auF1t">Fully offline</b><small data-i18n="auF1d">No CDN, no internet needed.</small></div></div>
+    <div class="auth-feat"><span class="tile t-green"><i class="fa-solid fa-language"></i></span><div><b data-i18n="auF2t">English + Persian</b><small data-i18n="auF2d">Full RTL, Jalali calendar.</small></div></div>
+    <div class="auth-feat"><span class="tile t-blue"><i class="fa-solid fa-shield-halved"></i></span><div><b data-i18n="auF3t">Auto-lock guard</b><small data-i18n="auF3d">Idle detection with stay-or-leave guard.</small></div></div>
   </div>
-  <small style="color:rgba(255,255,255,.45)"><i class="fa-solid fa-lock"></i> Your session stays in this browser.</small>
+  <small style="color:rgba(255,255,255,.45)"><i class="fa-solid fa-lock"></i> <span data-i18n="auFoot">Your session stays in this browser.</span></small>
 </div>
 <div class="auth-form"><div class="auth-card">
-<div class="brand" style="padding:0 0 4px"><span class="brand-mark"><i class="fa-solid fa-layer-group"></i></span><span><b>Welcome</b><br><small class="muted">Sign in or create an account</small></span></div>
-<div class="auth-tabs"><button id="tabLogin" class="active"><i class="fa-solid fa-right-to-bracket"></i> Login</button><button id="tabReg"><i class="fa-solid fa-user-plus"></i> Register</button></div>
+<div class="brand" style="padding:0 0 4px"><span class="brand-mark"><i class="fa-solid fa-layer-group"></i></span><span><b data-i18n="welcomeBack">Welcome</b><br><small class="muted" data-i18n="signinSub">Sign in or create an account</small></span></div>
+<div class="auth-tabs"><button id="tabLogin" class="active"><i class="fa-solid fa-right-to-bracket"></i> <span data-i18n="loginT">Login</span></button><button id="tabReg"><i class="fa-solid fa-user-plus"></i> <span data-i18n="regT">Register</span></button></div>
 <form id="formLogin" novalidate>
-<div class="field"><label>Email</label><div class="inp-wrap"><i class="fa-solid fa-envelope"></i><input type="email" id="liEmail" placeholder="you@mail.com" autocomplete="email"></div><div class="err" id="e-liEmail"></div></div>
-<div class="field"><label>Password</label><div class="inp-wrap"><i class="fa-solid fa-lock"></i><input type="password" id="liPass" placeholder="••••••••" autocomplete="current-password"><button type="button" class="pass-toggle" data-pass="liPass" aria-label="Show password"><i class="fa-solid fa-eye"></i></button></div><div class="err" id="e-liPass"></div></div>
-<button class="btn btn-primary" style="width:100%" type="submit"><i class="fa-solid fa-right-to-bracket"></i>Login</button>
-<p class="code-note" style="text-align:center"><a href="index.html"><i class="fa-solid fa-arrow-left"></i> Back to dashboard</a></p>
+<div class="field"><label data-i18n="email">Email</label><div class="inp-wrap"><i class="fa-solid fa-envelope"></i><input type="email" id="liEmail" placeholder="you@mail.com" autocomplete="email"></div><div class="err" id="e-liEmail"></div></div>
+<div class="field"><label data-i18n="password">Password</label><div class="inp-wrap"><i class="fa-solid fa-lock"></i><input type="password" id="liPass" placeholder="••••••••" autocomplete="current-password"><button type="button" class="pass-toggle" data-pass="liPass" aria-label="Show password"><i class="fa-solid fa-eye"></i></button></div><div class="err" id="e-liPass"></div></div>
+<button class="btn btn-primary" style="width:100%" type="submit"><i class="fa-solid fa-right-to-bracket"></i><span data-i18n="loginT">Login</span></button>
+<p class="code-note" style="text-align:center"><a href="index.html"><i class="fa-solid fa-arrow-left"></i> <span data-i18n="backDash">Back to dashboard</span></a></p>
 </form>
 <form id="formReg" style="display:none" novalidate>
-<div class="field"><label>Full name</label><div class="inp-wrap"><i class="fa-solid fa-user"></i><input type="text" id="rgName" placeholder="Sara Ahmadi" autocomplete="name"></div><div class="err" id="e-rgName"></div></div>
-<div class="field"><label>Email</label><div class="inp-wrap"><i class="fa-solid fa-envelope"></i><input type="email" id="rgEmail" placeholder="you@mail.com" autocomplete="email"></div><div class="err" id="e-rgEmail"></div></div>
-<div class="field"><label>Phone</label><div class="phone-row"><select id="rgCC" aria-label="Country code"><option value="+98">Iran +98</option><option value="+1">USA +1</option><option value="+49">Germany +49</option><option value="+44">UK +44</option><option value="+90">Türkiye +90</option><option value="+971">UAE +971</option><option value="+33">France +33</option><option value="+91">India +91</option></select><div class="inp-wrap"><i class="fa-solid fa-phone"></i><input type="tel" id="rgPhone" placeholder="912 345 6789" autocomplete="tel"></div></div><div class="err" id="e-rgPhone"></div></div>
-<div class="field"><label>Password (min 8, letter + number)</label><div class="inp-wrap"><i class="fa-solid fa-lock"></i><input type="password" id="rgPass" placeholder="••••••••" autocomplete="new-password"><button type="button" class="pass-toggle" data-pass="rgPass" aria-label="Show password"><i class="fa-solid fa-eye"></i></button></div><div class="err" id="e-rgPass"></div></div>
-<button class="btn btn-primary" style="width:100%" type="submit"><i class="fa-solid fa-user-plus"></i>Create account</button>
-<p class="code-note">Validation runs offline in JS; country dial code is part of the stored number.</p>
+<div class="field"><label data-i18n="fullName">Full name</label><div class="inp-wrap"><i class="fa-solid fa-user"></i><input type="text" id="rgName" placeholder="Sara Ahmadi" autocomplete="name"></div><div class="err" id="e-rgName"></div></div>
+<div class="field"><label data-i18n="email">Email</label><div class="inp-wrap"><i class="fa-solid fa-envelope"></i><input type="email" id="rgEmail" placeholder="you@mail.com" autocomplete="email"></div><div class="err" id="e-rgEmail"></div></div>
+<div class="field"><label data-i18n="phone">Phone</label><div class="phone-row"><select id="rgCC" aria-label="Country code"><option value="+98">Iran +98</option><option value="+1">USA +1</option><option value="+49">Germany +49</option><option value="+44">UK +44</option><option value="+90">Türkiye +90</option><option value="+971">UAE +971</option><option value="+33">France +33</option><option value="+91">India +91</option></select><div class="inp-wrap"><i class="fa-solid fa-phone"></i><input type="tel" id="rgPhone" placeholder="912 345 6789" autocomplete="tel"></div></div><div class="err" id="e-rgPhone"></div></div>
+<div class="field"><label data-i18n="passRule">Password (min 8, letter + number)</label><div class="inp-wrap"><i class="fa-solid fa-lock"></i><input type="password" id="rgPass" placeholder="••••••••" autocomplete="new-password"><button type="button" class="pass-toggle" data-pass="rgPass" aria-label="Show password"><i class="fa-solid fa-eye"></i></button></div><div class="err" id="e-rgPass"></div></div>
+<button class="btn btn-primary" style="width:100%" type="submit"><i class="fa-solid fa-user-plus"></i><span data-i18n="createAcc">Create account</span></button>
+<p class="code-note" data-i18n="auNote">Validation runs offline in JS.</p>
 </form>
 </div></div>
 </div>
-<script src="assets/js/theme.js"></script><script src="assets/js/sonner.js"></script><script src="assets/js/app.js"></script>
+<script src="assets/js/theme.js"></script><script src="assets/js/i18n.js"></script><script src="assets/js/sonner.js"></script><script src="assets/js/app.js"></script>
 <script>
 ThemeStore.apply();
 const $=id=>document.getElementById(id);
@@ -40,17 +40,19 @@ $('tabReg').onclick=()=>{$('tabReg').classList.add('active');$('tabLogin').class
 document.querySelectorAll('.pass-toggle').forEach(b=>b.onclick=()=>{const i=$(b.dataset.pass);const show=i.type==='password';i.type=show?'text':'password';b.innerHTML=show?'<i class="fa-solid fa-eye-slash"></i>':'<i class="fa-solid fa-eye"></i>';});
 const err=(id,m)=>$(id).textContent=m||'';
 const emailOk=v=>/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(v);
-$('formLogin').onsubmit=e=>{e.preventDefault();let ok=true;
+async function T(){try{return await I18N.dict(ThemeStore.get().lang);}catch(e){return{};}}
+const t=(d,k,fb)=>d[k]||fb;
+$('formLogin').onsubmit=async e=>{e.preventDefault();const d=await T();let ok=true;
   err('e-liEmail');err('e-liPass');
-  if(!emailOk($('liEmail').value.trim())){err('e-liEmail','Enter a valid email');ok=false;}
-  if($('liPass').value.length<8){err('e-liPass','Min 8 characters');ok=false;}
-  if(ok){toast.success('Welcome back');setTimeout(()=>App.go('index.html'),700);}else toast.error('Check the form');};
-$('formReg').onsubmit=e=>{e.preventDefault();let ok=true;
+  if(!emailOk($('liEmail').value.trim())){err('e-liEmail',t(d,'vEmail','Enter a valid email'));ok=false;}
+  if($('liPass').value.length<8){err('e-liPass',t(d,'vPass8','Min 8 characters'));ok=false;}
+  if(ok){toast.success(t(d,'welcomeBack','Welcome back'));setTimeout(()=>App.go('index.html'),700);}else toast.error(t(d,'formBad','Check the form'));};
+$('formReg').onsubmit=async e=>{e.preventDefault();const d=await T();let ok=true;
   ['e-rgName','e-rgEmail','e-rgPhone','e-rgPass'].forEach(i=>err(i));
-  if($('rgName').value.trim().length<3){err('e-rgName','Enter your name');ok=false;}
-  if(!emailOk($('rgEmail').value.trim())){err('e-rgEmail','Enter a valid email');ok=false;}
+  if($('rgName').value.trim().length<3){err('e-rgName',t(d,'vName','Enter your name'));ok=false;}
+  if(!emailOk($('rgEmail').value.trim())){err('e-rgEmail',t(d,'vEmail','Enter a valid email'));ok=false;}
   const digits=$('rgPhone').value.replace(/\D/g,'');
-  if(digits.length<7||digits.length>14){err('e-rgPhone','Enter a valid phone number');ok=false;}
-  if(!/^(?=.*[A-Za-z])(?=.*\d).{8,}$/.test($('rgPass').value)){err('e-rgPass','Min 8 chars incl. letter + number');ok=false;}
-  if(ok){toast.success('Account created',{description:$('rgCC').value+' '+$('rgPhone').value});setTimeout(()=>App.go('index.html'),900);}else toast.error('Check the form');};
+  if(digits.length<7||digits.length>14){err('e-rgPhone',t(d,'vPhone','Enter a valid phone number'));ok=false;}
+  if(!/^(?=.*[A-Za-z])(?=.*\d).{8,}$/.test($('rgPass').value)){err('e-rgPass',t(d,'vPassComplex','Min 8 chars incl. letter + number'));ok=false;}
+  if(ok){toast.success(t(d,'createAcc','Account created'),{description:$('rgCC').value+' '+$('rgPhone').value});setTimeout(()=>App.go('index.html'),900);}else toast.error(t(d,'formBad','Check the form'));};
 </script></body></html>

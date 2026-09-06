@@ -49,6 +49,7 @@
 
 *{box-sizing:border-box}
 html,body{height:100%}
+html,body{overflow-x:clip} /* off-canvas drawer/sidebar must never widen the page (clip keeps sticky working) */
 body{
   margin:0; background:var(--bg); color:var(--text);
   font-family:var(--font-en); font-size:14.5px; line-height:1.6;
