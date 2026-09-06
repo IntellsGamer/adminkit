@@ -395,6 +395,14 @@ App.go('playground-table.html'); // Turbo.visit() when present, full load otherw
 
 Rules for future code (this is where naive ports break):
 
+- **One identical `<head>` everywhere:** all 10 library scripts live in
+  `<head>` in the same order on every page (`theme → i18n → sonner → modal →
+  table → dropdown → jalaali → datepicker → idle → app`). Turbo merges
+  identical heads (no re-execution, no async race); only per-page **inline**
+  body scripts re-run per visit, with every global already defined. Never add
+  a page-specific library to just one page — append it to the shared order.
+- **Inline scripts must be re-runnable:** use `var`/function declarations,
+  never top-level `const`/`let` (re-execution would throw "already declared").
 - **Init on both events:** page widgets boot in `turbo:load` as well as
   `DOMContentLoaded` (Turbo fires `turbo:load` on every visit, including the
   first). All shell modules already do.

@@ -1,5 +1,16 @@
 <!doctype html><html lang="en" dir="ltr" data-theme="light"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<script src="assets/vendor/turbo/turbo.es2017-umd.min.js" defer></script><title>Login — AdminKit</title><link rel="stylesheet" href="assets/vendor/fontawesome/all.min.css"><link rel="stylesheet" href="assets/css/sonner.css"><link rel="stylesheet" href="assets/css/theme.css"><link rel="stylesheet" href="assets/css/components.css"></head>
+<script src="assets/vendor/turbo/turbo.es2017-umd.min.js" defer></script>
+<script src="assets/js/theme.js"></script>
+<script src="assets/js/i18n.js"></script>
+<script src="assets/js/sonner.js"></script>
+<script src="assets/js/modal.js"></script>
+<script src="assets/js/table.js"></script>
+<script src="assets/js/dropdown.js"></script>
+<script src="assets/js/jalaali-vendor.js"></script>
+<script src="assets/js/datepicker.js"></script>
+<script src="assets/js/idle.js"></script>
+<script src="assets/js/app.js"></script>
+<title>Login — AdminKit</title><link rel="stylesheet" href="assets/vendor/fontawesome/all.min.css"><link rel="stylesheet" href="assets/css/sonner.css"><link rel="stylesheet" href="assets/css/theme.css"><link rel="stylesheet" href="assets/css/components.css"></head>
 <body><div class="auth-wrap">
 <div class="auth-side">
   <div><div class="brand" style="padding:0"><span class="brand-mark"><i class="fa-solid fa-layer-group"></i></span><span><b>AdminKit</b><br><small class="muted" style="color:rgba(255,255,255,.6)" data-i18n="tagline">Modern admin</small></span></div></div>
@@ -31,17 +42,17 @@
 </form>
 </div></div>
 </div>
-<script src="assets/js/theme.js"></script><script src="assets/js/i18n.js"></script><script src="assets/js/sonner.js"></script><script src="assets/js/app.js"></script>
+
 <script>
 ThemeStore.apply();
-const $=id=>document.getElementById(id);
+var $=id=>document.getElementById(id);
 $('tabLogin').onclick=()=>{$('tabLogin').classList.add('active');$('tabReg').classList.remove('active');$('formLogin').style.display='';$('formReg').style.display='none';};
 $('tabReg').onclick=()=>{$('tabReg').classList.add('active');$('tabLogin').classList.remove('active');$('formReg').style.display='';$('formLogin').style.display='none';};
 document.querySelectorAll('.pass-toggle').forEach(b=>b.onclick=()=>{const i=$(b.dataset.pass);const show=i.type==='password';i.type=show?'text':'password';b.innerHTML=show?'<i class="fa-solid fa-eye-slash"></i>':'<i class="fa-solid fa-eye"></i>';});
-const err=(id,m)=>$(id).textContent=m||'';
-const emailOk=v=>/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(v);
+var err=(id,m)=>$(id).textContent=m||'';
+var emailOk=v=>/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(v);
 async function T(){try{return await I18N.dict(ThemeStore.get().lang);}catch(e){return{};}}
-const t=(d,k,fb)=>d[k]||fb;
+var t=(d,k,fb)=>d[k]||fb;
 $('formLogin').onsubmit=async e=>{e.preventDefault();const d=await T();let ok=true;
   err('e-liEmail');err('e-liPass');
   if(!emailOk($('liEmail').value.trim())){err('e-liEmail',t(d,'vEmail','Enter a valid email'));ok=false;}

@@ -3,6 +3,16 @@
 <head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <script src="assets/vendor/turbo/turbo.es2017-umd.min.js" defer></script>
+<script src="assets/js/theme.js"></script>
+<script src="assets/js/i18n.js"></script>
+<script src="assets/js/sonner.js"></script>
+<script src="assets/js/modal.js"></script>
+<script src="assets/js/table.js"></script>
+<script src="assets/js/dropdown.js"></script>
+<script src="assets/js/jalaali-vendor.js"></script>
+<script src="assets/js/datepicker.js"></script>
+<script src="assets/js/idle.js"></script>
+<script src="assets/js/app.js"></script>
 <title>Sonner playground — AdminKit</title>
 <link rel="stylesheet" href="assets/vendor/fontawesome/all.min.css">
 <link rel="stylesheet" href="assets/css/sonner.css">
@@ -124,13 +134,13 @@
 </aside>
 <div class="idle-wrap" id="idleWrap"><div class="idle-card"><span class="tile"><i class="fa-solid fa-bell"></i></span><h3 data-i18n="idleTitle">Are you still there?</h3><div class="progress"><i id="idleBar" style="width:0%"></i></div><p class="muted" id="idleTxt">60s</p><div class="btn-row" style="justify-content:center"><button class="btn btn-primary" id="idleStay"><i class="fa-solid fa-check"></i><span data-i18n="stay">Stay</span></button><button class="btn btn-ghost" id="idleLeave"><i class="fa-solid fa-lock"></i><span data-i18n="leave">Lock</span></button></div></div></div>
 <div class="lock-wrap" id="lockWrap"><div class="lock-card"><span class="tile t-red"><i class="fa-solid fa-lock"></i></span><h3 data-i18n="lockTitle">Locked</h3><p class="muted" data-i18n="lockDesc">Locked for inactivity.</p><button class="btn btn-primary btn-lg" id="lockBtn"><i class="fa-solid fa-arrow-right-to-bracket"></i><span data-i18n="unlock">Back to workflow</span></button></div></div>
-<script src="assets/js/theme.js"></script><script src="assets/js/i18n.js"></script><script src="assets/js/sonner.js"></script><script src="assets/js/modal.js"></script><script src="assets/js/idle.js"></script><script src="assets/js/app.js"></script>
+
 <script>
 function dock(p){Sonner.setPosition(p);toast.success(p);}
 function burst(){['First','Second','Third','Fourth','Fifth'].forEach((t,i)=>setTimeout(()=>toast(t+' toast — hover the stack to expand',{description:'Stack animation demo '+(i+1)+'/5'}),i*180));}
 function logEvt(m){const ol=document.getElementById('evtLog');const ph=document.getElementById('evtEmpty');if(ph)ph.remove();const li=document.createElement('li');li.textContent=new Date().toLocaleTimeString()+' — '+m;ol.prepend(li);while(ol.children.length>8)ol.lastChild.remove();}
 // ---- rich colors gallery ----
-const RICH_TXT={success:['Deployed','Version 2.4 is live on all nodes.'],info:['FYI','Maintenance window opens at 02:00 UTC.'],warning:['Quota 90%','Upgrade before Friday to avoid throttling.'],error:['Build failed','3 tests broke in auth.spec.js — see logs.'],loading:['Syncing…','Pulling the latest snapshot.']};
+var RICH_TXT={success:['Deployed','Version 2.4 is live on all nodes.'],info:['FYI','Maintenance window opens at 02:00 UTC.'],warning:['Quota 90%','Upgrade before Friday to avoid throttling.'],error:['Build failed','3 tests broke in auth.spec.js — see logs.'],loading:['Syncing…','Pulling the latest snapshot.']};
 function richDemo(kind){
   const [t,d]=RICH_TXT[kind];
   const base={richColors:true,description:d};

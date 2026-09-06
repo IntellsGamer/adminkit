@@ -23,6 +23,7 @@ function teardown(){while(docCleanups.length){try{docCleanups.pop()();}catch(e){
 // Chromium applies real lensing; Safari/Firefox keep frosted glass.
 (function injectLiquidFilter(){
   if(document.getElementById("ak-liquid"))return;
+  if(!document.body){document.addEventListener("DOMContentLoaded",injectLiquidFilter,{once:true});return;}
   const svg=document.createElementNS("http://www.w3.org/2000/svg","svg");
   svg.setAttribute("width","0");svg.setAttribute("height","0");
   svg.setAttribute("aria-hidden","true");
