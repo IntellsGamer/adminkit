@@ -1,0 +1,102 @@
+/* AdminKit theme/settings manager — offline, localStorage persisted.
+   - auto detect system prefs (matchMedia), listen for change and apply only
+     if user has NOT overridden OR theme setting is 'system'.
+   - persists: theme, primary, layout, sidebar, glass, lang/dir, idle minutes + off
+*/
+(function(){
+  "use strict";
+  const KEY="adminkit.settings.v2";
+  const defaults={
+    theme:"system",        // light | dark | system
+    primary:"#f59e0b",
+    layout:"vertical",     // vertical | horizontal
+    sidebar:"full",        // full | mini
+    glass:true,
+    lang:"en",             // en | fa
+    dir:"ltr",             // ltr | rtl (auto from lang unless overridden)
+    dirAuto:true,
+    idleMinutes:15,        // configurable; 0 = off
+    toasterPosition:"bottom-right"
+  };
+  function load(){ try{ return Object.assign({},defaults,JSON.parse(localStorage.getItem(KEY)||"{}")); }catch(e){ return Object.assign({},defaults); } }
+  function save(s){ try{ localStorage.setItem(KEY,JSON.stringify(s)); }catch(e){} }
+  let settings=load();
+  let userChangedTheme = settings.theme!=="system"; // "only if it was not changed yet or set to system default"
+
+  function sysTheme(){ return (window.matchMedia&&matchMedia("(prefers-color-scheme: dark)").matches)?"dark":"light"; }
+  function effectiveTheme(){ return settings.theme==="system"?sysTheme():settings.theme; }
+  function apply(){
+    const eff=effectiveTheme();
+    document.documentElement.dataset.theme=eff;
+    document.documentElement.setAttribute("data-theme",eff);
+    document.body.dataset.layout=settings.layout;
+    document.body.dataset.sidebar=settings.sidebar;
+    document.body.dataset.glass=settings.glass?"on":"off";
+    document.documentElement.lang=settings.lang;
+    const dir=settings.dirAuto?(settings.lang==="fa"?"rtl":"ltr"):settings.dir;
+    document.documentElement.dir=dir;
+    document.documentElement.style.setProperty("--primary",settings.primary);
+    // derive darker shade + soft tint + glow approx so every accent follows one color
+    document.documentElement.style.setProperty("--primary-600",shade(settings.primary,-24));
+    const rgb=hexRgb(settings.primary);
+    if(rgb){
+      document.documentElement.style.setProperty("--primary-soft","rgba("+rgb+",.13)");
+      document.documentElement.style.setProperty("--primary-glow","rgba("+rgb+",.45)");
+    }
+    // sync sonner theme + dir
+    document.querySelectorAll("[data-sonner-toaster]").forEach(el=>{
+      el.setAttribute("data-sonner-theme",eff);
+      el.setAttribute("dir",dir);
+    });
+    syncControls();
+  }
+  function hexRgb(hex){
+    try{
+      let h=String(hex).replace("#",""); if(h.length===3)h=h.split("").map(c=>c+c).join("");
+      const n=parseInt(h,16); return ((n>>16)+","+((n>>8)&255)+","+(n&255));
+    }catch(e){return null;}
+  }
+  function shade(hex,amt){
+    try{
+      let h=String(hex).replace("#",""); if(h.length===3)h=h.split("").map(c=>c+c).join("");
+      let n=parseInt(h,16),r=(n>>16)+amt,g=((n>>8)&255)+amt,b=(n&255)+amt;
+      r=Math.max(0,Math.min(255,r));g=Math.max(0,Math.min(255,g));b=Math.max(0,Math.min(255,b));
+      return "#"+((r<<16)|(g<<8)|b).toString(16).padStart(6,"0");
+    }catch(e){return hex;}
+  }
+  // Follow system changes only when allowed
+  if(window.matchMedia){
+    const mq=matchMedia("(prefers-color-scheme: dark)");
+    const onSys=e=>{
+      if(!userChangedTheme||settings.theme==="system"){
+        apply();
+        if(window.Sonner&&Sonner.setTheme)Sonner.setTheme(effectiveTheme());
+      }
+    };
+    if(mq.addEventListener)mq.addEventListener("change",onSys); else if(mq.addListener)mq.addListener(onSys);
+  }
+  function set(patch, opts){
+    opts=opts||{};
+    Object.assign(settings,patch);
+    if(patch.theme!==undefined)userChangedTheme=(patch.theme!=="system");
+    if(patch.lang!==undefined&&settings.dirAuto){settings.dir=settings.lang==="fa"?"rtl":"ltr";}
+    save(settings);apply();
+    if(!opts.silent&&window.App&&App.toastChanged)App.toastChanged(patch);
+  }
+  function syncControls(){
+    document.querySelectorAll("[data-set-theme]").forEach(el=>{el.checked=(el.value===settings.theme); if(el.tagName==="SELECT")el.value=settings.theme;});
+    const sel=document.getElementById("setTheme"); if(sel)sel.value=settings.theme;
+    const lay=document.getElementById("setLayout"); if(lay)lay.value=settings.layout;
+    const sb=document.getElementById("setSidebar"); if(sb)sb.value=settings.sidebar;
+    const gl=document.getElementById("setGlass"); if(gl)gl.checked=!!settings.glass;
+    const lg=document.getElementById("setLang"); if(lg)lg.value=settings.lang;
+    const dr=document.getElementById("setDir"); if(dr)dr.value=settings.dirAuto?"auto":settings.dir;
+    const im=document.getElementById("setIdle"); if(im)im.value=String(settings.idleMinutes);
+    const pr=document.getElementById("setPrimary"); if(pr)pr.value=settings.primary;
+    const tp=document.getElementById("topPrimary"); if(tp)tp.value=settings.primary;
+    const lt=document.getElementById("layoutToggle"); if(lt)lt.classList.toggle("on",settings.layout==="horizontal");
+    document.querySelectorAll(".swatch").forEach(s=>s.classList.toggle("active",s.dataset.color===settings.primary));
+  }
+  window.ThemeStore={get:()=>Object.assign({},settings),set,apply,effectiveTheme,KEY};
+  document.addEventListener("DOMContentLoaded",apply);
+})();

@@ -1,0 +1,55 @@
+<!doctype html><html lang="en" dir="ltr" data-theme="light"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Login — AdminKit</title><link rel="stylesheet" href="assets/vendor/fontawesome/all.min.css"><link rel="stylesheet" href="assets/css/sonner.css"><link rel="stylesheet" href="assets/css/theme.css"><link rel="stylesheet" href="assets/css/components.css"></head>
+<body><div class="auth-wrap">
+<div class="auth-side">
+  <div><div class="brand" style="padding:0"><span class="brand-mark"><i class="fa-solid fa-layer-group"></i></span><span><b>AdminKit</b><br><small class="muted" style="color:rgba(255,255,255,.6)">Modern admin</small></span></div></div>
+  <div>
+    <span class="eyebrow" style="color:rgba(255,255,255,.55)">Why AdminKit</span>
+    <h2 style="color:#fff;font-size:30px;margin:6px 0 4px">Operations, minus<br>the busywork.</h2>
+    <div class="auth-feat"><span class="tile"><i class="fa-solid fa-bolt"></i></span><div><b>Fully offline</b><small>No CDN, no internet needed. Open and work.</small></div></div>
+    <div class="auth-feat"><span class="tile t-green"><i class="fa-solid fa-language"></i></span><div><b>English + Persian</b><small>Full RTL, Jalali calendar, Vazirmatn.</small></div></div>
+    <div class="auth-feat"><span class="tile t-blue"><i class="fa-solid fa-shield-halved"></i></span><div><b>Auto-lock + PIN</b><small>Idle detection with stay-or-leave guard.</small></div></div>
+  </div>
+  <small style="color:rgba(255,255,255,.45)"><i class="fa-solid fa-lock"></i> Your session stays in this browser.</small>
+</div>
+<div class="auth-form"><div class="auth-card">
+<div class="brand" style="padding:0 0 4px"><span class="brand-mark"><i class="fa-solid fa-layer-group"></i></span><span><b>Welcome</b><br><small class="muted">Sign in or create an account</small></span></div>
+<div class="auth-tabs"><button id="tabLogin" class="active"><i class="fa-solid fa-right-to-bracket"></i> Login</button><button id="tabReg"><i class="fa-solid fa-user-plus"></i> Register</button></div>
+<form id="formLogin" novalidate>
+<div class="field"><label>Email</label><div class="inp-wrap"><i class="fa-solid fa-envelope"></i><input type="email" id="liEmail" placeholder="you@mail.com" autocomplete="email"></div><div class="err" id="e-liEmail"></div></div>
+<div class="field"><label>Password</label><div class="inp-wrap"><i class="fa-solid fa-lock"></i><input type="password" id="liPass" placeholder="••••••••" autocomplete="current-password"><button type="button" class="pass-toggle" data-pass="liPass" aria-label="Show password"><i class="fa-solid fa-eye"></i></button></div><div class="err" id="e-liPass"></div></div>
+<button class="btn btn-primary" style="width:100%" type="submit"><i class="fa-solid fa-right-to-bracket"></i>Login</button>
+<p class="code-note" style="text-align:center"><a href="index.html"><i class="fa-solid fa-arrow-left"></i> Back to dashboard</a></p>
+</form>
+<form id="formReg" style="display:none" novalidate>
+<div class="field"><label>Full name</label><div class="inp-wrap"><i class="fa-solid fa-user"></i><input type="text" id="rgName" placeholder="Sara Ahmadi" autocomplete="name"></div><div class="err" id="e-rgName"></div></div>
+<div class="field"><label>Email</label><div class="inp-wrap"><i class="fa-solid fa-envelope"></i><input type="email" id="rgEmail" placeholder="you@mail.com" autocomplete="email"></div><div class="err" id="e-rgEmail"></div></div>
+<div class="field"><label>Phone</label><div class="phone-row"><select id="rgCC" aria-label="Country code"><option value="+98">Iran +98</option><option value="+1">USA +1</option><option value="+49">Germany +49</option><option value="+44">UK +44</option><option value="+90">Türkiye +90</option><option value="+971">UAE +971</option><option value="+33">France +33</option><option value="+91">India +91</option></select><div class="inp-wrap"><i class="fa-solid fa-phone"></i><input type="tel" id="rgPhone" placeholder="912 345 6789" autocomplete="tel"></div></div><div class="err" id="e-rgPhone"></div></div>
+<div class="field"><label>Password (min 8, letter + number)</label><div class="inp-wrap"><i class="fa-solid fa-lock"></i><input type="password" id="rgPass" placeholder="••••••••" autocomplete="new-password"><button type="button" class="pass-toggle" data-pass="rgPass" aria-label="Show password"><i class="fa-solid fa-eye"></i></button></div><div class="err" id="e-rgPass"></div></div>
+<button class="btn btn-primary" style="width:100%" type="submit"><i class="fa-solid fa-user-plus"></i>Create account</button>
+<p class="code-note">Validation runs offline in JS; country dial code is part of the stored number.</p>
+</form>
+</div></div>
+</div>
+<script src="assets/js/theme.js"></script><script src="assets/js/sonner.js"></script>
+<script>
+ThemeStore.apply();
+const $=id=>document.getElementById(id);
+$('tabLogin').onclick=()=>{$('tabLogin').classList.add('active');$('tabReg').classList.remove('active');$('formLogin').style.display='';$('formReg').style.display='none';};
+$('tabReg').onclick=()=>{$('tabReg').classList.add('active');$('tabLogin').classList.remove('active');$('formReg').style.display='';$('formLogin').style.display='none';};
+document.querySelectorAll('.pass-toggle').forEach(b=>b.onclick=()=>{const i=$(b.dataset.pass);const show=i.type==='password';i.type=show?'text':'password';b.innerHTML=show?'<i class="fa-solid fa-eye-slash"></i>':'<i class="fa-solid fa-eye"></i>';});
+const err=(id,m)=>$(id).textContent=m||'';
+const emailOk=v=>/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(v);
+$('formLogin').onsubmit=e=>{e.preventDefault();let ok=true;
+  err('e-liEmail');err('e-liPass');
+  if(!emailOk($('liEmail').value.trim())){err('e-liEmail','Enter a valid email');ok=false;}
+  if($('liPass').value.length<8){err('e-liPass','Min 8 characters');ok=false;}
+  if(ok){toast.success('Welcome back');setTimeout(()=>location.href='index.html',700);}else toast.error('Check the form');};
+$('formReg').onsubmit=e=>{e.preventDefault();let ok=true;
+  ['e-rgName','e-rgEmail','e-rgPhone','e-rgPass'].forEach(i=>err(i));
+  if($('rgName').value.trim().length<3){err('e-rgName','Enter your name');ok=false;}
+  if(!emailOk($('rgEmail').value.trim())){err('e-rgEmail','Enter a valid email');ok=false;}
+  const digits=$('rgPhone').value.replace(/\D/g,'');
+  if(digits.length<7||digits.length>14){err('e-rgPhone','Enter a valid phone number');ok=false;}
+  if(!/^(?=.*[A-Za-z])(?=.*\d).{8,}$/.test($('rgPass').value)){err('e-rgPass','Min 8 chars incl. letter + number');ok=false;}
+  if(ok){toast.success('Account created',{description:$('rgCC').value+' '+$('rgPhone').value});setTimeout(()=>location.href='index.html',900);}else toast.error('Check the form');};
+</script></body></html>
