@@ -1,34 +1,626 @@
-# AdminKit — offline modern admin (plain HTML/CSS/JS)
+# AdminKit — آفلاین، مدرن، دوزبانه / Offline Modern Bilingual Admin
 
-No CDN. No build step. Zero emojis — Font Awesome 6.5.2, Inter + Vazirmatn,
-Jalali math and all component code vendored locally. Open any page directly —
-even with no internet.
+> **English docs first, then مستندات فارسی.** Plain HTML + CSS + JS. No CDN.
+> No build step. No emojis — Font Awesome only.
 
-## Pages
-- `index.html` — dashboard (hero, KPI tiles + sparklines + deltas, pills)
-- `login.html` — split-screen login/register (icon inputs, password toggle,
-  country dial codes, offline validation)
-- `playground-sonner.html` — Sonner port (types, promise, burst stack,
-  6 docks, live option rebuild, copy-paste)
-- `playground-modal.html` — modal port (sizes, sticky footer, confirm)
-- `playground-table.html` — DataTables-like grid (search/sort/page/export,
-  module toggles)
-- `playground-dropdown.html` — searchable dropdown (select replacement)
-- `playground-datepicker.html` — Persian + Gregorian picker (jalaali-js core,
-  month/year jump, min/max)
-- `playground-buttons.html` — full button set + icon buttons
+---
 
-## Highlights
-- Dark/light follows OS (`matchMedia`), re-applies on system change **only**
-  when theme is `system` or never overridden; saved in `localStorage` (v2)
-- Top bar carries live controls: layout toggle, theme-color dot, sun/moon,
-  language, settings — everything also in the drawer
-- Vertical sidebar (accordion, one-open) / mini mode (waterfall popup
-  outside) / horizontal top menu with image mega-menu / hamburger on mobile
-- EN/FA via `i18n/*.json` + auto RTL; idle minutes (0=off) → stay/leave
-  progress → PIN lock (default `1234`, `Idle.setPin()`)
-- Settings drawer sits opposite the sidebar and opens on first load
+# PART 1 — ENGLISH
 
-## Serve
-`python3 -m http.server 8000 --bind 0.0.0.0` in this folder
-(or just double-click the HTML files — fonts/icons resolve relatively).
+## 1. What is this?
+
+AdminKit is a complete, offline-first admin template: dashboard, login/register,
+and a **playground page for every ported module** (toast, modal, table,
+dropdown, date picker, buttons). Each playground is a live test bench **and**
+copy-paste documentation for future development.
+
+Core promises:
+
+| Promise | How |
+|---|---|
+| Works with no internet | Every CSS/JS/font/icon vendored locally |
+| Dark / light follows your OS | `matchMedia` + change listener, gated (see §5) |
+| English + Persian, full RTL | External `i18n/*.json` dictionaries (see §7) |
+| Settings survive reloads | Everything in `localStorage` (see §19) |
+| Easy to reuse later | One tiny global per module (`toast`, `Modal`, `DataGrid`, `NiceSelect`, `DatePicker`, `ThemeStore`, `Idle`) |
+
+## 2. Quick start
+
+**Option A — just open it:** double-click `index.html`. Works offline.
+Limitation: on `file://`, the language dictionaries cannot `fetch`, so pages
+stay in their baked-in language until served over HTTP (see FAQ §21).
+
+**Option B — local server (recommended):**
+
+```bash
+cd adminkit
+python3 -m http.server 8000 --bind 0.0.0.0
+# open http://localhost:8000/index.html
+```
+
+**Option C — any static host:** upload the folder as-is (GitHub Pages,
+Nginx, IIS, VB.NET `wwwroot`, …). No server code needed.
+
+## 3. Pages
+
+| File | What | Use it for |
+|---|---|---|
+| `index.html` | Dashboard: hero, KPI tiles + sparklines + delta pills, activity, idle card | Home page |
+| `login.html` | Split-screen login/register: icon inputs, password eye-toggle, country dial-code select, offline validation | Auth page |
+| `playground-sonner.html` | Toast lab: all types, rich gallery, recipes, event log, live Toaster rebuild | Learn/test `toast` |
+| `playground-modal.html` | Modal lab: sizes, sticky footer, confirm, template triggers | Learn/test `Modal` |
+| `playground-table.html` | Grid lab: search/sort/page/export/columns + module toggles | Learn/test `DataGrid` |
+| `playground-dropdown.html` | Searchable select lab | Learn/test `NiceSelect` |
+| `playground-datepicker.html` | Jalali + Gregorian picker lab | Learn/test `DatePicker` |
+| `playground-buttons.html` | Full button set + icon buttons | Copy button classes |
+
+Every page shares the same shell: sidebar, top bar, settings drawer,
+idle/lock overlays. Change the theme once — it follows you across pages via
+`localStorage`.
+
+## 4. Theme settings (UI)
+
+**Top bar (always visible):** hamburger (mobile) · horizontal menus ·
+search · layout toggle (vertical/horizontal) · color dot (theme color) ·
+sun/moon · EN/فا · gear (opens settings).
+
+**Settings drawer** (gear icon; sits on the **opposite side** of the sidebar;
+**opens automatically on first visit**):
+
+| Setting | Values | Notes |
+|---|---|---|
+| Theme | System / Light / Dark | System follows the OS live |
+| Primary color | color input + 6 swatches | Default amber `#f59e0b`; recolors accents, tiles, progress, focus rings |
+| Menu layout | Vertical / Horizontal | Horizontal hides sidebar, shows top mega-menu |
+| Sidebar mode | Full / Mini | Mini = icons + tiny labels; submenus pop **outside** as waterfall cards |
+| Liquid glass | on / off | Kill-switch for all nav-layer glass |
+| Language | English / فارسی | Switches dictionary + direction |
+| Direction | Auto / LTR / RTL | Auto follows language (FA→RTL) |
+| Auto-lock | minutes, `0` = off | Default 15; warning → lock screen |
+
+## 5. Dark / light logic (read this once)
+
+```js
+ThemeStore.get()            // {theme, primary, layout, sidebar, glass, lang, dir, dirAuto, idleMinutes, toasterPosition}
+ThemeStore.set({theme:'dark'})
+ThemeStore.set({primary:'#0ea5e9', layout:'horizontal'})
+ThemeStore.effectiveTheme() // 'light' | 'dark' (resolves 'system' via OS)
+```
+
+- On load the OS preference is detected (`prefers-color-scheme`).
+- The OS **change event is honored only if** you never picked a theme manually
+  **or** the setting is `System default`. Your explicit choice always wins.
+- Sonner toasters + `dir`/`lang` attributes re-sync on every change.
+
+## 6. Layout system
+
+- **Vertical:** sticky glass sidebar. Parent items accordion **inside** the
+  sidebar; opening one closes the rest.
+- **Mini:** icons + tiny text. Opening a parent shows its children in a
+  **floating card outside** the sidebar, anchored to the clicked row.
+- **Horizontal:** sidebar hides; top bar shows dropdown menus incl. a
+  **mega-menu with images** (offline inline-SVG covers — swap `src` for yours).
+- **Mobile (≤860px):** hamburger toggles the sidebar as an overlay drawer.
+- Active states are quiet (neutral gray block), Vercel-style — parents are
+  never "active", only the current leaf page is bold.
+
+## 7. i18n + RTL
+
+Dictionaries live **outside** code: `i18n/en.json`, `i18n/fa.json`
+(`{"key":"text"}`). Usage in HTML:
+
+```html
+<span data-i18n="dashboard">Dashboard</span>
+<input data-i18n-ph="searchPh" placeholder="Search…">
+```
+
+```js
+I18N.apply('fa');                 // swap language at runtime
+const d = await I18N.dict('en');  // read raw dictionary
+```
+
+**Add a language:** copy `en.json` → `ar.json`, translate values, add
+`<option value="ar">`, and extend the `dirAuto` rule in `theme.js` if it is
+RTL. Everything (sidebar, drawer side, switch direction, datepicker, toasts)
+follows `document.dir` automatically.
+
+## 8. Sonner toasts (exact vanilla port of `emilkowalski/sonner`)
+
+CSS is a **verbatim copy** of upstream `styles.css` (`assets/css/sonner.css`);
+behavior (stacking math, swipe physics, promise flow) is ported 1:1 to
+`assets/js/sonner.js`. Originals kept in `_source/sonner/`.
+
+```html
+<link rel="stylesheet" href="assets/css/sonner.css">
+<script src="assets/js/sonner.js"></script>
+```
+
+```js
+toast('Plain message');
+toast.success('Saved', { description: 'Hello world', richColors: true });
+toast.error('Failed', { description: 'See logs', closeButton: true });
+toast.info('Heads up'); toast.warning('Careful');
+toast.loading('Uploading…');                       // persists until updated/dismissed
+
+const id = toast.loading('Uploading…');
+toast.success('Uploaded', { id });                 // update in place by id
+
+toast('Undoable', {
+  action: { label: 'Undo', onClick: () => toast('Undone') },
+  cancel: { label: 'Later', onClick(){} },
+});
+toast('Pinned', { dismissible: false, duration: Infinity,
+  action: { label: 'Got it', onClick(){} } });
+
+toast.promise(fetch('/api').then(r => r.json()), {
+  loading: 'Loading…',
+  success: (d) => ({ message: 'Done', description: d.name }), // or a string
+  error: (e) => ({ message: 'Failed', description: String(e.message), richColors: true }),
+  finally: () => console.log('settled'),
+}).unwrap().then(d => …).catch(e => …);            // note: unwrap() is a FUNCTION
+
+toast.custom(toast.html('<b>Any</b> HTML'));       // custom content
+toast.dismiss();                                   // all
+toast.dismiss(id);                                 // one
+toast.getHistory().length;                         // last 100, dismissed incl.
+toast.getToasts().length;                          // currently active
+```
+
+**Per-toast options:** `id, description, duration` (ms, default `4000`,
+`Infinity` = sticky), `closeButton, dismissible (default true), invert,
+richColors, icon` (HTML string / `toast.html()` / DOM node),
+`style` (inline CSS object), `className/classNames, position`
+(`top-left|top-center|top-right|bottom-left|bottom-center|bottom-right` —
+a second dock appears automatically), `onDismiss, onAutoClose, testId,
+unstyled, actionButtonStyle, cancelButtonStyle`.
+
+**Toaster options** (`Sonner.createToaster({...})`, one auto-mounts):
+
+```js
+Sonner.createToaster({ position:'bottom-right', theme:'system', richColors:false,
+  expand:false, duration:4000, visibleToasts:3, gap:14, offset:'24px',
+  mobileOffset:'16px', dir:'auto', closeButton:false, invert:false,
+  swipeDirections:['top','right'], hotkey:['altKey','KeyT'] });
+Sonner.setPosition('top-center');   // also persists to settings
+Sonner.setTheme('dark');
+```
+
+Behavior notes: hover expands the stack, hover/interaction/hidden-tab pauses
+timers, swipe (mouse + touch, velocity-aware) dismisses, `Alt+T` expands,
+`Esc` collapses, history capped at 100 like upstream.
+
+## 9. Modal (Radix Dialog + shadcn styling port)
+
+```html
+<script src="assets/js/modal.js"></script>
+```
+
+```js
+const h = Modal.open({
+  title: 'Delete?', desc: 'This cannot be undone.', body: '<p>HTML</p>', // or bodyNode
+  footer: '<button class="btn btn-ghost" data-modal-close>Cancel</button>',
+  size: 'md',              // sm | md | lg | xl | full
+  showClose: true, scrollable: true, stickyFooter: true,
+  modal: true,             // false = page keeps scrolling, no scroll-lock
+  dismissEsc: true, dismissOutside: true,
+  onOpenChange: (open) => {}, onClose: (why) => {},  // why: 'esc'|'outside'|'close-btn'|…
+});
+h.close('done'); h.dlg; Modal.closeAll();
+
+const ok = await Modal.confirm({ title:'Delete item?', desc:'…' }); // true/false
+```
+
+**No-JS triggers** (like Radix Trigger/Content composition):
+
+```html
+<button data-modal-target="#tplHello" data-modal-size="md">Open</button>
+<template id="tplHello" data-title="Hello" data-desc="Zero JS">…body…</template>
+```
+
+Focus is trapped, `Esc`/overlay dismiss, background scroll locks, ARIA
+labelledby/describedby, enter animation is keyframed (always plays).
+
+## 10. Table (`DataGrid` — DataTables-like, lightweight)
+
+```html
+<script src="assets/js/table.js"></script>
+```
+
+```js
+const grid = new DataGrid(document.getElementById('grid'), {
+  columns: [{key:'name',title:'Name'},{key:'email',title:'Email'}],
+  rows: [{name:'Sara',email:'s@x.io'}],
+  pageSize: 8, search: true, paging: true,
+  exports: true,    // CSV + Excel (.xls) + Copy buttons
+  colToggle: true,  // "Columns (n/m)" popover with switches
+  info: true,       // "Showing 1–8 from 12"
+});
+grid.destroy(); // unbinds document listeners
+```
+
+- Toolbar builds **once** (typing never loses focus); only rows repaint.
+- Column popover never rebuilds on toggle — no flicker, stays open.
+- Exports respect current search/sort/visible columns.
+- **VB.NET migration:** it renders a plain `<table>` from a JSON array —
+  serialize your `DataTable` to the same shape and reuse everything.
+
+## 11. Dropdown (`NiceSelect` — react-select-like)
+
+```html
+<script src="assets/js/dropdown.js"></script>
+```
+
+```js
+new NiceSelect(document.getElementById('country'), // upgrades a real <select>
+  { search: true, placeholder: 'Select…', onChange: v => console.log(v) });
+new NiceSelect(document.getElementById('mount'),
+  { options: [{value:'a',label:'Alpha'}], value: 'a', onChange… });
+sel.setOptions([…]); // refresh choices later
+```
+
+Search-on-type, ↑↓ + Enter + Esc keyboard, ✓ on selected, closes on
+outside click. Country/dial-code lists are plain option arrays — edit freely.
+
+## 12. Date picker (Jalali math = exact `jalaali-js` vendor)
+
+```html
+<script src="assets/js/jalaali-vendor.js"></script>
+<script src="assets/js/datepicker.js"></script>
+```
+
+```js
+new DatePicker(document.getElementById('birth'), {
+  locale: 'fa',                 // 'fa' | 'en'
+  format: 'jYYYY/jMM/jDD',      // j-tokens = Jalali, plain = Gregorian
+  min: new Date(2020,0,1), max: null,
+  presets: true,                // Today / Now buttons
+  onChange: d => console.log(d) // Date | null
+});
+picker.setLocale('en');
+```
+
+Popup has month/year jump selects, Today/Clear, min/max disabling, RTL-aware
+placement. Conversion calls the vendored `jalaali.toJalaali/toGregorian/
+jalaaliMonthLength` (Intl fallback only if the vendor file is missing).
+
+## 13. Buttons (Vercel-quiet)
+
+`btn btn-primary|success|info|warning|danger|ghost|outline|soft|glass`
++ `btn-sm|btn-lg`, `btn-round|btn-sq`. Primary inverts with the theme
+(dark-on-light, light-on-dark) like Geist; the rest are flat and subtle.
+Icon-only: reuse `icon-btn` + any `fa-*` icon. Full set demoed in
+`playground-buttons.html`.
+
+## 14. Auth page (`login.html`)
+
+- Tabs: Login (email + password) / Register (name + email + phone + password).
+- Phone = dial-code `<select>` (8 countries — extend in HTML) + number input;
+  stored value is `code + number`.
+- Rules: valid email · password ≥ 8 chars with letter + number · name ≥ 3 ·
+  phone 7–14 digits. Errors render under fields; success toasts + redirects.
+- Split-screen showcase panel on desktop, stacked form on mobile.
+
+## 15. Idle detection + lock screen
+
+```js
+Idle.tick();            // restart the countdown manually
+Idle.setPin('4321');    // change PIN (default '1234')
+Idle.setWarnSecs(30);   // warning window seconds (default 60)
+```
+
+- Any pointer/key/wheel/touch resets the timer.
+- After `idleMinutes` (settings, `0` = off): warning card with live progress
+  bar + countdown. **Stay** dismisses and restarts; **Leave** locks now.
+- Warning length = `min(60s, half the interval)` so short timeouts still work.
+- Lock screen asks PIN → unlock restarts the interval. Elements required per
+  page: `#idleWrap #idleBar #idleTxt #idleStay #idleLeave #lockWrap #lockPin
+  #lockBtn` (all playgrounds + dashboard include them).
+
+## 16. Offline assets (all local, zero network)
+
+| Asset | Location | Notes |
+|---|---|---|
+| Inter 400–800 (latin) | `assets/fonts/inter-*.woff2` | EN UI font |
+| Vazirmatn 400–900 (arabic subset = Persian) | `assets/fonts/vazirmatn-*.woff2` | auto-used when `lang=fa` |
+| Font Awesome 6.5.2 css | `assets/vendor/fontawesome/all.min.css` | unmodified |
+| FA webfonts (solid/regular/brands/v4compat) | `assets/vendor/webfonts/` | relative `../webfonts/` intact |
+| Jalali math (jalaali-js UMD) | `assets/js/jalaali-vendor.js` | byte-identical vendor |
+
+Swap fonts by dropping same-named `.woff2` files in place. **Zero emojis
+anywhere** — every icon is `<i class="fa-solid fa-…">` (Sonner keeps its own
+upstream SVGs untouched as part of the exact port).
+
+## 17. Liquid glass (the honest version)
+
+Researched from Apple HIG + WWDC25 + established web implementations:
+
+- **Real lensing**: SVG `feTurbulence → feDisplacementMap` (`#ak-liquid`,
+  injected once by `app.js`) fed into the topbar as
+  `backdrop-filter: … url('#ak-liquid')` behind
+  `@supports (backdrop-filter: url('#ak-liquid'))` → Chromium refracts for
+  real; Safari/Firefox fall back to frost. One refractive surface only
+  (displacement has real GPU cost). Bar content stays crisp (only backdrop warps).
+- **Specular system**: 4-sided inset rim (top brightest), edge gleam on
+  sidebar/drawer, thicker-glass treatment on transient menus.
+- **Navigation layer only** (Apple's rule): topbar, sidebar, drawer, modal,
+  popovers. Cards, auth, buttons are solid — never glass-on-glass.
+- **Scroll edge effect**: scrolled content deepens bar blur + shadow.
+- **Kill-switch + a11y**: drawer toggle sets `data-glass=off` (all solid);
+  `prefers-reduced-transparency` also collapses to solid.
+
+## 18. Project structure
+
+```
+adminkit/
+├── index.html                  dashboard
+├── login.html                  auth
+├── playground-*.html           6 module labs (sonner/modal/table/…)
+├── assets/css/theme.css        design system (light + graphite dark)
+├── assets/css/sonner.css       VERBATIM upstream sonner styles
+├── assets/css/components.css   modal/table/dropdown/datepicker/buttons/auth
+├── assets/js/theme.js          settings store (ThemeStore)
+├── assets/js/i18n.js           dictionary loader (I18N)
+├── assets/js/sonner.js         Sonner port (toast + Sonner)
+├── assets/js/modal.js          dialog port (Modal)
+├── assets/js/table.js          grid (DataGrid)
+├── assets/js/dropdown.js       select (NiceSelect)
+├── assets/js/jalaali-vendor.js exact jalaali-js build
+├── assets/js/datepicker.js     picker UI (DatePicker)
+├── assets/js/idle.js           idle + lock (Idle)
+├── assets/js/app.js            shell wiring (sidebar/drawer/glass/scroll)
+├── assets/fonts/               Inter + Vazirmatn woff2
+├── assets/vendor/              Font Awesome css + webfonts
+├── i18n/en.json · fa.json      dictionaries (add languages here)
+└── _source/                    upstream originals for audit
+```
+
+## 19. localStorage reference
+
+| Key | Shape |
+|---|---|
+| `adminkit.settings.v2` | `{theme:'system', primary:'#f59e0b', layout:'vertical', sidebar:'full', glass:true, lang:'en', dir:'ltr', dirAuto:true, idleMinutes:15, toasterPosition:'bottom-right'}` |
+| `adminkit.seen` | `'1'` once the settings drawer auto-opened |
+
+## 20. Keyboard shortcuts
+
+| Keys | Action |
+|---|---|
+| `Alt+T` | Expand toast stack |
+| `Esc` | Collapse toasts · close modal · close dropdown/popover · close drawer |
+| `↑ ↓ Enter` | Navigate searchable dropdown |
+
+## 21. FAQ / troubleshooting
+
+- **Persian doesn't apply on double-click:** `fetch()` needs HTTP. Serve the
+  folder (§2, option B). Everything else works on `file://`.
+- **Old theme came back:** v1 settings key is ignored; v2 applies fresh
+  defaults (amber accent). Clear site data to reset fully.
+- **Icons show as boxes:** serve over HTTP with `assets/vendor/` intact; check
+  `all.min.css` → `../webfonts/` relative path.
+- **`toast.loading` never disappears:** by design (upstream too) — update it
+  by `id` or `dismiss(id)`.
+- **Toasts invisible in mini layout:** they dock to viewport corners, not the
+  sidebar — check `Sonner.setPosition`.
+- **Why no Tailwind:** Play CDN needs internet; a vendored build needs npm.
+  Hand-rolled component CSS (~20 KB) keeps plain-HTML offline loading.
+
+## 22. Sources & licenses
+
+- Sonner — `emilkowalski/sonner` (MIT): styles verbatim, behavior ported.
+- Dialog — `radix-ui/primitives` (MIT) + shadcn/ui dialog styling (MIT).
+- Jalali math — `jalaali/jalaali-js` (MIT), byte-identical vendor.
+- Font Awesome 6.5.2 (icons CC-BY-4.0, code MIT) via cdnjs, vendored.
+- Inter (OFL, Fontsource), Vazirmatn (OFL, Fontsource), vendored.
+- Modern language lessons: `IntellsGamer/elib-web`, `IntellsGamer/manus-xray`
+  (principles studied, no code copied). See `SOURCES.md`.
+
+---
+
+# PART 2 — فارسی
+
+## ۱. این چیست؟
+
+ادمین‌کیت یک قالب مدیریتی کامل و آفلاین است: داشبورد، ورود/ثبت‌نام، و برای
+**هر ماژول یک صفحه جدا (playground)** — هم برای تست زنده، هم برای کپی کردن
+کد در توسعه‌های بعدی.
+
+| قول | روش |
+|---|---|
+| بدون اینترنت کار می‌کند | همه CSS/JS/فونت/آیکون داخل پروژه |
+| روشن/تیره خودکار با سیستم | `matchMedia` + شنونده تغییر، با شرط (بخش ۵) |
+| انگلیسی + فارسی با RTL کامل | دیکشنری جدا `i18n/*.json` (بخش ۷) |
+| تنظیمات ذخیره می‌شود | همه در `localStorage` (بخش ۱۹) |
+| استفاده مجدد آسان | برای هر ماژول فقط یک آبجکت سراسری |
+
+## ۲. شروع سریع
+
+**راه اول — باز کردن مستقیم:** روی `index.html` دابل‌کلیک کنید.
+نکته: روی `file://` دیکشنری زبان با `fetch` خوانده نمی‌شود؛ برای فارسی کامل
+از راه دوم استفاده کنید.
+
+**راه دوم — سرور محلی (پیشنهادی):**
+
+```bash
+cd adminkit
+python3 -m http.server 8000 --bind 0.0.0.0
+# باز کنید: http://localhost:8000/index.html
+```
+
+**راه سوم — هر هاست استاتیک:** همین پوشه را آپلود کنید (GitHub Pages،
+Nginx، IIS، پوشه `wwwroot` در VB.NET و…). هیچ کد سمت سرور لازم نیست.
+
+## ۳. صفحه‌ها
+
+| فایل | محتوا | کاربرد |
+|---|---|---|
+| `index.html` | داشبورد: هیرو، کارت‌های KPI با نمودار و درصد، فعالیت، قفل | صفحه اصلی |
+| `login.html` | ورود/ثبت‌نام دو ستونه: اینپوت آیکون‌دار، نمایش رمز، پیش‌شماره کشور، اعتبارسنجی آفلاین | احراز هویت |
+| `playground-sonner.html` | آزمایشگاه اعلان: همه نوع‌ها، گالری رنگی، دستورها، لاگ رویداد، بازسازی زنده | یادگیری `toast` |
+| `playground-modal.html` | آزمایشگاه مودال: اندازه‌ها، فوتر چسبان، تأیید، تریگر قالبی | یادگیری `Modal` |
+| `playground-table.html` | آزمایشگاه جدول: جستجو/مرتب/صفحه/خروجی/ستون‌ها + کلیدهای ماژول | یادگیری `DataGrid` |
+| `playground-dropdown.html` | دراپ‌داون جستجوشو | یادگیری `NiceSelect` |
+| `playground-datepicker.html` | تقویم شمسی + میلادی | یادگیری `DatePicker` |
+| `playground-buttons.html` | ست کامل دکمه + دکمه آیکونی | کپی کلاس دکمه |
+
+## ۴. تنظیمات پوسته
+
+**نوار بالا:** همبرگر (موبایل) · منوهای افقی · جستجو · دکمه چیدمان
+(عمودی/افقی) · نقطه رنگ · خورشید/ماه · EN/فا · چرخ‌دنده.
+
+**کشوی تنظیمات** (سمت **مخالف** سایدبار؛ در **اولین بازدید خودش باز می‌شود**):
+پوسته (سیستم/روشن/تیره) · رنگ اصلی (پیش‌فرض کهربایی `#f59e0b`) · چیدمان منو ·
+حالت سایدبار (کامل/مینی با پاپ‌آپ شناور) · شیشه مایع · زبان · جهت (خودکار:
+فارسی→راست‌به‌چپ) · قفل خودکار (دقیقه، `۰` = خاموش).
+
+## ۵. منطق روشن/تیره
+
+```js
+ThemeStore.get()            // همه تنظیمات
+ThemeStore.set({theme:'dark'})
+ThemeStore.set({primary:'#0ea5e9', layout:'horizontal'})
+ThemeStore.effectiveTheme() // 'light' یا 'dark'
+```
+
+- با `prefers-color-scheme` تم سیستم خوانده می‌شود.
+- تغییر تم سیستم فقط وقتی اعمال می‌شود که **شما دستی تم انتخاب نکرده باشید**
+  یا گزینه روی **پیش‌فرض سیستم** باشد. انتخاب دستی شما همیشه برنده است.
+
+## ۶. سیستم چیدمان
+
+- **عمودی:** سایدبار شیشه‌ای. باز کردن یک آیتم، بقیه را می‌بندد (آکاردئون).
+- **مینی:** فقط آیکون + لیبل کوچک؛ زیرمنو **بیرون** سایدبار به‌صورت کارت شناور.
+- **افقی:** سایدبار مخفی؛ منوی بالا با **مگامنوی تصویردار** (عکس‌ها SVG آفلاین‌اند؛ `src` را عوض کنید).
+- **موبایل:** همبرگر سایدبار را به‌صورت کشویی باز می‌کند.
+
+## ۷. چندزبانگی و RTL
+
+فایل‌ها بیرون از کدند: `i18n/en.json` و `i18n/fa.json`. در HTML:
+
+```html
+<span data-i18n="dashboard">Dashboard</span>
+```
+
+```js
+I18N.apply('fa');
+```
+
+**افزودن زبان:** از `en.json` کپی بگیرید، ترجمه کنید، به `<select>` اضافه کنید.
+اگر راست‌به‌چپ است، قانون `dirAuto` در `theme.js` را گسترش دهید. بقیه (سایدبار،
+کشو، سوییچ، تقویم، اعلان‌ها) خودکار با `document.dir` همراه می‌شوند.
+
+## ۸. اعلان‌های Sonner (پورت دقیق نسخه React)
+
+```js
+toast.success('ذخیره شد', { description:'سلام دنیا', richColors:true });
+toast.error('خطا', { description:'لاگ را ببین', closeButton:true });
+const id = toast.loading('در حال آپلود…');
+toast.success('تمام شد', { id });                 // آپدیت با همان id
+toast('اقدام', { action:{label:'بازگردانی', onClick:()=>{}}, cancel:{label:'بعداً', onClick(){}} });
+toast.promise(fetch('/api').then(r=>r.json()), {
+  loading:'…', success:(d)=>'تمام شد', error:'خطا',
+}).unwrap().then(…).catch(…);                      // دقت: unwrap() تابع است
+toast.dismiss(); toast.dismiss(id);
+Sonner.setPosition('top-center');                  // ۶ گوشه پشتیبانی می‌شود
+```
+
+گزینه‌های هر اعلان: `duration` (پیش‌فرض ۴۰۰۰، `Infinity` = ماندگار)،
+`closeButton, dismissible, invert, richColors, icon, style, position,
+onDismiss, onAutoClose`. هاور استک را باز می‌کند و تایمر را نگه می‌دارد؛
+سوایپ (ماوس + لمسی) می‌بندد؛ `Alt+T` باز، `Esc` جمع می‌کند؛ تاریخچه تا ۱۰۰ عدد.
+
+## ۹. مودال
+
+```js
+Modal.open({ title:'مطمئنی؟', desc:'…', body:'<p>…</p>', footer:'…',
+  size:'md', showClose:true, scrollable:true, stickyFooter:true,
+  modal:true, dismissEsc:true, dismissOutside:true,
+  onClose:(why)=>{} });
+const ok = await Modal.confirm({ title:'حذف؟', desc:'…' }); // true/false
+```
+
+تریگر بدون JS با `data-modal-target="#tpl"` + تگ `<template>`. فوکوس حبس
+می‌شود، `Esc`/کلیک بیرون می‌بندد، اسکرول صفحه قفل می‌شود.
+
+## ۱۰. جدول
+
+```js
+const grid = new DataGrid(document.getElementById('grid'), {
+  columns:[{key:'name',title:'نام'}], rows:[{name:'سارا'}],
+  pageSize:8, search:true, paging:true, exports:true, colToggle:true, info:true,
+});
+grid.destroy();
+```
+
+نوار ابزار یک بار ساخته می‌شود (فوکوس جستجو هرگز نمی‌پرد)؛ فقط بدنه جدول
+از نو رسم می‌شود. پاپ‌آور ستون‌ها هنگام تیک زدن باز می‌ماند. خروجی‌ها
+(CSV/Excel/Copy) جستجو و مرتب‌سازی فعلی را رعایت می‌کنند.
+**مهاجرت به VB.NET:** خروجی یک `<table>` ساده از آرایه JSON است — همان شکل را
+از `DataTable` سریالایز کنید و همه‌چیز را نگه دارید.
+
+## ۱۱. دراپ‌داون
+
+```js
+new NiceSelect(document.getElementById('country'), { search:true, onChange:v=>… });
+sel.setOptions([{value:'a',label:'آلفا'}]);
+```
+
+جستجو هنگام تایپ، کیبورد (↑↓ Enter Esc)، تیک گزینه انتخاب‌شده، بستن با کلیک بیرون.
+
+## ۱۲. تقویم
+
+```js
+new DatePicker(input, { locale:'fa', format:'jYYYY/jMM/jDD',
+  min:new Date(2020,0,1), max:null, presets:true, onChange:d=>… });
+```
+
+پرش ماه/سال، امروز/پاک، غیرفعال‌سازی با min/max، جای‌گیری سازگار با RTL.
+توکن‌های `jYYYY/jMM/jDD` شمسی‌اند؛ بقیه میلادی.
+
+## ۱۳. دکمه‌ها
+
+`btn btn-primary|success|info|warning|danger|ghost|outline|soft|glass` به‌علاوه
+`btn-sm|btn-lg` و `btn-round|btn-sq`. دکمه اصلی با تم معکوس می‌شود (تیره در
+روشن، روشن در تیره)؛ بقیه تخت و آرام‌اند.
+
+## ۱۴. ورود/ثبت‌نام
+
+تب ورود (ایمیل + رمز) و ثبت‌نام (نام + ایمیل + تلفن + رمز). تلفن = انتخاب
+پیش‌شماره (۸ کشور — در HTML اضافه کنید) + شماره؛ مقدار نهایی «کد + شماره» است.
+قوانین: ایمیل معتبر · رمز ≥ ۸ کاراکتر شامل حرف + عدد · نام ≥ ۳ · تلفن ۷ تا ۱۴
+رقم. خطا زیر فیلد، موفقیت با اعلان + هدایت.
+
+## ۱۵. تشخیص بیکاری + قفل
+
+```js
+Idle.tick(); Idle.setPin('4321'); Idle.setWarnSecs(30);
+```
+
+هر تعاملی تایمر را صفر می‌کند. بعد از `idleMinutes` (صفر = خاموش): کارت هشدار
+با نوار پیشرفت و شمارش معکوس — **ماندن** برمی‌گرداند و تایمر را از نو می‌سازد،
+**ترک** فوری قفل می‌کند. طول هشدار = کمینه ۶۰ ثانیه و نصف بازه. قفل با پین
+(پیش‌فرض `1234`) باز می‌شود و بازه از نو اجرا می‌شود.
+
+## ۱۶. فایل‌های آفلاین
+
+فونت Inter و وزیرمتن (`assets/fonts/`)، فونت‌Awesome نسخه ۶٫۵٫۲
+(`assets/vendor/`)، موتور شمسی (`jalaali-vendor.js`) — همه محلی، بدون حتی یک
+درخواست شبکه. برای تعویض فونت، فایل هم‌نام را جایگزین کنید. هیچ ایموجی در
+پروژه نیست؛ همه آیکون‌ها `<i class="fa-solid …">` هستند.
+
+## ۱۷. شیشه مایع (نسخه صادقانه)
+
+طبق HIG اپل و پیاده‌سازی‌های معتبر وب: شکست نور واقعی با
+`feTurbulence → feDisplacementMap` فقط در نوار بالا و فقط در کرومیوم (بقیه
+مرورگرها شیشه مات می‌بینند)؛ لبه‌های نورانی چهارطرفه؛ شیشه فقط در لایه
+ناوبری (نوار، سایدبار، کشو، مودال، پاپ‌آورها) — کارت‌ها و دکمه‌ها مات‌اند؛
+افکت لبه اسکرول؛ کلید خاموش + احترام به `prefers-reduced-transparency`.
+
+## ۱۸ تا ۲۲
+
+ساختار پروژه، کلیدهای `localStorage`، میانبرها، عیب‌یابی و منابع — عیناً مطابق
+بخش‌های 18 تا 22 انگلیسی بالا (کلید تنظیمات `adminkit.settings.v2`، میانبر
+`Alt+T` و `Esc`، منابع MIT در `SOURCES.md`).
+
+---
+
+*AdminKit — built offline-first. EN + FA. No CDN. No emojis.*
