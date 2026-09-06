@@ -1,12 +1,16 @@
 /* Idle manager: configurable minutes (0=off). No interaction -> warning card with
    live progress bar + Stay/Leave buttons (reruns interval on stay). If countdown
-   passes -> lock screen (PIN, default 1234, change via Idle.setPin). All offline. */
+   passes -> lock screen with a single back-to-workflow button. All offline. */
 (function(g){
 "use strict";
-let timer=null,warnTimer=null,last=Date.now(),pin="1234",warnSecs=60;
+let timer=null,warnTimer=null,last=Date.now(),warnSecs=60;
 function mins(){ try{return+(ThemeStore.get().idleMinutes||0);}catch(e){return 15;} }
 function reset(){ last=Date.now(); }
+if(!window.__akIdleBound){
 ["pointerdown","keydown","wheel","touchstart","mousemove"].forEach(ev=>document.addEventListener(ev,()=>{last=Date.now();},{passive:true}));
+document.addEventListener("visibilitychange",()=>{if(!document.hidden)tick();});
+window.__akIdleBound=true;
+}
 function tick(){
   clearTimeout(timer);
   const m=mins();
@@ -36,15 +40,16 @@ function showWarn(){
   if(leave)leave.onclick=()=>{clearInterval(warnTimer);w.classList.remove("show");showLock();};
 }
 function showLock(){
+  // No PIN — a single button returns to the workflow and restarts the interval.
   const l=document.getElementById("lockWrap"); if(!l)return;
   l.classList.add("show");
-  const inp=document.getElementById("lockPin"), btn=document.getElementById("lockBtn");
-  if(inp){inp.value="";setTimeout(()=>inp.focus(),80);}
-  const go=()=>{ if(!inp||inp.value===pin){l.classList.remove("show");last=Date.now();tick();toast&&toast.success("Unlocked");} else {toast&&toast.error("Wrong PIN");} };
+  const btn=document.getElementById("lockBtn");
+  const go=()=>{ l.classList.remove("show"); last=Date.now(); tick(); if(window.toast)toast.success("Welcome back"); };
   if(btn)btn.onclick=go;
-  if(inp)inp.onkeydown=e=>{if(e.key==="Enter")go();};
 }
-g.Idle={tick,reset,setPin:p=>pin=p,setWarnSecs:s=>warnSecs=s};
-document.addEventListener("DOMContentLoaded",()=>{reset();tick();document.addEventListener("visibilitychange",()=>{if(!document.hidden)tick();});});
+g.Idle={tick,reset,setWarnSecs:s=>warnSecs=s};
+function bootIdle(){reset();tick();}
+document.addEventListener("DOMContentLoaded",bootIdle);
+document.addEventListener("turbo:load",bootIdle);
 setInterval(tick,30000);
 })(window);

@@ -21,8 +21,7 @@
     }catch(e){/* offline file:// fallback: keep existing text */}
   }
   window.I18N={apply,dict};
-  document.addEventListener("DOMContentLoaded",()=>{
-    const s=window.ThemeStore?ThemeStore.get():{lang:"en"};
-    apply(s.lang||"en");
-  });
+  function boot(){ const s=window.ThemeStore?ThemeStore.get():{lang:"en"}; apply(s.lang||"en"); }
+  document.addEventListener("DOMContentLoaded",boot);
+  document.addEventListener("turbo:load",boot);
 })();

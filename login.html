@@ -1,4 +1,5 @@
-<!doctype html><html lang="en" dir="ltr" data-theme="light"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Login — AdminKit</title><link rel="stylesheet" href="assets/vendor/fontawesome/all.min.css"><link rel="stylesheet" href="assets/css/sonner.css"><link rel="stylesheet" href="assets/css/theme.css"><link rel="stylesheet" href="assets/css/components.css"></head>
+<!doctype html><html lang="en" dir="ltr" data-theme="light"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<script src="assets/vendor/turbo/turbo.es2017-umd.min.js" defer></script><title>Login — AdminKit</title><link rel="stylesheet" href="assets/vendor/fontawesome/all.min.css"><link rel="stylesheet" href="assets/css/sonner.css"><link rel="stylesheet" href="assets/css/theme.css"><link rel="stylesheet" href="assets/css/components.css"></head>
 <body><div class="auth-wrap">
 <div class="auth-side">
   <div><div class="brand" style="padding:0"><span class="brand-mark"><i class="fa-solid fa-layer-group"></i></span><span><b>AdminKit</b><br><small class="muted" style="color:rgba(255,255,255,.6)">Modern admin</small></span></div></div>
@@ -30,7 +31,7 @@
 </form>
 </div></div>
 </div>
-<script src="assets/js/theme.js"></script><script src="assets/js/sonner.js"></script>
+<script src="assets/js/theme.js"></script><script src="assets/js/sonner.js"></script><script src="assets/js/app.js"></script>
 <script>
 ThemeStore.apply();
 const $=id=>document.getElementById(id);
@@ -43,7 +44,7 @@ $('formLogin').onsubmit=e=>{e.preventDefault();let ok=true;
   err('e-liEmail');err('e-liPass');
   if(!emailOk($('liEmail').value.trim())){err('e-liEmail','Enter a valid email');ok=false;}
   if($('liPass').value.length<8){err('e-liPass','Min 8 characters');ok=false;}
-  if(ok){toast.success('Welcome back');setTimeout(()=>location.href='index.html',700);}else toast.error('Check the form');};
+  if(ok){toast.success('Welcome back');setTimeout(()=>App.go('index.html'),700);}else toast.error('Check the form');};
 $('formReg').onsubmit=e=>{e.preventDefault();let ok=true;
   ['e-rgName','e-rgEmail','e-rgPhone','e-rgPass'].forEach(i=>err(i));
   if($('rgName').value.trim().length<3){err('e-rgName','Enter your name');ok=false;}
@@ -51,5 +52,5 @@ $('formReg').onsubmit=e=>{e.preventDefault();let ok=true;
   const digits=$('rgPhone').value.replace(/\D/g,'');
   if(digits.length<7||digits.length>14){err('e-rgPhone','Enter a valid phone number');ok=false;}
   if(!/^(?=.*[A-Za-z])(?=.*\d).{8,}$/.test($('rgPass').value)){err('e-rgPass','Min 8 chars incl. letter + number');ok=false;}
-  if(ok){toast.success('Account created',{description:$('rgCC').value+' '+$('rgPhone').value});setTimeout(()=>location.href='index.html',900);}else toast.error('Check the form');};
+  if(ok){toast.success('Account created',{description:$('rgCC').value+' '+$('rgPhone').value});setTimeout(()=>App.go('index.html'),900);}else toast.error('Check the form');};
 </script></body></html>

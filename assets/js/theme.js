@@ -64,8 +64,8 @@
       return "#"+((r<<16)|(g<<8)|b).toString(16).padStart(6,"0");
     }catch(e){return hex;}
   }
-  // Follow system changes only when allowed
-  if(window.matchMedia){
+  // Follow system changes only when allowed (bound once — survives Turbo visits)
+  if(window.matchMedia&&!window.__akThemeMq){
     const mq=matchMedia("(prefers-color-scheme: dark)");
     const onSys=e=>{
       if(!userChangedTheme||settings.theme==="system"){
@@ -74,6 +74,7 @@
       }
     };
     if(mq.addEventListener)mq.addEventListener("change",onSys); else if(mq.addListener)mq.addListener(onSys);
+    window.__akThemeMq=true;
   }
   function set(patch, opts){
     opts=opts||{};
@@ -96,7 +97,17 @@
     const tp=document.getElementById("topPrimary"); if(tp)tp.value=settings.primary;
     const lt=document.getElementById("layoutToggle"); if(lt)lt.classList.toggle("on",settings.layout==="horizontal");
     document.querySelectorAll(".swatch").forEach(s=>s.classList.toggle("active",s.dataset.color===settings.primary));
+    // skip link (a11y): one injection covers every page
+    const m=document.querySelector("main.content");
+    if(m&&!document.getElementById("skipLink")){
+      m.id=m.id||"main"; if(!m.hasAttribute("tabindex"))m.setAttribute("tabindex","-1");
+      const a=document.createElement("a"); a.href="#main"; a.id="skipLink"; a.className="skip";
+      a.setAttribute("data-i18n","skip");
+      a.textContent=settings.lang==="fa"?"پرش به محتوا":"Skip to content";
+      document.body.prepend(a);
+    }
   }
   window.ThemeStore={get:()=>Object.assign({},settings),set,apply,effectiveTheme,KEY};
   document.addEventListener("DOMContentLoaded",apply);
+  document.addEventListener("turbo:load",apply); // Hotwired Turbo visit (see README §18)
 })();

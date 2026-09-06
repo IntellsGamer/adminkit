@@ -2,6 +2,7 @@
 <html lang="en" dir="ltr" data-theme="light">
 <head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<script src="assets/vendor/turbo/turbo.es2017-umd.min.js" defer></script>
 <title>Sonner playground — AdminKit</title>
 <link rel="stylesheet" href="assets/vendor/fontawesome/all.min.css">
 <link rel="stylesheet" href="assets/css/sonner.css">
@@ -11,11 +12,11 @@
 <body data-layout="vertical" data-sidebar="full" data-glass="on">
 <div class="app">
 <aside class="sidebar"><div class="brand"><span class="brand-mark"><i class="fa-solid fa-layer-group"></i></span><span class="brand-text"><span>AdminKit</span><small>Modern admin</small></span></div>
-<nav class="nav"><div class="nav-label"><span>Main</span></div>
-<div class="nav-item"><button class="nav-link" onclick="location.href='index.html'"><i class="fa-solid fa-table-columns fa-fw"></i><span class="nav-text">Dashboard</span></button></div>
-<div class="nav-item open"><button class="nav-link"><i class="fa-solid fa-flask fa-fw"></i><span class="nav-text">Playgrounds</span><i class="fa-solid fa-chevron-down chev"></i></button>
+<nav class="nav"><div class="nav-label"><span data-i18n="main">Main</span></div>
+<div class="nav-item"><button class="nav-link" onclick="App.go('index.html')"><i class="fa-solid fa-table-columns fa-fw"></i><span class="nav-text">Dashboard</span></button></div>
+<div class="nav-item open"><button class="nav-link"><i class="fa-solid fa-flask fa-fw"></i><span class="nav-text" data-i18n="playgrounds">Playgrounds</span><i class="fa-solid fa-chevron-down chev"></i></button>
 <div class="nav-sub"><a class="nav-link active" href="playground-sonner.html"><i class="fa-solid fa-bell fa-fw"></i><span class="nav-text">Sonner</span></a><a class="nav-link" href="playground-modal.html"><i class="fa-solid fa-window-restore fa-fw"></i><span class="nav-text">Modal</span></a><a class="nav-link" href="playground-table.html"><i class="fa-solid fa-table fa-fw"></i><span class="nav-text">Table</span></a><a class="nav-link" href="playground-dropdown.html"><i class="fa-solid fa-chevron-down fa-fw"></i><span class="nav-text">Dropdown</span></a><a class="nav-link" href="playground-datepicker.html"><i class="fa-solid fa-calendar-days fa-fw"></i><span class="nav-text">Date picker</span></a><a class="nav-link" href="playground-buttons.html"><i class="fa-solid fa-circle-dot fa-fw"></i><span class="nav-text">Buttons</span></a></div></div>
-<div class="nav-item"><button class="nav-link" onclick="location.href='login.html'"><i class="fa-solid fa-key fa-fw"></i><span class="nav-text">Login / Register</span></button></div>
+<div class="nav-item"><button class="nav-link" onclick="App.go('login.html')"><i class="fa-solid fa-key fa-fw"></i><span class="nav-text" data-i18n="login">Login / Register</span></button></div>
 </nav></aside>
 <div class="main">
 <header class="topbar"><button class="icon-btn hamburger" data-act="nav"><i class="fa-solid fa-bars"></i></button><div class="topbar-spacer"></div>
@@ -26,7 +27,7 @@
 <div class="pagenav"><a href="index.html"><i class="fa-solid fa-table-columns"></i>Dashboard</a><a class="active" href="playground-sonner.html"><i class="fa-solid fa-bell"></i>Sonner</a><a href="playground-modal.html"><i class="fa-solid fa-window-restore"></i>Modal</a><a href="playground-table.html"><i class="fa-solid fa-table"></i>Table</a><a href="playground-dropdown.html"><i class="fa-solid fa-chevron-down"></i>Dropdown</a><a href="playground-datepicker.html"><i class="fa-solid fa-calendar-days"></i>Date picker</a><a href="playground-buttons.html"><i class="fa-solid fa-circle-dot"></i>Buttons</a><a href="login.html"><i class="fa-solid fa-key"></i>Auth</a></div>
 <h1>Sonner — exact vanilla port</h1>
 <p class="muted">Ported from <code>emilkowalski/sonner</code> (<code>state.ts</code> / <code>index.tsx</code> / <code>assets.tsx</code>; CSS copied <b>verbatim</b>; originals in <code>_source/sonner/</code>). Enter + stacking + swipe-out animations, promise flow, hotkey <code>Alt+T</code>, 6 positions, RTL. Tip: fire 4+ toasts, then hover the stack to watch it expand.</p>
-<div class="grid" style="grid-template-columns:1fr 1fr">
+<div class="grid cols-2">
 <div class="card"><div class="section-head"><span class="tile t-ghost"><i class="fa-solid fa-bell"></i></span><h3>Types</h3></div><div class="btn-row">
 <button class="btn btn-ghost" onclick="toast('Plain message')"><i class="fa-solid fa-message"></i>message</button>
 <button class="btn btn-success" onclick="toast.success('Done',{description:'It worked'})"><i class="fa-solid fa-check"></i>success</button>
@@ -61,7 +62,7 @@
 <div class="set-row"><span>Gap (px)</span><select id="optGap"><option>8</option><option selected>14</option><option>24</option></select></div>
 <p class="muted">Swipe to dismiss (mouse/touch), pause on hover, <code>Alt+T</code> expands, <code>Esc</code> collapses. History capped at 100 like the original.</p></div>
 </div>
-<div class="grid" style="grid-template-columns:1fr 1fr;margin-top:16px">
+<div class="grid cols-2" style="margin-top:16px">
 <div class="card"><div class="section-head"><span class="tile t-ghost"><i class="fa-solid fa-palette"></i></span><h3>Rich colors gallery</h3></div><div class="btn-row">
 <button class="btn btn-success btn-sm" onclick="richDemo('success')"><i class="fa-solid fa-check"></i>rich success</button>
 <button class="btn btn-info btn-sm" onclick="richDemo('info')"><i class="fa-solid fa-circle-info"></i>rich info</button>
@@ -112,17 +113,17 @@
 </main></div></div>
 <div class="scrim" id="scrim"></div>
 <aside class="drawer" id="settingsDrawer"><div style="display:flex;align-items:center;justify-content:space-between"><h3 style="margin:0"><i class="fa-solid fa-sliders"></i> Theme settings</h3><button class="icon-btn" data-act="settings-close"><i class="fa-solid fa-xmark"></i></button></div>
-<div class="set-row"><span>Theme</span><select id="setTheme"><option value="system">System default</option><option value="light">Light</option><option value="dark">Dark</option></select></div>
-<div class="set-row"><span>Primary</span><input type="color" id="setPrimary" value="#f59e0b"></div>
-<div class="set-row"><span>Menu</span><select id="setLayout"><option value="vertical">Vertical</option><option value="horizontal">Horizontal</option></select></div>
-<div class="set-row"><span>Sidebar</span><select id="setSidebar"><option value="full">Full</option><option value="mini">Mini</option></select></div>
-<div class="set-row"><span>Glass</span><label class="switch"><input type="checkbox" id="setGlass" checked><i></i></label></div>
+<div class="set-row"><span data-i18n="theme">Theme</span><select id="setTheme"><option value="system">System default</option><option value="light">Light</option><option value="dark">Dark</option></select></div>
+<div class="set-row"><span data-i18n="primary">Primary</span><input type="color" id="setPrimary" value="#f59e0b"></div>
+<div class="set-row"><span data-i18n="layout">Menu layout</span><select id="setLayout"><option value="vertical">Vertical</option><option value="horizontal">Horizontal</option></select></div>
+<div class="set-row"><span data-i18n="sidebar">Sidebar mode</span><select id="setSidebar"><option value="full">Full</option><option value="mini">Mini</option></select></div>
+<div class="set-row"><span data-i18n="glass">Glass</span><label class="switch"><input type="checkbox" id="setGlass" checked><i></i></label></div>
 <div class="set-row"><span>Language</span><select id="setLang"><option value="en">English</option><option value="fa">فارسی</option></select></div>
-<div class="set-row"><span>Dir</span><select id="setDir"><option value="auto">Auto</option><option value="ltr">LTR</option><option value="rtl">RTL</option></select></div>
+<div class="set-row"><span data-i18n="direction">Direction</span><select id="setDir"><option value="auto">Auto</option><option value="ltr">LTR</option><option value="rtl">RTL</option></select></div>
 <div class="set-row"><span>Auto-lock min (0=off)</span><input type="number" id="setIdle" min="0" max="120" style="width:90px"></div>
 </aside>
 <div class="idle-wrap" id="idleWrap"><div class="idle-card"><span class="tile"><i class="fa-solid fa-bell"></i></span><h3>Are you still there?</h3><div class="progress"><i id="idleBar" style="width:0%"></i></div><p class="muted" id="idleTxt">60s</p><div class="btn-row" style="justify-content:center"><button class="btn btn-primary" id="idleStay"><i class="fa-solid fa-check"></i>Stay</button><button class="btn btn-ghost" id="idleLeave"><i class="fa-solid fa-lock"></i>Lock</button></div></div></div>
-<div class="lock-wrap" id="lockWrap"><div class="lock-card"><span class="tile t-red"><i class="fa-solid fa-lock"></i></span><h3>Locked</h3><input type="password" id="lockPin" placeholder="••••"><br><button class="btn btn-primary" id="lockBtn"><i class="fa-solid fa-lock-open"></i>Unlock</button></div></div>
+<div class="lock-wrap" id="lockWrap"><div class="lock-card"><span class="tile t-red"><i class="fa-solid fa-lock"></i></span><h3 data-i18n="lockTitle">Locked</h3><p class="muted" data-i18n="lockDesc">Locked for inactivity.</p><button class="btn btn-primary btn-lg" id="lockBtn"><i class="fa-solid fa-arrow-right-to-bracket"></i><span data-i18n="unlock">Back to workflow</span></button></div></div>
 <script src="assets/js/theme.js"></script><script src="assets/js/i18n.js"></script><script src="assets/js/sonner.js"></script><script src="assets/js/modal.js"></script><script src="assets/js/idle.js"></script><script src="assets/js/app.js"></script>
 <script>
 function dock(p){Sonner.setPosition(p);toast.success(p);}

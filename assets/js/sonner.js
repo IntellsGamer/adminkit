@@ -481,7 +481,7 @@ function createToaster(userProps){
     if(e.code==="Escape"&&(document.activeElement===section.querySelector("ol")||section.contains(document.activeElement))){ state.expanded=false; render(); }
   }
   document.addEventListener("keydown",onKey);
-  useIsDocumentHidden(null,v=>{state.isHidden=v;render();});
+  const unwatchHidden=useIsDocumentHidden(null,v=>{state.isHidden=v;render();});
   /* toast.delete watcher */
   const iv=setInterval(()=>{ let ch=false; state.toasts.forEach(t=>{ if(t.delete){ const R=listByPos.__rt&&listByPos.__rt[t.id]; if(R&&!R.removed){R.removed=true;R.offsetBeforeRemove=R.offset||0;ch=true; setTimeout(()=>removeToast(t),TIME_BEFORE_UNMOUNT);} if(t.onDismiss&&!t.__dNotified){t.__dNotified=true; try{t.onDismiss(t);}catch(_){}} } }); if(ch)render(); },120);
   document.body.appendChild(section);
@@ -489,7 +489,7 @@ function createToaster(userProps){
   const api={el:section,props,state,
     setTheme(th){ props.theme=th; state.actualTheme=th==="system"?(matchMedia("(prefers-color-scheme: dark)").matches?"dark":"light"):th; render(); },
     setPosition(p){ props.position=p; render(); },
-    destroy(){ unsub(); document.removeEventListener("keydown",onKey); clearInterval(iv); section.remove();
+    destroy(){ unsub(); document.removeEventListener("keydown",onKey); try{unwatchHidden();}catch(e){} clearInterval(iv); section.remove();
       const i=toasters.indexOf(api); if(i>=0)toasters.splice(i,1);
       if(defaultToaster===api)defaultToaster=null; }};
   toasters.push(api); return api;
@@ -508,4 +508,6 @@ global.Sonner={createToaster,toast,getAsset,ICONS,ensureDefault,
 };
 global.toast=toast;
 document.addEventListener("DOMContentLoaded",()=>ensureDefault());
+document.addEventListener("turbo:load",()=>ensureDefault()); // fresh <body> needs a fresh <ol>
+document.addEventListener("turbo:before-render",()=>{ if(defaultToaster){ try{defaultToaster.destroy();}catch(e){} } });
 })(window);

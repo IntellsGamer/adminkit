@@ -61,8 +61,9 @@ idle/lock overlays. Change the theme once — it follows you across pages via
 ## 4. Theme settings (UI)
 
 **Top bar (always visible):** hamburger (mobile) · horizontal menus ·
-search · layout toggle (vertical/horizontal) · color dot (theme color) ·
-sun/moon · EN/فا · gear (opens settings).
+search (command-palette page jumper, ↓↑ + Enter) · layout toggle
+(vertical/horizontal) · color dot (theme color) · sun/moon · EN/فا · gear
+(opens settings).
 
 **Settings drawer** (gear icon; sits on the **opposite side** of the sidebar;
 **opens automatically on first visit**):
@@ -123,6 +124,24 @@ const d = await I18N.dict('en');  // read raw dictionary
 `<option value="ar">`, and extend the `dirAuto` rule in `theme.js` if it is
 RTL. Everything (sidebar, drawer side, switch direction, datepicker, toasts)
 follows `document.dir` automatically.
+
+155 keys per language cover the full chrome: nav, drawer groups, playground
+headings, login form + validation messages, table/dropdown/datepicker/modal
+labels. JS modules take translated strings as options (never hardcoded):
+
+```js
+const d = await I18N.dict(ThemeStore.get().lang);
+new DataGrid(el, {…, strings:{ search:d.tblSearch, columns:d.tblColumns,
+  showing:d.tblShowing, from:d.tblFrom, page:d.tblPage,
+  perPage:d.tblPerPage, noRows:d.tblNoRows }});
+new NiceSelect(el, {…, searchPh:d.ddSearchPh, noResults:d.ddNoResults });
+new DatePicker(el, {…, }); // labels via picker.setStrings({today:d.dpToday,…})
+Modal.confirm({…, okLabel:d.mOk, cancelLabel:d.mCancel });
+document.addEventListener('app:lang', () => rebuildWithNewStrings());
+```
+
+`App.setLang()` applies the dictionary **and** fires `app:lang` so live
+modules rebuild in the new language.
 
 ## 8. Sonner toasts (exact vanilla port of `emilkowalski/sonner`)
 
@@ -187,7 +206,10 @@ Sonner.setTheme('dark');
 
 Behavior notes: hover expands the stack, hover/interaction/hidden-tab pauses
 timers, swipe (mouse + touch, velocity-aware) dismisses, `Alt+T` expands,
-`Esc` collapses, history capped at 100 like upstream.
+`Esc` collapses, history capped at 100 like upstream. The playground adds a
+rich-colors gallery (every type + action/promise/invert variants), a recipes
+card (per-toast dock, custom icon/style, sticky note, `unwrap()` logging),
+a live event log, and a Toaster rebuild panel (expand/rich/close/visible/gap).
 
 ## 9. Modal (Radix Dialog + shadcn styling port)
 
@@ -208,6 +230,8 @@ const h = Modal.open({
 h.close('done'); h.dlg; Modal.closeAll();
 
 const ok = await Modal.confirm({ title:'Delete item?', desc:'…' }); // true/false
+// translated confirm buttons:
+const ok2 = await Modal.confirm({ title:d.x, okLabel:d.mOk, cancelLabel:d.mCancel });
 ```
 
 **No-JS triggers** (like Radix Trigger/Content composition):
@@ -256,10 +280,14 @@ new NiceSelect(document.getElementById('country'), // upgrades a real <select>
 new NiceSelect(document.getElementById('mount'),
   { options: [{value:'a',label:'Alpha'}], value: 'a', onChange… });
 sel.setOptions([…]); // refresh choices later
+sel.destroy();        // unbind + unwrap (restores a wrapped <select>)
 ```
 
 Search-on-type, ↑↓ + Enter + Esc keyboard, ✓ on selected, closes on
-outside click. Country/dial-code lists are plain option arrays — edit freely.
+outside click. Proper listbox semantics (`combobox` button with
+`aria-expanded`, `role=option` + `aria-selected` rows, highlighted row kept
+in view). Translated via `searchPh`/`noResults` options (§7). Country/dial-code
+lists are plain option arrays — edit freely.
 
 ## 12. Date picker (Jalali math = exact `jalaali-js` vendor)
 
@@ -277,6 +305,7 @@ new DatePicker(document.getElementById('birth'), {
   onChange: d => console.log(d) // Date | null
 });
 picker.setLocale('en');
+picker.setStrings({ today:d.dpToday, clear:d.dpClear, now:d.dpNow });
 ```
 
 Popup has month/year jump selects, Today/Clear, min/max disabling, RTL-aware
@@ -304,7 +333,6 @@ Icon-only: reuse `icon-btn` + any `fa-*` icon. Full set demoed in
 
 ```js
 Idle.tick();            // restart the countdown manually
-Idle.setPin('4321');    // change PIN (default '1234')
 Idle.setWarnSecs(30);   // warning window seconds (default 60)
 ```
 
@@ -312,9 +340,10 @@ Idle.setWarnSecs(30);   // warning window seconds (default 60)
 - After `idleMinutes` (settings, `0` = off): warning card with live progress
   bar + countdown. **Stay** dismisses and restarts; **Leave** locks now.
 - Warning length = `min(60s, half the interval)` so short timeouts still work.
-- Lock screen asks PIN → unlock restarts the interval. Elements required per
-  page: `#idleWrap #idleBar #idleTxt #idleStay #idleLeave #lockWrap #lockPin
-  #lockBtn` (all playgrounds + dashboard include them).
+- Lock screen has **no PIN** — one big button returns to the workflow and
+  restarts the interval. Elements required per page: `#idleWrap #idleBar
+  #idleTxt #idleStay #idleLeave #lockWrap #lockBtn` (all playgrounds +
+  dashboard include them).
 
 ## 16. Offline assets (all local, zero network)
 
@@ -348,7 +377,45 @@ Researched from Apple HIG + WWDC25 + established web implementations:
 - **Kill-switch + a11y**: drawer toggle sets `data-glass=off` (all solid);
   `prefers-reduced-transparency` also collapses to solid.
 
-## 18. Project structure
+## 18. Turbo Drive navigation (Hotwired, vendored offline)
+
+Like `elib-web`, every click between pages goes through **Turbo Drive**
+(`assets/vendor/turbo/turbo.es2017-umd.min.js`, v8.0.12, MIT © 37signals —
+same file elib-web loads from CDN, but vendored here so it works offline).
+Only `<body>` swaps; theme, settings and toast history survive the visit, with
+a primary-colored progress bar on top.
+
+```html
+<script src="assets/vendor/turbo/turbo.es2017-umd.min.js" defer></script>
+```
+
+```js
+App.go('playground-table.html'); // Turbo.visit() when present, full load otherwise
+```
+
+Rules for future code (this is where naive ports break):
+
+- **Init on both events:** page widgets boot in `turbo:load` as well as
+  `DOMContentLoaded` (Turbo fires `turbo:load` on every visit, including the
+  first). All shell modules already do.
+- **Never stack document listeners:** `app.js` keeps every document/window
+  binding in a list — `App.teardown()` removes them on `turbo:before-render`,
+  then `initShell()` rebinds the fresh DOM. Copy that pattern, not bare
+  `addEventListener`.
+- **One-shot globals are guarded:** `matchMedia`, activity trackers, modal
+  triggers use `window.__ak*` flags so re-executed scripts don't double-bind.
+- **Ephemerals die on navigation:** the default Sonner toaster is destroyed on
+  `turbo:before-render` (recreated on load, active toasts replay); open modals
+  `closeAll()` on `turbo:before-visit`; grids/selects expose `destroy()`.
+- **Forms are safe:** handlers call `preventDefault()` first, which Turbo
+  respects — login validation runs unchanged, no page submit.
+- **Anchors work:** `#overview` scrolls in-page; cross-page `#analytics`
+  visits then scrolls.
+- **`file://` degrades gracefully:** Drive needs `fetch`, so double-clicked
+  files fall back to full-page loads automatically. Serve over HTTP (§2) for
+  instant visits.
+
+## 19. Project structure
 
 ```
 adminkit/
@@ -367,29 +434,36 @@ adminkit/
 ├── assets/js/jalaali-vendor.js exact jalaali-js build
 ├── assets/js/datepicker.js     picker UI (DatePicker)
 ├── assets/js/idle.js           idle + lock (Idle)
-├── assets/js/app.js            shell wiring (sidebar/drawer/glass/scroll)
+├── assets/js/app.js            shell wiring + Turbo lifecycle (init/teardown)
 ├── assets/fonts/               Inter + Vazirmatn woff2
+├── assets/vendor/turbo/        Hotwired Turbo 8 UMD (offline Drive)
 ├── assets/vendor/              Font Awesome css + webfonts
 ├── i18n/en.json · fa.json      dictionaries (add languages here)
 └── _source/                    upstream originals for audit
 ```
 
-## 19. localStorage reference
+## 20. localStorage reference
 
 | Key | Shape |
 |---|---|
 | `adminkit.settings.v2` | `{theme:'system', primary:'#f59e0b', layout:'vertical', sidebar:'full', glass:true, lang:'en', dir:'ltr', dirAuto:true, idleMinutes:15, toasterPosition:'bottom-right'}` |
 | `adminkit.seen` | `'1'` once the settings drawer auto-opened |
 
-## 20. Keyboard shortcuts
+## 21. Keyboard shortcuts & accessibility
 
 | Keys | Action |
 |---|---|
 | `Alt+T` | Expand toast stack |
 | `Esc` | Collapse toasts · close modal · close dropdown/popover · close drawer |
-| `↑ ↓ Enter` | Navigate searchable dropdown |
+| `↑ ↓ Enter` | Navigate searchable dropdown + command-palette search |
 
-## 21. FAQ / troubleshooting
+- Skip-to-content link injected on every page (auto-translated).
+- Dropdown exposes `combobox`/`listbox`/`option` roles; table sort headers are
+  real `<button>`s with `aria-sort`; dialogs carry `aria-modal` + labelledby.
+- `prefers-reduced-motion` disables animation system-wide;
+  `prefers-reduced-transparency` collapses glass to solid.
+
+## 22. FAQ / troubleshooting
 
 - **Persian doesn't apply on double-click:** `fetch()` needs HTTP. Serve the
   folder (§2, option B). Everything else works on `file://`.
@@ -404,9 +478,10 @@ adminkit/
 - **Why no Tailwind:** Play CDN needs internet; a vendored build needs npm.
   Hand-rolled component CSS (~20 KB) keeps plain-HTML offline loading.
 
-## 22. Sources & licenses
+## 23. Sources & licenses
 
 - Sonner — `emilkowalski/sonner` (MIT): styles verbatim, behavior ported.
+- Turbo — `@hotwired/turbo` v8 (MIT © 37signals): UMD vendored, Drive enabled.
 - Dialog — `radix-ui/primitives` (MIT) + shadcn/ui dialog styling (MIT).
 - Jalali math — `jalaali/jalaali-js` (MIT), byte-identical vendor.
 - Font Awesome 6.5.2 (icons CC-BY-4.0, code MIT) via cdnjs, vendored.
@@ -592,13 +667,13 @@ new DatePicker(input, { locale:'fa', format:'jYYYY/jMM/jDD',
 ## ۱۵. تشخیص بیکاری + قفل
 
 ```js
-Idle.tick(); Idle.setPin('4321'); Idle.setWarnSecs(30);
+Idle.tick(); Idle.setWarnSecs(30);
 ```
 
 هر تعاملی تایمر را صفر می‌کند. بعد از `idleMinutes` (صفر = خاموش): کارت هشدار
 با نوار پیشرفت و شمارش معکوس — **ماندن** برمی‌گرداند و تایمر را از نو می‌سازد،
-**ترک** فوری قفل می‌کند. طول هشدار = کمینه ۶۰ ثانیه و نصف بازه. قفل با پین
-(پیش‌فرض `1234`) باز می‌شود و بازه از نو اجرا می‌شود.
+**ترک** فوری قفل می‌کند. طول هشدار = کمینه ۶۰ ثانیه و نصف بازه. صفحه قفل
+**پین ندارد** — یک دکمه بزرگ «بازگشت به کار» بازه را از نو شروع می‌کند.
 
 ## ۱۶. فایل‌های آفلاین
 
@@ -615,11 +690,13 @@ Idle.tick(); Idle.setPin('4321'); Idle.setWarnSecs(30);
 ناوبری (نوار، سایدبار، کشو، مودال، پاپ‌آورها) — کارت‌ها و دکمه‌ها مات‌اند؛
 افکت لبه اسکرول؛ کلید خاموش + احترام به `prefers-reduced-transparency`.
 
-## ۱۸ تا ۲۲
+## ۱۸ تا ۲۴
 
-ساختار پروژه، کلیدهای `localStorage`، میانبرها، عیب‌یابی و منابع — عیناً مطابق
-بخش‌های 18 تا 22 انگلیسی بالا (کلید تنظیمات `adminkit.settings.v2`، میانبر
-`Alt+T` و `Esc`، منابع MIT در `SOURCES.md`).
+ساختار پروژه، توربو، کلیدهای `localStorage`، میانبرها و دسترس‌پذیری، عیب‌یابی
+و منابع — عیناً مطابق بخش‌های 18 تا 24 انگلیسی بالا (کلید تنظیمات
+`adminkit.settings.v2`، میانبر `Alt+T` و `Esc`، توربوی آفلاین، منابع MIT در
+`SOURCES.md`). دیکشنری‌ها اکنون ۱۵۵ کلید در هر زبان‌اند و رشته‌های جدول،
+دراپ‌داون، تقویم و مودال هم از همان JSON می‌آیند.
 
 ---
 

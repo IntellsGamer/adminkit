@@ -34,9 +34,9 @@ Upstream files (vendored in `_source/sonner/`):
   reconciliation); dismiss path marks `delete:true` and lets the watcher
   play the exit before filtering (filtering in the subscriber yanked the
   node with no exit animation).
-Playground: `playground-sonner.html` (all types, actions, promise,
-loading→update, burst stack demo, 6 docks, live expand/richColors/close/
-visibleToasts/gap rebuild, copy-paste snippet).
+Playground: `playground-sonner.html` (all types, rich-colors gallery, recipes,
+event log, loading→update, burst stack demo, 6 docks, live expand/richColors/
+close/visibleToasts/gap rebuild, copy-paste snippet).
 
 ## 2. Modal — `radix-ui/primitives` Dialog + `shadcn/ui` dialog styling (MIT)
 - `packages/react/dialog/src/dialog.tsx` (614 lines, vendored at
@@ -74,11 +74,25 @@ Playground: `playground-datepicker.html`.
 ## 6. Modern language — `IntellsGamer/elib-web` (principles, not a copy)
 Studied `templates/base.html`, `templates/dashboard.html`, `static/app.css`:
 glass-with-inner-highlight, one confident accent, eyebrow labels, glowing
-pills, lift-on-hover, sheen buttons, hairline borders, FA icons, big radius,
+pills, lift-on-hover, quiet flat buttons, hairline borders, FA icons, big radius,
 reveals, keyframe modal/toast entrances. Applied as an original light+dark
 admin theme in `assets/css/theme.css` (default accent amber `#f59e0b`,
 configurable — indigo etc. one click away). No serif display font copied:
 admin headings are tight Inter.
+
+## 7. Navigation — Hotwired Turbo 8 (MIT © 37signals, like elib-web)
+
+- `turbo.es2017-umd.min.js` (v8.0.12, the exact file elib-web loads from CDN)
+  vendored to `assets/vendor/turbo/`, included with `defer` on all 8 pages.
+- Lifecycle contract so Drive visits never double-bind or leak: shell wiring
+  lives in `App.initShell()` with every document/window listener tracked and
+  removed by `App.teardown()` (`turbo:before-render` → teardown,
+  `turbo:load` → init); one-shot globals use `window.__ak*` guards; the
+  default Sonner toaster is destroyed pre-render and recreated on load
+  (active toasts replay); open modals `closeAll()` pre-visit; grids/selects
+  expose `destroy()`; programmatic navigation goes through `App.go()`
+  (Turbo.visit with full-load fallback); forms keep working because handlers
+  `preventDefault()` first, which Drive respects.
 
 ## Why hand CSS instead of Tailwind
 The brief demands pages that "load with normal html pages" **offline**.

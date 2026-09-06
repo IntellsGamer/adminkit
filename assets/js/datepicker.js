@@ -20,8 +20,12 @@ function jLen(jy,jm){ const j=J(); if(j&&j.jalaaliMonthLength)return j.jalaaliMo
 function pad(n){return String(n).padStart(2,"0");}
 class DatePicker{
   constructor(input,opts){
-    this.input=input; this.o=Object.assign({locale:"fa",format:"",min:null,max:null,presets:true,onChange:null},opts||{});
+    this.input=input; this.o=Object.assign({locale:"fa",format:"",min:null,max:null,presets:true,onChange:null,todayLabel:null,clearLabel:null,nowLabel:null},opts||{});
     if(!this.o.format)this.o.format=this.o.locale==="fa"?"jYYYY/jMM/jDD":"YYYY-MM-DD";
+    const fa0=this.o.locale==="fa";
+    if(!this.o.todayLabel)this.o.todayLabel=fa0?"امروز":"Today";
+    if(!this.o.clearLabel)this.o.clearLabel=fa0?"پاک":"Clear";
+    if(!this.o.nowLabel)this.o.nowLabel=fa0?"اکنون":"Now";
     this.view=new Date(); this.sel=null;
     this.pop=document.createElement("div"); this.pop.className="dp-pop"; this.pop.style.display="none";
     document.body.appendChild(this.pop);
@@ -68,8 +72,8 @@ class DatePicker{
     this.pop.innerHTML='<div class="dp-head"><button class="icon-btn" data-n="p" aria-label="Previous"><i class="fa-solid fa-chevron-left"></i></button>'+jump+'<button class="icon-btn" data-n="n" aria-label="Next"><i class="fa-solid fa-chevron-right"></i></button></div>'
       +'<div class="muted" style="font-size:12px;font-weight:700;margin-bottom:6px">'+title+'</div>'
       +'<div class="dp-grid">'+cells+'</div>'
-      +'<div class="btn-row" style="margin-top:10px"><button class="btn btn-ghost btn-sm" data-n="today"><i class="fa-solid fa-calendar-day"></i> Today / امروز</button><button class="btn btn-ghost btn-sm" data-n="clear">Clear</button>'
-      +(this.o.presets?'<button class="btn btn-soft btn-sm" data-n="now">Now</button>':"")+"</div>";
+      +'<div class="btn-row" style="margin-top:10px"><button class="btn btn-ghost btn-sm" data-n="today"><i class="fa-solid fa-calendar-day"></i> '+this.o.todayLabel+'</button><button class="btn btn-ghost btn-sm" data-n="clear">'+this.o.clearLabel+'</button>'
+      +(this.o.presets?'<button class="btn btn-soft btn-sm" data-n="now">'+this.o.nowLabel+'</button>':"")+"</div>";
     this.pop.querySelectorAll(".dp-day").forEach(b=>b.onclick=()=>{this.sel=new Date(+b.dataset.t);this.input.value=this.fmt(this.sel);this.view=new Date(this.sel);this.o.onChange&&this.o.onChange(this.sel);this.hide();});
     this.pop.querySelector('[data-n="p"]').onclick=()=>this.nav(-1);
     this.pop.querySelector('[data-n="n"]').onclick=()=>this.nav(1);
@@ -93,6 +97,7 @@ class DatePicker{
     this.draw();
   }
   setLocale(l){ this.o.locale=l; if(!this.o._fmtTouched)this.o.format=l==="fa"?"jYYYY/jMM/jDD":"YYYY-MM-DD"; this.draw(); }
+  setStrings(s){ s=s||{}; if(s.today)this.o.todayLabel=s.today; if(s.clear)this.o.clearLabel=s.clear; if(s.now)this.o.nowLabel=s.now; this.draw(); }
 }
 g.DatePicker=DatePicker;
 })(window);

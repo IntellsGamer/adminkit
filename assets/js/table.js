@@ -15,6 +15,7 @@ function toExcelHTML(cols,rows){ let h='<table><thead><tr>'+cols.map(c=>"<th>"+e
 class DataGrid{
   constructor(el,opts){
     this.el=el; this.o=Object.assign({columns:[],rows:[],pageSize:8,search:true,paging:true,exports:true,colToggle:true,info:true},opts||{});
+    this.o.strings=Object.assign({search:"Search…",columns:"Columns",showing:"Showing",from:"from",page:"Page",perPage:"/ page",noRows:"No rows"},(opts&&opts.strings)||{});
     this.q=""; this.sortKey=""; this.sortDir=1; this.page=1; this.hidden=new Set(); this.colsOpen=false;
     this._docClick=(e)=>{ if(this.colsOpen&&this.el.isConnected&&!this.el.contains(e.target)){ this.colsOpen=false; const p=this.el.querySelector('[data-g="colpanel"]'); if(p)p.hidden=true; } };
     this._docKey=(e)=>{ if(e.key==="Escape"&&this.colsOpen){ this.colsOpen=false; const p=this.el.querySelector('[data-g="colpanel"]'); if(p)p.hidden=true; } };
@@ -36,10 +37,10 @@ class DataGrid{
   renderTools(){
     const box=this.el.querySelector(".tbl-tools");
     let h="";
-    if(this.o.search)h+='<input type="search" data-g="q" placeholder="Search…" value="'+esc(this.q)+'">';
+    if(this.o.search)h+='<input type="search" data-g="q" placeholder="'+esc(this.o.strings.search)+'" value="'+esc(this.q)+'">';
     if(this.o.exports)h+='<button type="button" class="btn btn-ghost btn-sm" data-g="csv"><i class="fa-solid fa-file-csv"></i>CSV</button><button type="button" class="btn btn-ghost btn-sm" data-g="xls"><i class="fa-solid fa-file-excel"></i>Excel</button><button type="button" class="btn btn-ghost btn-sm" data-g="copy"><i class="fa-solid fa-copy"></i>Copy</button>';
     if(this.o.colToggle){
-      h+='<span class="colvis"><button type="button" class="btn btn-ghost btn-sm" data-g="cols"><i class="fa-solid fa-table-columns"></i>Columns (<span data-g="colcount">'+this.colCountLabel()+'</span>)<i class="fa-solid fa-chevron-down" style="font-size:10px"></i></button>'
+      h+='<span class="colvis"><button type="button" class="btn btn-ghost btn-sm" data-g="cols"><i class="fa-solid fa-table-columns"></i>'+esc(this.o.strings.columns)+' (<span data-g="colcount">'+this.colCountLabel()+'</span>)<i class="fa-solid fa-chevron-down" style="font-size:10px"></i></button>'
         +'<span class="colvis-panel" data-g="colpanel"'+(this.colsOpen?'':' hidden')+'>'
         +this.o.columns.map(c=>'<label class="colvis-row"><span>'+esc(c.title)+'</span><span class="switch switch-sm"><input type="checkbox" data-g="col" value="'+esc(c.key)+'"'+(this.hidden.has(c.key)?'':' checked')+'><i></i></span></label>').join('')+'</span></span>';
     }
@@ -66,13 +67,13 @@ class DataGrid{
     const total=rows.length, ps=this.o.pageSize, pages=Math.max(1,Math.ceil(total/ps));
     if(this.page>pages)this.page=pages;
     const start=(this.page-1)*ps, slice=rows.slice(start,start+ps);
-    let h='<div class="tbl-wrap"><table class="data"><thead><tr>'+cols.map(c=>'<th data-g="sort" data-k="'+esc(c.key)+'">'+esc(c.title)+(this.sortKey===c.key?'<i class="fa-solid '+(this.sortDir>0?"fa-sort-up":"fa-sort-down")+'"></i>':"")+"</th>").join("")+"</tr></thead><tbody>";
-    h+=slice.map(r=>"<tr>"+cols.map(c=>"<td>"+esc(r[c.key])+"</td>").join("")+"</tr>").join("")||'<tr><td colspan="'+cols.length+'">No rows</td></tr>';
+    let h='<div class="tbl-wrap"><table class="data"><thead><tr>'+cols.map(c=>'<th data-k="'+esc(c.key)+'"'+(this.sortKey===c.key?' aria-sort="'+(this.sortDir>0?"ascending":"descending")+'"':"")+'>'+'<button type="button" class="thbtn" data-g="sort" data-k="'+esc(c.key)+'">'+esc(c.title)+(this.sortKey===c.key?'<i class="fa-solid '+(this.sortDir>0?"fa-sort-up":"fa-sort-down")+'"></i>':"")+"</button></th>").join("")+"</tr></thead><tbody>";
+    h+=slice.map(r=>"<tr>"+cols.map(c=>"<td>"+esc(r[c.key])+"</td>").join("")+"</tr>").join("")||'<tr><td colspan="'+cols.length+'">'+esc(this.o.strings.noRows)+"</td></tr>";
     h+="</tbody></table></div>";
     if(this.o.paging||this.o.info){
       h+='<div class="tbl-pager">';
-      if(this.o.info)h+='<span class="muted">Showing '+(total?(start+1):0)+"–"+Math.min(start+ps,total)+" from "+total+"</span>";
-      if(this.o.paging){h+='<span style="flex:1"></span><button type="button" class="btn btn-ghost btn-sm" data-g="prev"><i class="fa-solid fa-chevron-left"></i></button><span>Page '+this.page+" / "+pages+'</span><button type="button" class="btn btn-ghost btn-sm" data-g="next"><i class="fa-solid fa-chevron-right"></i></button><select data-g="ps" aria-label="Rows per page">'+[5,8,15,25,50].map(n=>'<option value="'+n+'"'+(ps===n?" selected":"")+">"+n+" / page</option>").join("")+"</select>";}
+      if(this.o.info)h+='<span class="muted">'+esc(this.o.strings.showing)+' '+(total?(start+1):0)+"–"+Math.min(start+ps,total)+" "+esc(this.o.strings.from)+" "+total+"</span>";
+      if(this.o.paging){h+='<span style="flex:1"></span><button type="button" class="btn btn-ghost btn-sm" data-g="prev"><i class="fa-solid fa-chevron-left"></i></button><span>'+esc(this.o.strings.page)+' '+this.page+" / "+pages+'</span><button type="button" class="btn btn-ghost btn-sm" data-g="next"><i class="fa-solid fa-chevron-right"></i></button><select data-g="ps" aria-label="Rows per page">'+[5,8,15,25,50].map(n=>'<option value="'+n+'"'+(ps===n?" selected":"")+">"+n+" "+esc(this.o.strings.perPage)+"</option>").join("")+"</select>";}
       h+="</div>";
     }
     box.innerHTML=h;

@@ -74,9 +74,10 @@ function open(opts){
 }
 function confirm(o){
   o=o||{};
+  const okLabel=o.okLabel||"Confirm", cancelLabel=o.cancelLabel||"Cancel";
   return new Promise(res=>{
     const h=open({title:o.title||"Are you absolutely sure?",desc:o.desc||"This action cannot be undone.",
-      body:o.body||"",footer:'<button class="btn btn-ghost" data-x="cancel">Cancel</button> <button class="btn btn-danger" data-x="ok">Confirm</button>',
+      body:o.body||"",footer:'<button class="btn btn-ghost" data-x="cancel">'+cancelLabel+'</button> <button class="btn btn-danger" data-x="ok">'+okLabel+"</button>",
       size:o.size||"sm",stickyFooter:true});
     h.dlg.addEventListener("click",e=>{
       if(e.target.closest('[data-x="ok"]')){h.close("ok");res(true);}
@@ -86,6 +87,7 @@ function confirm(o){
 }
 g.Modal={open,confirm,stack:()=>stack.slice(),closeAll:()=>stack.slice().forEach(s=>s.close("all"))};
 // declarative triggers: <button data-modal-target="#id"> + <template id="id">
+if(!g.__akModalBound){
 document.addEventListener("click",e=>{
   const t=e.target.closest("[data-modal-target]");
   if(!t)return;
@@ -96,4 +98,8 @@ document.addEventListener("click",e=>{
     body:tpl.innerHTML,size:t.dataset.modalSize||tpl.dataset.size||"md",
     footer:t.dataset.modalFooter!==undefined?undefined:(tpl.dataset.footer||"")});
 });
+// an open dialog must not survive a Turbo navigation (its nodes leave with the old <body>)
+document.addEventListener("turbo:before-visit",()=>{try{g.Modal.closeAll();}catch(e){}});
+g.__akModalBound=true;
+}
 })(window);
