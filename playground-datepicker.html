@@ -12,8 +12,110 @@
 <script src="assets/js/app.js"></script>
 <title>Date picker playground — AdminKit</title><link rel="stylesheet" href="assets/vendor/fontawesome/all.min.css"><link rel="stylesheet" href="assets/css/sonner.css"><link rel="stylesheet" href="assets/css/theme.css"><link rel="stylesheet" href="assets/css/components.css"></head>
 <body data-layout="vertical" data-sidebar="full" data-glass="on"><div class="app">
-<aside class="sidebar"><div class="brand"><span class="brand-mark"><i class="fa-solid fa-layer-group"></i></span><span class="brand-text"><span>AdminKit</span><small>Modern admin</small></span></div><nav class="nav"><div class="nav-item"><button class="nav-link" onclick="App.go('index.html')"><i class="fa-solid fa-table-columns fa-fw"></i><span class="nav-text" data-i18n="dashboard">Dashboard</span></button></div><div class="nav-item open"><button class="nav-link"><i class="fa-solid fa-flask fa-fw"></i><span class="nav-text" data-i18n="playgrounds">Playgrounds</span><i class="fa-solid fa-chevron-down chev"></i></button><div class="nav-sub"><a class="nav-link" href="playground-sonner.html"><i class="fa-solid fa-bell fa-fw"></i><span class="nav-text" data-i18n="sonner">Sonner</span></a><a class="nav-link" href="playground-modal.html"><i class="fa-solid fa-window-restore fa-fw"></i><span class="nav-text" data-i18n="modal">Modal</span></a><a class="nav-link" href="playground-table.html"><i class="fa-solid fa-table fa-fw"></i><span class="nav-text" data-i18n="table">Table</span></a><a class="nav-link" href="playground-dropdown.html"><i class="fa-solid fa-chevron-down fa-fw"></i><span class="nav-text" data-i18n="dropdown">Dropdown</span></a><a class="nav-link active" href="playground-datepicker.html"><i class="fa-solid fa-calendar-days fa-fw"></i><span class="nav-text" data-i18n="datepicker">Date picker</span></a><a class="nav-link" href="playground-buttons.html"><i class="fa-solid fa-circle-dot fa-fw"></i><span class="nav-text" data-i18n="buttons">Buttons</span></a></div></div></nav></aside>
-<div class="main"><header class="topbar"><button class="icon-btn hamburger" data-act="nav"><i class="fa-solid fa-bars"></i></button><div class="topbar-spacer"></div><button class="icon-btn" id="layoutToggle"><i class="fa-solid fa-table-columns"></i></button><input type="color" class="color-dot" id="topPrimary" value="#f59e0b" title="Theme color"><button class="icon-btn" id="themeToggle"><i class="fa-solid fa-moon icon-moon"></i><i class="fa-solid fa-sun icon-sun"></i></button><button class="icon-btn" data-act="settings"><i class="fa-solid fa-gear"></i></button></header>
+<aside class="sidebar" id="sidebar">
+    <div class="brand"><span class="brand-mark"><i class="fa-solid fa-layer-group"></i></span><span class="brand-text"><span data-i18n="appName">AdminKit</span><small data-i18n="tagline">Modern admin</small></span></div>
+    <nav class="nav">
+      <div class="nav-label"><span data-i18n="main">Main</span></div>
+      <div class="nav-item">
+        <button class="nav-link"><i class="fa-solid fa-table-columns fa-fw"></i><span class="nav-text" data-i18n="dashboard">Dashboard</span><i class="fa-solid fa-chevron-down chev"></i></button>
+        <div class="nav-sub">
+          <a class="nav-link" href="index.html#overview"><i class="fa-solid fa-chart-line fa-fw"></i><span class="nav-text" data-i18n="overview">Overview</span></a>
+          <a class="nav-link" href="index.html#analytics"><i class="fa-solid fa-chart-pie fa-fw"></i><span class="nav-text" data-i18n="analytics">Analytics</span></a>
+          <a class="nav-link" href="playground-table.html"><i class="fa-solid fa-file-lines fa-fw"></i><span class="nav-text" data-i18n="reports">Reports</span></a>
+        </div>
+      </div>
+      <div class="nav-item">
+        <button class="nav-link"><i class="fa-solid fa-flask fa-fw"></i><span class="nav-text" data-i18n="playgrounds">Playgrounds</span><i class="fa-solid fa-chevron-down chev"></i></button>
+        <div class="nav-sub">
+          <a class="nav-link" href="playground-sonner.html"><i class="fa-solid fa-bell fa-fw"></i><span class="nav-text" data-i18n="sonner">Sonner playground</span></a>
+          <a class="nav-link" href="playground-modal.html"><i class="fa-solid fa-window-restore fa-fw"></i><span class="nav-text" data-i18n="modal">Modal playground</span></a>
+          <a class="nav-link" href="playground-table.html"><i class="fa-solid fa-table fa-fw"></i><span class="nav-text" data-i18n="table">Table playground</span></a>
+          <a class="nav-link" href="playground-dropdown.html"><i class="fa-solid fa-chevron-down fa-fw"></i><span class="nav-text" data-i18n="dropdown">Dropdown playground</span></a>
+          <a class="nav-link" href="playground-datepicker.html"><i class="fa-solid fa-calendar-days fa-fw"></i><span class="nav-text" data-i18n="datepicker">Date picker playground</span></a>
+          <a class="nav-link" href="playground-buttons.html"><i class="fa-solid fa-circle-dot fa-fw"></i><span class="nav-text" data-i18n="buttons">Buttons playground</span></a>
+        </div>
+      </div>
+      <div class="nav-item">
+        <button class="nav-link"><i class="fa-solid fa-gear fa-fw"></i><span class="nav-text" data-i18n="system">System</span><i class="fa-solid fa-chevron-down chev"></i></button>
+        <div class="nav-sub">
+          <a class="nav-link" href="login.html"><i class="fa-solid fa-key fa-fw"></i><span class="nav-text" data-i18n="login">Login / Register</span></a>
+          <a class="nav-link" href="#" data-act="settings"><i class="fa-solid fa-sliders fa-fw"></i><span class="nav-text" data-i18n="settings">Theme settings</span></a>
+        </div>
+      </div>
+    </nav>
+  </aside>
+<div class="main"><header class="topbar">
+      <button class="icon-btn hamburger" data-act="nav" aria-label="Menu"><i class="fa-solid fa-bars"></i></button>
+      <nav class="hmenu" aria-label="Horizontal">
+        <div><button class="hlink"><i class="fa-solid fa-table-columns"></i><span data-i18n="dashboards">Dashboards</span><i class="fa-solid fa-chevron-down" style="font-size:10px"></i></button>
+          <div class="drop mega">
+            <a href="index.html"><img alt="" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='104' height='76'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0' stop-color='%23f59e0b'/%3E%3Cstop offset='1' stop-color='%23ea580c'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='104' height='76' rx='12' fill='url(%23g)'/%3E%3Crect x='12' y='48' width='60' height='6' rx='3' fill='white' opacity='.8'/%3E%3Crect x='12' y='38' width='40' height='6' rx='3' fill='white' opacity='.5'/%3E%3C/svg%3E"><span><b>Overview</b><br><small class="muted">KPI + charts</small></span></a>
+            <a href="playground-table.html"><img alt="" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='104' height='76'%3E%3Crect width='104' height='76' rx='12' fill='%23059669'/%3E%3Crect x='12' y='16' width='80' height='6' rx='3' fill='white' opacity='.8'/%3E%3Crect x='12' y='28' width='80' height='6' rx='3' fill='white' opacity='.5'/%3E%3Crect x='12' y='40' width='80' height='6' rx='3' fill='white' opacity='.5'/%3E%3Crect x='12' y='52' width='52' height='6' rx='3' fill='white' opacity='.5'/%3E%3C/svg%3E"><span><b>Reports</b><br><small class="muted">Tables + export</small></span></a>
+            <a href="playground-sonner.html"><img alt="" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='104' height='76'%3E%3Crect width='104' height='76' rx='12' fill='%230369a1'/%3E%3Crect x='32' y='14' width='40' height='30' rx='9' fill='white' opacity='.9'/%3E%3Crect x='12' y='52' width='80' height='6' rx='3' fill='white' opacity='.5'/%3E%3C/svg%3E"><span><b>Alerts</b><br><small class="muted">Sonner toasts</small></span></a>
+          </div>
+        </div>
+        <div><button class="hlink"><i class="fa-solid fa-cube"></i><span data-i18n="components">Components</span><i class="fa-solid fa-chevron-down" style="font-size:10px"></i></button>
+          <div class="drop">
+            <a href="playground-buttons.html"><i class="fa-solid fa-circle-dot fa-fw"></i><span data-i18n="buttons">Buttons playground</span></a>
+            <a href="playground-modal.html"><i class="fa-solid fa-window-restore fa-fw"></i><span data-i18n="modal">Modal playground</span></a>
+            <a href="playground-dropdown.html"><i class="fa-solid fa-chevron-down fa-fw"></i><span data-i18n="dropdown">Dropdown playground</span></a>
+            <a href="playground-datepicker.html"><i class="fa-solid fa-calendar-days fa-fw"></i><span data-i18n="datepicker">Date picker playground</span></a>
+            <a href="playground-sonner.html"><i class="fa-solid fa-bell fa-fw"></i><span data-i18n="sonner">Sonner playground</span></a>
+            <a href="playground-table.html"><i class="fa-solid fa-table fa-fw"></i><span data-i18n="table">Table playground</span></a>
+          </div>
+        </div>
+        <div><button class="hlink" onclick="App.go('login.html')"><i class="fa-solid fa-key"></i><span data-i18n="auth">Auth</span></button></div>
+      </nav>
+      <div class="topbar-spacer"></div>
+      <label class="searchbox"><i class="fa-solid fa-magnifying-glass"></i><input data-i18n-ph="searchPh" placeholder="Search…"></label>
+      <span class="top-sep"></span>
+      <div class="tmenu">
+        <button class="icon-btn" data-tmenu aria-label="Theme" title="Theme"><i class="fa-solid fa-circle-half-stroke" id="tbThemeIcon"></i></button>
+        <div class="tmenu-drop" role="menu">
+          <div class="tmenu-head"><span data-i18n="themeMenu">Theme</span></div>
+          <button type="button" class="tmi" data-theme-pick="system"><i class="fa-solid fa-desktop fa-fw"></i><span data-i18n="system">System default</span><i class="fa-solid fa-check tick"></i></button>
+          <button type="button" class="tmi" data-theme-pick="light"><i class="fa-solid fa-sun fa-fw"></i><span data-i18n="light">Light</span><i class="fa-solid fa-check tick"></i></button>
+          <button type="button" class="tmi" data-theme-pick="dark"><i class="fa-solid fa-moon fa-fw"></i><span data-i18n="dark">Dark</span><i class="fa-solid fa-check tick"></i></button>
+          <div class="tmenu-sep"></div>
+          <div class="tmenu-row"><span data-i18n="primary">Primary color</span><input type="color" class="color-dot" id="tbPrimary" value="#f59e0b" aria-label="Theme color"></div>
+          <div class="tmenu-row"><span data-i18n="swatches">Swatches</span><span class="swatches"><button type="button" class="swatch" data-color="#f59e0b" style="background:#f59e0b" aria-label="amber"></button><button type="button" class="swatch" data-color="#6366f1" style="background:#6366f1" aria-label="indigo"></button><button type="button" class="swatch" data-color="#0ea5e9" style="background:#0ea5e9" aria-label="sky"></button><button type="button" class="swatch" data-color="#12a56f" style="background:#12a56f" aria-label="green"></button><button type="button" class="swatch" data-color="#e5484d" style="background:#e5484d" aria-label="red"></button><button type="button" class="swatch" data-color="#8b5cf6" style="background:#8b5cf6" aria-label="violet"></button></span></div>
+          <div class="tmenu-sep"></div>
+          <div class="tmenu-row"><span data-i18n="layout">Menu layout</span><span class="seg"><button type="button" data-layout-pick="vertical"><span data-i18n="vertical">Vertical sidebar</span></button><button type="button" data-layout-pick="horizontal"><span data-i18n="horizontal">Horizontal top menu</span></button></span></div>
+          <div class="tmenu-row"><span data-i18n="sidebar">Sidebar mode</span><span class="seg"><button type="button" data-sidebar-pick="full"><span data-i18n="full">Full</span></button><button type="button" data-sidebar-pick="mini"><span data-i18n="mini">Mini (icons)</span></button></span></div>
+          <div class="tmenu-row"><span data-i18n="glass">Liquid glass</span><label class="switch"><input type="checkbox" id="tbGlass" checked><i></i></label></div>
+        </div>
+      </div>
+      <div class="tmenu">
+        <button class="icon-btn" data-tmenu aria-label="Language" title="Language"><i class="fa-solid fa-language"></i><span class="lang-flag" id="tbLangLabel">EN</span></button>
+        <div class="tmenu-drop" role="menu">
+          <div class="tmenu-head"><span data-i18n="langMenu">Language</span></div>
+          <button type="button" class="tmi" data-lang="en"><i class="fa-solid fa-globe fa-fw"></i><span>English</span><i class="fa-solid fa-check tick"></i></button>
+          <button type="button" class="tmi" data-lang="fa"><i class="fa-solid fa-globe fa-fw"></i><span>فارسی</span><i class="fa-solid fa-check tick"></i></button>
+        </div>
+      </div>
+      <div class="tmenu">
+        <button class="icon-btn" data-tmenu aria-label="Notifications" title="Notifications"><i class="fa-solid fa-bell"></i><span class="badge" id="notifBadge" data-num>3</span></button>
+        <div class="tmenu-drop wide" role="menu">
+          <div class="tmenu-head"><span data-i18n="notifications">Notifications</span></div>
+          <a class="notif" href="index.html#analytics"><span class="tile t-green"><i class="fa-solid fa-check"></i></span><span><b data-i18n="notif1t">Deployment succeeded</b><br><small data-i18n="notif1d">Reports build finished</small></span></a>
+          <a class="notif" href="playground-table.html"><span class="tile t-blue"><i class="fa-solid fa-user-plus"></i></span><span><b data-i18n="notif2t">New signup</b><br><small data-i18n="notif2d">Sara joined the workspace</small></span></a>
+          <a class="notif" href="index.html"><span class="tile"><i class="fa-solid fa-lock"></i></span><span><b data-i18n="notif3t">Auto-lock armed</b><br><small data-i18n="notif3d">Idle guard restarts</small></span></a>
+          <div class="tmenu-sep"></div>
+          <button type="button" class="tmi" id="notifMark"><i class="fa-solid fa-check-double fa-fw"></i><span data-i18n="markRead">Mark all read</span></button>
+        </div>
+      </div>
+      <div class="tmenu">
+        <button class="avatar-btn" data-tmenu aria-label="Profile" title="Profile"><span class="avatar">A</span><i class="fa-solid fa-chevron-down"></i></button>
+        <div class="tmenu-drop" role="menu">
+          <div class="tmenu-head"><span data-i18n="profile">Profile</span></div>
+          <a class="tmi" href="login.html"><i class="fa-solid fa-user fa-fw"></i><span data-i18n="myProfile">My profile</span></a>
+          <a class="tmi" href="#" data-act="settings"><i class="fa-solid fa-sliders fa-fw"></i><span data-i18n="settings">Theme settings</span></a>
+          <div class="tmenu-sep"></div>
+          <a class="tmi" href="login.html"><i class="fa-solid fa-right-from-bracket fa-fw"></i><span data-i18n="logout">Logout</span></a>
+        </div>
+      </div>
+      <button class="icon-btn" data-act="settings" aria-label="Settings"><i class="fa-solid fa-gear"></i></button>
+    </header>
 <main class="content"><div class="pagenav"><a href="index.html"><i class="fa-solid fa-table-columns"></i><span data-i18n="dashboard">Dashboard</span></a><a href="playground-sonner.html"><i class="fa-solid fa-bell"></i><span data-i18n="sonner">Sonner</span></a><a href="playground-modal.html"><i class="fa-solid fa-window-restore"></i><span data-i18n="modal">Modal</span></a><a href="playground-table.html"><i class="fa-solid fa-table"></i><span data-i18n="table">Table</span></a><a href="playground-dropdown.html"><i class="fa-solid fa-chevron-down"></i><span data-i18n="dropdown">Dropdown</span></a><a class="active" href="playground-datepicker.html"><i class="fa-solid fa-calendar-days"></i><span data-i18n="datepicker">Date picker</span></a><a href="playground-buttons.html"><i class="fa-solid fa-circle-dot"></i><span data-i18n="buttons">Buttons</span></a><a href="login.html"><i class="fa-solid fa-key"></i><span data-i18n="login">Auth</span></a></div>
 <h1 data-i18n="pgDpH">Persian + Gregorian date picker</h1><p class="muted">Jalali math is the exact <code>jalaali-js</code> algorithm vendored offline at <code>assets/js/jalaali-vendor.js</code> (<code>toJalaali/toGregorian/jalaaliMonthLength</code>). Popup: month/year jump, min/max, formats, presets.</p><p class="muted" data-i18n="pgDpP">Exact jalaali-js math, vendored offline.</p>
 <div class="grid cols-2"><div class="card"><div class="section-head"><span class="tile t-ghost"><i class="fa-solid fa-calendar-days"></i></span><h3 data-i18n="tryIt">Try it</h3></div><div class="field"><label data-i18n="dpFaL">Jalali date (fa)</label><input id="dpFa" placeholder="1404/…"></div><div class="field"><label data-i18n="dpEnL">Gregorian (en)</label><input id="dpEn" placeholder="YYYY-MM-DD"></div><div class="field"><label data-i18n="dpMinL">Constrained (2024 only, no presets)</label><input id="dpMin" placeholder="Pick within 2024"></div><div class="btn-row"><button class="btn btn-ghost btn-sm" id="btnFa">FA locale</button><button class="btn btn-ghost btn-sm" id="btnEn">EN locale</button></div><p class="muted">Value: <b id="dpOut">—</b></p></div>
@@ -25,8 +127,42 @@
   format: 'jYYYY/jMM/jDD', // or 'YYYY-MM-DD'
   presets: true, min: new Date(2020,0,1), max: null,
   onChange: d =&gt; console.log(d) });&lt;/script&gt;</pre></div></div>
-</main></div></div>
-<div class="scrim" id="scrim"></div><aside class="drawer" id="settingsDrawer"><div style="display:flex;justify-content:space-between;align-items:center"><h3 style="margin:0"><i class="fa-solid fa-sliders"></i> Settings</h3><button class="icon-btn" data-act="settings-close"><i class="fa-solid fa-xmark"></i></button></div><div class="set-row"><span data-i18n="theme">Theme</span><select id="setTheme"><option value="system" data-i18n="system">System default</option><option value="light" data-i18n="light">Light</option><option value="dark" data-i18n="dark">Dark</option></select></div><div class="set-row"><span data-i18n="primary">Primary</span><input type="color" id="setPrimary" value="#f59e0b"></div><div class="set-row"><span data-i18n="layout">Menu layout</span><select id="setLayout"><option value="vertical" data-i18n="vertical">Vertical</option><option value="horizontal" data-i18n="horizontal">Horizontal</option></select></div><div class="set-row"><span data-i18n="sidebar">Sidebar mode</span><select id="setSidebar"><option value="full" data-i18n="full">Full</option><option value="mini" data-i18n="mini">Mini</option></select></div><div class="set-row"><span data-i18n="glass">Glass</span><label class="switch"><input type="checkbox" id="setGlass" checked><i></i></label></div><div class="set-row"><span data-i18n="language">Language</span><select id="setLang"><option value="en">EN</option><option value="fa">FA</option></select></div><div class="set-row"><span data-i18n="direction">Direction</span><select id="setDir"><option value="auto" data-i18n="auto">Auto</option><option value="ltr" data-i18n="ltr">LTR</option><option value="rtl" data-i18n="rtl">RTL</option></select></div><div class="set-row"><span data-i18n="idle">Auto-lock (minutes, 0 = off)</span><input type="number" id="setIdle" min="0" max="120" style="width:90px"></div></aside>
+</main>
+    <footer class="footer">
+      <span class="fbrand"><i class="fa-solid fa-layer-group"></i><span data-i18n="appName">AdminKit</span></span>
+      <span class="muted" data-i18n="footerTag">Offline-first admin template. No CDN, no build step.</span>
+      <nav><a href="index.html"><span data-i18n="dashboard">Dashboard</span></a><a href="playground-table.html"><span data-i18n="reports">Reports</span></a><a href="login.html"><span data-i18n="login">Login / Register</span></a></nav>
+      <span class="muted">© <span data-year>2026</span></span>
+    </footer></div></div>
+<div class="scrim" id="scrim"></div><aside class="drawer" id="settingsDrawer" aria-label="Settings">
+  <div style="display:flex;align-items:center;justify-content:space-between"><h3 style="margin:0"><i class="fa-solid fa-sliders"></i> <span data-i18n="settings">Theme settings</span></h3><button class="icon-btn" data-act="settings-close"><i class="fa-solid fa-xmark"></i></button></div>
+  <div class="set-group"><span class="eyebrow" data-i18n="appearance">Appearance</span>
+    <div class="set-row"><span data-i18n="theme">Theme</span><select id="setTheme"><option value="system" data-i18n="system">System default</option><option value="light" data-i18n="light">Light</option><option value="dark" data-i18n="dark">Dark</option></select></div>
+    <div class="set-row"><span data-i18n="quick">Quick</span><span><button class="btn btn-ghost btn-sm" data-theme-pick="light"><span data-i18n="light">Light</span></button> <button class="btn btn-ghost btn-sm" data-theme-pick="dark"><span data-i18n="dark">Dark</span></button> <button class="btn btn-ghost btn-sm" data-theme-pick="system"><span data-i18n="auto">Auto</span></button></span></div>
+    <div class="set-row"><span data-i18n="primary">Primary color</span><input type="color" id="setPrimary" value="#f59e0b"></div>
+    <div class="set-row"><span data-i18n="swatches">Swatches</span><span class="swatches">
+      <button class="swatch" data-color="#f59e0b" style="background:#f59e0b" aria-label="amber"></button>
+      <button class="swatch" data-color="#6366f1" style="background:#6366f1" aria-label="indigo"></button>
+      <button class="swatch" data-color="#0ea5e9" style="background:#0ea5e9" aria-label="sky"></button>
+      <button class="swatch" data-color="#12a56f" style="background:#12a56f" aria-label="green"></button>
+      <button class="swatch" data-color="#e5484d" style="background:#e5484d" aria-label="red"></button>
+      <button class="swatch" data-color="#8b5cf6" style="background:#8b5cf6" aria-label="violet"></button>
+    </span></div>
+    <div class="set-row"><span data-i18n="glass">Liquid glass</span><label class="switch"><input type="checkbox" id="setGlass" checked><i></i></label></div>
+  </div>
+  <div class="set-group"><span class="eyebrow" data-i18n="layoutGroup">Layout</span>
+    <div class="set-row"><span data-i18n="layout">Menu layout</span><select id="setLayout"><option value="vertical" data-i18n="vertical">Vertical sidebar</option><option value="horizontal" data-i18n="horizontal">Horizontal top menu</option></select></div>
+    <div class="set-row"><span data-i18n="sidebar">Sidebar mode</span><select id="setSidebar"><option value="full" data-i18n="full">Full</option><option value="mini" data-i18n="mini">Mini (icons)</option></select></div>
+  </div>
+  <div class="set-group"><span class="eyebrow" data-i18n="localeGroup">Locale</span>
+    <div class="set-row"><span data-i18n="language">Language</span><select id="setLang"><option value="en">English</option><option value="fa">فارسی</option></select></div>
+    <div class="set-row"><span data-i18n="direction">Direction</span><select id="setDir"><option value="auto" data-i18n="auto">Auto</option><option value="ltr" data-i18n="ltr">LTR</option><option value="rtl" data-i18n="rtl">RTL</option></select></div>
+  </div>
+  <div class="set-group"><span class="eyebrow" data-i18n="securityGroup">Security</span>
+    <div class="set-row"><span data-i18n="idle">Auto-lock (minutes, 0 = off)</span><input type="number" id="setIdle" min="0" max="120" step="1" style="width:90px"></div>
+  </div>
+  <p class="muted" style="font-size:12.5px">System theme is followed automatically and only applied when you haven't overridden it (or when set to System default). All settings persist in localStorage.</p>
+</aside>
 <div class="idle-wrap" id="idleWrap"><div class="idle-card"><span class="tile"><i class="fa-solid fa-bell"></i></span><h3 data-i18n="idleTitle">Still there?</h3><div class="progress"><i id="idleBar"></i></div><p class="muted" id="idleTxt"></p><button class="btn btn-primary" id="idleStay"><i class="fa-solid fa-check"></i><span data-i18n="stay">Stay</span></button> <button class="btn btn-ghost" id="idleLeave"><i class="fa-solid fa-lock"></i><span data-i18n="leave">Lock</span></button></div></div>
 <div class="lock-wrap" id="lockWrap"><div class="lock-card"><span class="tile t-red"><i class="fa-solid fa-lock"></i></span><h3 data-i18n="lockTitle">Locked</h3><p class="muted" data-i18n="lockDesc">Locked for inactivity.</p><button class="btn btn-primary btn-lg" id="lockBtn"><i class="fa-solid fa-arrow-right-to-bracket"></i><span data-i18n="unlock">Back to workflow</span></button></div></div>
 

@@ -60,10 +60,19 @@ idle/lock overlays. Change the theme once — it follows you across pages via
 
 ## 4. Theme settings (UI)
 
-**Top bar (always visible):** hamburger (mobile) · horizontal menus ·
-search (command-palette page jumper, ↓↑ + Enter) · layout toggle
-(vertical/horizontal) · color dot (theme color) · sun/moon · EN/فا · gear
-(opens settings).
+**Top bar (always visible, identical on every page):** hamburger (mobile) ·
+horizontal menus (horizontal layout only; extra entries auto-collapse into a
+`More ⌄` overflow entry) · search (command-palette page jumper, ↓↑ + Enter) ·
+theme dropdown (System default / Light / Dark + primary color + 6 swatches +
+layout + sidebar mode + glass switch) · language dropdown (English / فارسی) ·
+notifications dropdown (badge + mark-all-read) · profile dropdown (profile /
+settings / logout) · gear (opens settings drawer).
+
+The old one-off top-bar buttons (`#layoutToggle`, `#topPrimary`,
+`#themeToggle`, `EN`/`فا`) are gone — every theme control now lives in the
+theme dropdown (top bar) and stays in sync with the settings drawer via
+`ThemeStore`. If you still have the old IDs on a custom page they keep working,
+but new pages should copy the unified `<header class="topbar">` shell.
 
 **Settings drawer** (gear icon; sits on the **opposite side** of the sidebar;
 **opens automatically on first visit**):
@@ -101,9 +110,77 @@ ThemeStore.effectiveTheme() // 'light' | 'dark' (resolves 'system' via OS)
   **floating card outside** the sidebar, anchored to the clicked row.
 - **Horizontal:** sidebar hides; top bar shows dropdown menus incl. a
   **mega-menu with images** (offline inline-SVG covers — swap `src` for yours).
+  When entries overflow the bar width, extras move into a trailing `More ⌄`
+  entry automatically (`fitHmenu()` in `app.js`; re-runs on resize, layout
+  switch and language change — see §6b).
 - **Mobile (≤860px):** hamburger toggles the sidebar as an overlay drawer.
 - Active states are quiet (neutral gray block), Vercel-style — parents are
-  never "active", only the current leaf page is bold.
+  never "active", only the current leaf page is bold. The shared shell is
+  identical on all pages; `syncActive()` in `app.js` highlights the current
+  file automatically, so no per-page `active` bookkeeping.
+- **Footer:** every shell page ends with `<footer class="footer">` (brand +
+  tagline + 3 links + auto year); `login.html` uses a compact `.auth-foot`.
+  The year follows the locale digits (see §7).
+
+## 6b. Mega menu — how to add one
+
+The horizontal bar supports a normal dropdown **and** a 3-column mega menu.
+Copy this pattern inside `<nav class="hmenu">` (every page already has the
+same shell, so add it once and copy to all pages, or add it to `index.html`
+and re-sync):
+
+```html
+<nav class="hmenu" aria-label="Horizontal">
+  <!-- 1. mega menu: parent button + .drop.mega with 3 cards -->
+  <div>
+    <button class="hlink">
+      <i class="fa-solid fa-table-columns"></i>
+      <span data-i18n="dashboards">Dashboards</span>
+      <i class="fa-solid fa-chevron-down" style="font-size:10px"></i>
+    </button>
+    <div class="drop mega">
+      <a href="index.html">
+        <img alt="" src="data:image/svg+xml,...your-cover...">
+        <span><b>Overview</b><br><small class="muted">KPI + charts</small></span>
+      </a>
+      <a href="playground-table.html">
+        <img alt="" src="data:image/svg+xml,...your-cover...">
+        <span><b>Reports</b><br><small class="muted">Tables + export</small></span>
+      </a>
+      <a href="playground-sonner.html">
+        <img alt="" src="data:image/svg+xml,...your-cover...">
+        <span><b>Alerts</b><br><small class="muted">Sonner toasts</small></span>
+      </a>
+    </div>
+  </div>
+  <!-- 2. normal dropdown: same, but .drop without .mega -->
+  <div>
+    <button class="hlink">
+      <i class="fa-solid fa-cube"></i>
+      <span data-i18n="components">Components</span>
+      <i class="fa-solid fa-chevron-down" style="font-size:10px"></i>
+    </button>
+    <div class="drop">
+      <a href="playground-buttons.html"><i class="fa-solid fa-circle-dot fa-fw"></i><span data-i18n="buttons">Buttons</span></a>
+      <a href="playground-modal.html"><i class="fa-solid fa-window-restore fa-fw"></i><span data-i18n="modal">Modal</span></a>
+    </div>
+  </div>
+  <!-- 3. plain link (no .drop at all): navigates directly -->
+  <div><button class="hlink" onclick="App.go('login.html')"><i class="fa-solid fa-key"></i><span data-i18n="auth">Auth</span></button></div>
+</nav>
+```
+
+Rules:
+
+- `.drop.mega` = 3-column card grid (covers via inline-SVG so it works
+  offline; swap the `src` for your own images). Plain `.drop` = vertical link
+  list. No `.drop` = direct navigation button.
+- Labels with `data-i18n="..."` need matching keys in `i18n/en.json` +
+  `i18n/fa.json`.
+- Mobile (≤560px) collapses `.mega` to 1 column automatically.
+- Overflow is free: if your entries exceed the bar, `fitHmenu()` moves the
+  trailing ones into `More ⌄` — no extra markup needed (the `#hMore` node is
+  injected by JS).
 
 ## 7. i18n + RTL
 
@@ -121,13 +198,15 @@ const d = await I18N.dict('en');  // read raw dictionary
 ```
 
 **Add a language:** copy `en.json` → `ar.json`, translate values, add
-`<option value="ar">`, and extend the `dirAuto` rule in `theme.js` if it is
-RTL. Everything (sidebar, drawer side, switch direction, datepicker, toasts)
-follows `document.dir` automatically.
+a `<button data-lang="ar">` entry to the top-bar language dropdown **and** an
+`<option value="ar">` to `#setLang` in the drawer, and extend the `dirAuto`
+rule in `theme.js` if it is RTL. Everything (sidebar, drawer side, switch
+direction, datepicker, toasts) follows `document.dir` automatically.
 
-155 keys per language cover the full chrome: nav, drawer groups, playground
-headings, login form + validation messages, table/dropdown/datepicker/modal
-labels. JS modules take translated strings as options (never hardcoded):
+196 keys per language cover the full chrome: nav, top-bar dropdowns
+(theme/lang/notifications/profile), mega-menu labels, drawer groups, footer,
+playground headings, login form + validation messages,
+table/dropdown/datepicker/modal labels. JS modules take translated strings as options (never hardcoded):
 
 ```js
 const d = await I18N.dict(ThemeStore.get().lang);
@@ -142,6 +221,17 @@ document.addEventListener('app:lang', () => rebuildWithNewStrings());
 
 `App.setLang()` applies the dictionary **and** fires `app:lang` so live
 modules rebuild in the new language.
+
+**Persian digits:** when `lang=fa`, Latin digits render as Persian digits
+(۰۱۲۳۴۵۶۷۸۹) in opted-in spots — any `[data-num]` element, `.kpi-num` tiles,
+`.pill` badges, `#idleTxt` countdown and `[data-year]` footer year (helpers:
+`I18N.toFa()` / `I18N.toEn()` / `I18N.localizeNumbers(lang)`). Originals are
+cached so switching back to `en` restores Latin digits. To opt a new number
+in, just add `data-num`:
+
+```html
+<div class="kpi-num" data-num>8,412</div>
+```
 
 ## 8. Sonner toasts (exact vanilla port of `emilkowalski/sonner`)
 
@@ -332,14 +422,18 @@ Icon-only: reuse `icon-btn` + any `fa-*` icon. Full set demoed in
 ## 15. Idle detection + lock screen
 
 ```js
-Idle.tick();            // restart the countdown manually
+Idle.tick();            // restart the countdown manually (cancels any pending warning first)
+Idle.cancel();          // cancel pending timeout + warning countdown + hide warning card
 Idle.setWarnSecs(30);   // warning window seconds (default 60)
 ```
 
-- Any pointer/key/wheel/touch resets the timer.
+- Any pointer/key/wheel/touch bumps the last-activity timestamp.
 - After `idleMinutes` (settings, `0` = off): warning card with live progress
   bar + countdown. **Stay** dismisses and restarts; **Leave** locks now.
-- Warning length = `min(60s, half the interval)` so short timeouts still work.
+- Warning length = `min(60s, half the interval)` so short timeouts (e.g. 1
+  minute) still work. Changing the interval calls `Idle.tick()`, which cancels
+  the previous pending timeout **and** any running warning countdown.
+- The countdown digits follow the locale (`fa` → Persian digits).
 - Lock screen has **no PIN** — one big button returns to the workflow and
   restarts the interval. Elements required per page: `#idleWrap #idleBar
   #idleTxt #idleStay #idleLeave #lockWrap #lockBtn` (all playgrounds +

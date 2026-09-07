@@ -95,7 +95,17 @@
     const im=document.getElementById("setIdle"); if(im)im.value=String(settings.idleMinutes);
     const pr=document.getElementById("setPrimary"); if(pr)pr.value=settings.primary;
     const tp=document.getElementById("topPrimary"); if(tp)tp.value=settings.primary;
+    const tbp=document.getElementById("tbPrimary"); if(tbp)tbp.value=settings.primary;
+    const tbg=document.getElementById("tbGlass"); if(tbg)tbg.checked=!!settings.glass;
     const lt=document.getElementById("layoutToggle"); if(lt)lt.classList.toggle("on",settings.layout==="horizontal");
+    // topbar dropdown selected states (theme / layout / sidebar / lang)
+    document.querySelectorAll("[data-theme-pick]").forEach(b=>b.classList.toggle("on",b.dataset.themePick===settings.theme));
+    document.querySelectorAll("[data-layout-pick]").forEach(b=>b.classList.toggle("on",b.dataset.layoutPick===settings.layout));
+    document.querySelectorAll("[data-sidebar-pick]").forEach(b=>b.classList.toggle("on",b.dataset.sidebarPick===settings.sidebar));
+    document.querySelectorAll("[data-lang]").forEach(b=>b.classList.toggle("on",b.dataset.lang===settings.lang));
+    const ll=document.getElementById("tbLangLabel"); if(ll)ll.textContent=(settings.lang==="fa")?"فا":"EN";
+    const ti=document.getElementById("tbThemeIcon");
+    if(ti)ti.className="fa-solid "+(settings.theme==="system"?"fa-circle-half-stroke":(ThemeStore.effectiveTheme()==="dark"?"fa-sun":"fa-moon"));
     document.querySelectorAll(".swatch").forEach(s=>s.classList.toggle("active",s.dataset.color===settings.primary));
     // skip link (a11y): one injection covers every page
     const m=document.querySelector("main.content");

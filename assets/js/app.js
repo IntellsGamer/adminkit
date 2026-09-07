@@ -7,6 +7,7 @@
 (function(){
 "use strict";
 function setLang(l){ThemeStore.set({lang:l});Promise.resolve(window.I18N?I18N.apply(l):null).then(()=>document.dispatchEvent(new CustomEvent("app:lang",{detail:{lang:l}})));}
+function refreshNumbers(){ try{ if(window.I18N&&I18N.localizeNumbers)I18N.localizeNumbers(ThemeStore.get().lang); }catch(e){} try{ fitHmenu(); }catch(e){} }
 function toastChanged(patch){
   if(patch.theme!==undefined&&window.Sonner)Sonner.setTheme(ThemeStore.effectiveTheme());
   if(patch.toasterPosition!==undefined&&window.Sonner)Sonner.setPosition(patch.toasterPosition);
@@ -14,7 +15,7 @@ function toastChanged(patch){
 }
 // Turbo-aware navigation: use Turbo Drive when present, plain load otherwise.
 function go(url){ try{ if(window.Turbo&&Turbo.visit){Turbo.visit(url);return;} }catch(e){} location.href=url; }
-window.App={toastChanged,setLang,go,init:initShell,teardown};
+window.App={toastChanged,setLang,go,init:initShell,teardown,refreshNumbers};
 const docCleanups=[];
 function onDoc(target,type,fn,opts){target.addEventListener(type,fn,opts);docCleanups.push(()=>{try{target.removeEventListener(type,fn,opts);}catch(e){}});}
 function teardown(){while(docCleanups.length){try{docCleanups.pop()();}catch(e){}}}
@@ -35,6 +36,63 @@ function teardown(){while(docCleanups.length){try{docCleanups.pop()();}catch(e){
     +'</filter></defs>';
   document.body.prepend(svg);
 })();
+// Horizontal "More": when .hmenu items overflow (too many items or narrow
+// screen), extra top-level entries move into a trailing v-chevron "More" drop.
+// Idempotent: restores everything first, then clips until it fits.
+function fitHmenu(){
+  document.querySelectorAll(".hmenu").forEach(bar=>{
+    let more=bar.querySelector(":scope > #hMore");
+    let drop=bar.querySelector(":scope > #hMore > #hMoreDrop");
+    if(!more){
+      more=document.createElement("div"); more.id="hMore";
+      more.innerHTML='<button class="hlink" aria-expanded="false" aria-haspopup="true"><i class="fa-solid fa-ellipsis"></i><span data-i18n="more">More</span><i class="fa-solid fa-chevron-down vicon"></i></button><div class="drop" id="hMoreDrop"></div>';
+      drop=more.querySelector("#hMoreDrop");
+      bar.appendChild(more);
+      const btn=more.querySelector(":scope > button.hlink");
+      btn.addEventListener("click",e=>{
+        e.stopPropagation();
+        const was=more.classList.contains("open");
+        document.querySelectorAll(".hmenu > div.open").forEach(o=>o.classList.remove("open"));
+        document.querySelectorAll(".tmenu.open").forEach(o=>o.classList.remove("open"));
+        more.classList.toggle("open",!was);
+        btn.setAttribute("aria-expanded",String(!was));
+      });
+      if(window.I18N){ try{ I18N.dict(ThemeStore.get().lang).then(d=>{ const s=more.querySelector('[data-i18n="more"]'); if(s&&d.more)s.textContent=d.more; }); }catch(e){} }
+    }
+    // restore: move everything back out of More
+    while(drop.firstChild){ bar.insertBefore(drop.firstChild,more); }
+    more.classList.remove("open"); more.style.display="none";
+    if(document.body.dataset.layout!=="horizontal")return;
+    if(bar.clientWidth<=0)return;
+    // clip trailing items (never the More entry itself) until it fits
+    let guard=0;
+    while(guard++<24 && bar.scrollWidth>bar.clientWidth+4){
+      const kids=[...bar.children].filter(el=>el.id!=="hMore");
+      if(kids.length<=1)break;
+      const victim=kids[kids.length-1];
+      drop.insertBefore(victim,drop.firstChild);
+      more.style.display="";
+    }
+    if(drop.children.length)more.style.display="";
+    else more.style.display="none";
+  });
+}
+// Same shell everywhere: highlight the nav leaf matching this URL.
+function syncActive(){
+  let file="index.html";
+  try{ file=(location.pathname.split("/").pop()||"index.html").split("?")[0].split("#")[0]||"index.html"; }catch(e){}
+  document.querySelectorAll(".sidebar .nav-sub a.nav-link, .pagenav a").forEach(a=>{
+    const href=(a.getAttribute("href")||"").split("#")[0].split("?")[0];
+    if(href===file)a.classList.add("active"); else a.classList.remove("active");
+  });
+  // dashboard parent opens when on index; playgrounds parent opens on playground-*
+  const onPlay=file.indexOf("playground-")===0;
+  document.querySelectorAll(".sidebar .nav-item").forEach(item=>{
+    const txt=(item.textContent||"");
+    if(/Playground|زمین/.test(txt))item.classList.toggle("open",onPlay||item.querySelector(".nav-sub a.active")!==null);
+    if(/Dashboard|داشبورد/.test(txt)&&file==="index.html")item.classList.add("open");
+  });
+}
 function initShell(){
   teardown();
   ThemeStore.apply();
@@ -72,7 +130,8 @@ function initShell(){
     }));
   });
   // horizontal top menu: click toggles (touch), hover still works on desktop
-  document.querySelectorAll(".hmenu > div").forEach(wrap=>{
+  // (#hMore has its own dedicated toggle — skip it here to avoid double-binding)
+  document.querySelectorAll(".hmenu > div:not(#hMore)").forEach(wrap=>{
     const btn=wrap.querySelector(":scope > button.hlink"), drop=wrap.querySelector(":scope > .drop");
     if(!btn||!drop)return;
     btn.setAttribute("aria-expanded","false");
@@ -94,14 +153,14 @@ function initShell(){
   document.querySelectorAll("[data-act='nav']").forEach(b=>bindOnce(b,"nav",()=>b.addEventListener("click",()=>document.body.classList.toggle("nav-open"))));
   // settings drawer (opposite of sidebar side)
   const drawer=document.getElementById("settingsDrawer"), scrim=document.getElementById("scrim");
-  function openSettings(){ThemeStore.apply();if(drawer)drawer.classList.add("open");if(scrim)scrim.classList.add("show");}
+  function openSettings(){ThemeStore.apply();document.querySelectorAll(".tmenu.open").forEach(o=>o.classList.remove("open"));if(drawer)drawer.classList.add("open");if(scrim)scrim.classList.add("show");}
   function closeSettings(){if(drawer)drawer.classList.remove("open");if(scrim)scrim.classList.remove("show");}
   document.querySelectorAll("[data-act='settings']").forEach(b=>bindOnce(b,"set",()=>b.addEventListener("click",openSettings)));
   document.querySelectorAll("[data-act='settings-close']").forEach(b=>bindOnce(b,"setx",()=>b.addEventListener("click",closeSettings)));
   if(scrim)bindOnce(scrim,"scrim",()=>scrim.addEventListener("click",()=>{closeSettings();document.body.classList.remove("nav-open");}));
   // first load -> open up settings (per spec: pull menu opens on first load)
   try{if(!localStorage.getItem("adminkit.seen")){localStorage.setItem("adminkit.seen","1");setTimeout(openSettings,600);}}catch(e){}
-  // controls
+  // controls (drawer keeps canonical IDs; topbar dropdown mirrors them)
   const $=id=>document.getElementById(id);
   if($("setTheme"))$("setTheme").onchange=e=>ThemeStore.set({theme:e.target.value});
   if($("setLayout"))$("setLayout").onchange=e=>ThemeStore.set({layout:e.target.value});
@@ -113,10 +172,48 @@ function initShell(){
   if($("setPrimary"))$("setPrimary").oninput=e=>ThemeStore.set({primary:e.target.value});
   document.querySelectorAll(".swatch").forEach(b=>b.onclick=()=>ThemeStore.set({primary:b.dataset.color}));
   document.querySelectorAll("[data-theme-pick]").forEach(b=>b.onclick=()=>ThemeStore.set({theme:b.dataset.themePick}));
+  document.querySelectorAll("[data-layout-pick]").forEach(b=>b.onclick=()=>ThemeStore.set({layout:b.dataset.layoutPick}));
+  document.querySelectorAll("[data-sidebar-pick]").forEach(b=>b.onclick=()=>ThemeStore.set({sidebar:b.dataset.sidebarPick}));
+  // legacy topbar buttons (kept working if a page still has them)
   if($("themeToggle"))$("themeToggle").onclick=()=>{const cur=ThemeStore.effectiveTheme();ThemeStore.set({theme:cur==="dark"?"light":"dark"});};
   if($("layoutToggle"))$("layoutToggle").onclick=()=>{const cur=ThemeStore.get().layout;ThemeStore.set({layout:cur==="vertical"?"horizontal":"vertical"});};
   if($("topPrimary"))$("topPrimary").oninput=e=>ThemeStore.set({primary:e.target.value});
+  if($("tbPrimary"))$("tbPrimary").oninput=e=>ThemeStore.set({primary:e.target.value});
+  if($("tbGlass"))$("tbGlass").onchange=e=>ThemeStore.set({glass:e.target.checked});
   document.querySelectorAll("[data-lang]").forEach(b=>b.onclick=()=>setLang(b.dataset.lang));
+  // ---- topbar dropdowns (theme / lang / notif / profile): one open at a time
+  document.querySelectorAll("[data-tmenu]").forEach(btn=>{
+    bindOnce(btn,"tmenu",()=>btn.addEventListener("click",e=>{
+      e.stopPropagation();
+      const wrap=btn.closest(".tmenu"); const was=wrap&&wrap.classList.contains("open");
+      document.querySelectorAll(".tmenu.open").forEach(o=>o.classList.remove("open"));
+      document.querySelectorAll(".hmenu > div.open").forEach(o=>o.classList.remove("open"));
+      if(wrap&&!was)wrap.classList.add("open");
+    }));
+  });
+  onDoc(document,"click",e=>{
+    if(!e.target.closest(".tmenu"))document.querySelectorAll(".tmenu.open").forEach(o=>o.classList.remove("open"));
+  });
+  const markBtn=$("notifMark"); if(markBtn)bindOnce(markBtn,"notif",()=>markBtn.addEventListener("click",()=>{const b=$("notifBadge");if(b)b.style.display="none";}));
+  // ---- horizontal overflow: clip into a "More ⌄" entry when too wide ----
+  try{ fitHmenu(); }catch(e){}
+  onDoc(window,"resize",()=>{ try{fitHmenu();}catch(e){} });
+  onDoc(document,"app:lang",()=>{ try{setTimeout(fitHmenu,50);}catch(e){} });
+  // refit after layout switches (vertical<->horizontal changes .hmenu visibility)
+  try{
+    if(window.__akHmenuObs)window.__akHmenuObs.disconnect();
+    window.__akHmenuObs=new MutationObserver(()=>{ try{fitHmenu();}catch(e){} });
+    window.__akHmenuObs.observe(document.body,{attributes:true,attributeFilter:["data-layout"]});
+  }catch(e){}
+  // ---- active link sync: same shell on every page, current page highlights itself
+  try{ syncActive(); }catch(e){}
+  // ---- footer year (localized digits when fa)
+  try{
+    document.querySelectorAll("[data-year]").forEach(el=>{
+      const y=String(new Date().getFullYear());
+      el.textContent=(ThemeStore.get().lang==="fa"&&window.I18N)?I18N.toFa(y):y;
+    });
+  }catch(e){}
   // scroll edge effect: content dissolving beneath lifts the glass bar
   function onScroll(){const y=window.scrollY||document.documentElement.scrollTop||0;document.querySelectorAll(".topbar").forEach(t=>t.classList.toggle("scrolled",y>8));}
   onDoc(document,"scroll",onScroll,{passive:true});onDoc(window,"scroll",onScroll,{passive:true});onScroll();
@@ -163,8 +260,8 @@ function initShell(){
   // demo progress bars + reveal on load
   document.querySelectorAll("[data-bar]").forEach(el=>{setTimeout(()=>el.style.width=el.dataset.bar+"%",300);});
   setTimeout(()=>document.querySelectorAll(".reveal").forEach(el=>el.classList.add("in")),60);
-  // Escape closes drawer
-  onDoc(document,"keydown",e=>{if(e.key==="Escape"){closeSettings();document.querySelectorAll(".hmenu > div.open").forEach(o=>o.classList.remove("open"));}});
+  // Escape closes drawer + any open menu
+  onDoc(document,"keydown",e=>{if(e.key==="Escape"){closeSettings();document.querySelectorAll(".hmenu > div.open").forEach(o=>o.classList.remove("open"));document.querySelectorAll(".tmenu.open").forEach(o=>o.classList.remove("open"));}});
 }
 document.addEventListener("DOMContentLoaded",initShell);
 document.addEventListener("turbo:load",initShell);
