@@ -229,7 +229,11 @@ modules rebuild in the new language.
 (۰۱۲۳۴۵۶۷۸۹) in opted-in spots — any `[data-num]` element, `.kpi-num` tiles,
 `.pill` badges, `#idleTxt` countdown and `[data-year]` footer year (helpers:
 `I18N.toFa()` / `I18N.toEn()` / `I18N.localizeNumbers(lang)`). Originals are
-cached so switching back to `en` restores Latin digits. To opt a new number
+cached so switching back to `en` restores Latin digits. Static text across the
+shell (content, footer, drawer, topbar) follows the locale too — code blocks,
+tables, form controls and live picker/dropdown panels always stay Latin. The
+data-grid pager converts its own labels automatically in `fa` mode (option
+values stay Latin under the hood). To opt a new number
 in, just add `data-num`:
 
 ```html

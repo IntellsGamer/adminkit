@@ -14,14 +14,27 @@
     const res=await fetch("i18n/"+lang+".json",{cache:"no-store"});
     const j=await res.json(); cache[lang]=j; return j;
   }
+  // Containers whose static text follows the locale digits, plus the legacy
+  // opt-in spots. Live widgets with their own renderers (tables, pickers,
+  // custom dropdowns) and code/form nodes are skipped, so values, snippets
+  // and re-rendered controls always stay Latin. Originals are cached per text
+  // node, so toggling languages never double-converts.
+  const SKIP_TXT="pre,code,table,select,input,textarea,script,style,.dd,.dp-pop,[data-keep-latin]";
   function localizeNumbers(lang){
     try{
-      const els=document.querySelectorAll("[data-num],.kpi-num,.num-fa,#idleTxt,.pill");
-      els.forEach(el=>{
-        // skip elements that contain interactive children where digit swap is risky
-        if(el.querySelector("input,select,textarea"))return;
-        // walk child text nodes so icons (<i>) survive
-        const walker=document.createTreeWalker(el,NodeFilter.SHOW_TEXT);
+      const roots=[];
+      document.querySelectorAll("main.content,.footer,.drawer,.topbar").forEach(el=>roots.push(el));
+      document.querySelectorAll("[data-num],.kpi-num,.num-fa,#idleTxt,.pill,[data-year]").forEach(el=>{
+        if(roots.some(r=>r!==el&&r.contains(el)))return;
+        roots.push(el);
+      });
+      roots.forEach(root=>{
+        if(root.closest&&root.closest(SKIP_TXT))return;
+        const walker=document.createTreeWalker(root,NodeFilter.SHOW_TEXT,{acceptNode(n){
+          const p=n.parentElement;
+          if(!p||p.closest(SKIP_TXT))return NodeFilter.FILTER_REJECT;
+          return /[0-9۰-۹]/.test(n.nodeValue)?NodeFilter.FILTER_ACCEPT:NodeFilter.FILTER_REJECT;
+        }});
         const nodes=[]; while(walker.nextNode())nodes.push(walker.currentNode);
         nodes.forEach(n=>{
           if(n.__akOrig===undefined)n.__akOrig=n.nodeValue;
