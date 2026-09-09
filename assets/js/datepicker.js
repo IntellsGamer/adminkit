@@ -20,7 +20,7 @@ function jLen(jy,jm){ const j=J(); if(j&&j.jalaaliMonthLength)return j.jalaaliMo
 function pad(n){return String(n).padStart(2,"0");}
 class DatePicker{
   constructor(input,opts){
-    this.input=input; this.o=Object.assign({locale:"fa",format:"",min:null,max:null,presets:true,onChange:null,todayLabel:null,clearLabel:null,nowLabel:null},opts||{});
+    this.input=input; this.o=Object.assign({locale:"fa",format:"",min:null,max:null,presets:true,onChange:null,todayLabel:null,clearLabel:null,nowLabel:null,searchPh:null,noResults:null},opts||{});
     if(!this.o.format)this.o.format=this.o.locale==="fa"?"jYYYY/jMM/jDD":"YYYY-MM-DD";
     const fa0=this.o.locale==="fa";
     if(!this.o.todayLabel)this.o.todayLabel=fa0?"امروز":"Today";
@@ -81,6 +81,19 @@ class DatePicker{
     if(jm&&jy){const go=()=>{this.view=toG(+jy.value,+jm.value,1);this.draw();};jm.onchange=go;jy.onchange=go;}
     const em=this.pop.querySelector('[data-n="em"]'),ey=this.pop.querySelector('[data-n="ey"]');
     if(em&&ey){const go=()=>{this.view=new Date(+ey.value,+em.value,1);this.draw();};em.onchange=go;ey.onchange=go;}
+    // month/year jumps use the shared custom dropdown (months: no search,
+    // years: 61 options so search stays on). Rebuilt with the popup on every
+    // draw; stale instances self-clean once detached.
+    const upSel=(s,search)=>{ try{
+      if(!window.NiceSelect||!s)return;
+      const o={search:!!search};
+      if(this.o.searchPh)o.searchPh=this.o.searchPh;
+      if(this.o.noResults)o.noResults=this.o.noResults;
+      new NiceSelect(s,o);
+      const r=s.nextElementSibling;
+      if(r&&r.classList&&r.classList.contains("dd"))r.classList.add("dd-compact");
+    }catch(e){} };
+    upSel(jm,false); upSel(jy,true); upSel(em,false); upSel(ey,true);
     this.pop.querySelector('[data-n="today"]').onclick=()=>{this.sel=new Date();this.view=new Date();this.input.value=this.fmt(this.sel);this.o.onChange&&this.o.onChange(this.sel);this.draw();};
     this.pop.querySelector('[data-n="clear"]').onclick=()=>{this.sel=null;this.input.value="";this.o.onChange&&this.o.onChange(null);this.hide();};
     const now=this.pop.querySelector('[data-n="now"]'); if(now)now.onclick=()=>{this.sel=new Date();this.view=new Date();this.input.value=this.fmt(this.sel);this.o.onChange&&this.o.onChange(this.sel);this.hide();};
@@ -97,7 +110,7 @@ class DatePicker{
     this.draw();
   }
   setLocale(l){ this.o.locale=l; if(!this.o._fmtTouched)this.o.format=l==="fa"?"jYYYY/jMM/jDD":"YYYY-MM-DD"; this.draw(); }
-  setStrings(s){ s=s||{}; if(s.today)this.o.todayLabel=s.today; if(s.clear)this.o.clearLabel=s.clear; if(s.now)this.o.nowLabel=s.now; this.draw(); }
+  setStrings(s){ s=s||{}; if(s.today)this.o.todayLabel=s.today; if(s.clear)this.o.clearLabel=s.clear; if(s.now)this.o.nowLabel=s.now; if(s.searchPh)this.o.searchPh=s.searchPh; if(s.noResults)this.o.noResults=s.noResults; this.draw(); }
 }
 g.DatePicker=DatePicker;
 })(window);

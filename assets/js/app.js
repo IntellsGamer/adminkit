@@ -64,9 +64,23 @@ function fitHmenu(){
     more.classList.remove("open"); more.style.display="none";
     if(document.body.dataset.layout!=="horizontal")return;
     if(bar.clientWidth<=0)return;
-    // clip trailing items (never the More entry itself) until it fits
+    // clip trailing items (never the More entry itself) until it fits.
+    // NOTE: .hmenu is overflow:visible so dropdowns can escape (overflow:hidden
+    // clipped .drop invisible — buttons looked dead with no console errors).
+    // scrollWidth only exceeds clientWidth when overflow clips, so measure by
+    // summing visible child widths instead.
+    function barOverflows(){
+      const cs=getComputedStyle(bar);
+      const gap=parseFloat(cs.columnGap||cs.gap||"4")||0;
+      const kids=[...bar.children].filter(el=>el.style.display!=="none"&&getComputedStyle(el).display!=="none");
+      if(kids.length<=1)return false;
+      let total=0;
+      for(const el of kids){ try{ total+=el.getBoundingClientRect().width+gap; }catch(e){ total+=el.offsetWidth+gap; } }
+      total-=gap;
+      return total>bar.clientWidth+4;
+    }
     let guard=0;
-    while(guard++<24 && bar.scrollWidth>bar.clientWidth+4){
+    while(guard++<24 && barOverflows()){
       const kids=[...bar.children].filter(el=>el.id!=="hMore");
       if(kids.length<=1)break;
       const victim=kids[kids.length-1];
@@ -75,6 +89,35 @@ function fitHmenu(){
     }
     if(drop.children.length)more.style.display="";
     else more.style.display="none";
+  });
+}
+// Native <select> → NiceSelect upgrade: one custom dropdown system everywhere.
+// Short lists (settings, dial-code, pager opts) get search:false; opt into
+// search per-select with data-search="true". Idempotent via select._nice.
+// Module-owned dynamic selects are skipped here: .dp-pop (datepicker rebuilds
+// them on every draw) and [data-g] (grid internals upgrade themselves).
+function upgradeSelects(){
+  if(!window.NiceSelect)return;
+  document.querySelectorAll("select").forEach(sel=>{
+    try{
+      if(sel.hasAttribute("data-keep-native"))return;
+      if(sel.closest(".dp-pop"))return;
+      if(sel.hasAttribute("data-g"))return;
+      const prev=sel._nice;
+      if(prev&&prev.root&&prev.root.isConnected)return;
+      if(prev){ try{ delete sel._nice; }catch(e){ sel._nice=null; } }
+      new NiceSelect(sel,{search:sel.dataset.search==="true"});
+      const root=sel.nextElementSibling;
+      if(root&&root.classList&&root.classList.contains("dd")
+        &&sel.closest(".set-row,.phone-row,.tbl-pager,.dp-jump"))root.classList.add("dd-compact");
+    }catch(e){}
+  });
+}
+// Re-read native options/value into the custom UI (silent). Runs after I18N
+// re-translates <option> labels so the custom dropdown never goes stale.
+function resyncSelects(){
+  document.querySelectorAll("select").forEach(sel=>{
+    try{ const inst=sel._nice; if(inst&&inst.root&&inst.root.isConnected)inst.syncFromSrc(); }catch(e){}
   });
 }
 // Same shell everywhere: highlight the nav leaf matching this URL.
@@ -181,6 +224,12 @@ function initShell(){
   if($("tbPrimary"))$("tbPrimary").oninput=e=>ThemeStore.set({primary:e.target.value});
   if($("tbGlass"))$("tbGlass").onchange=e=>ThemeStore.set({glass:e.target.checked});
   document.querySelectorAll("[data-lang]").forEach(b=>b.onclick=()=>setLang(b.dataset.lang));
+  // ---- custom dropdowns: upgrade every static native <select> to NiceSelect.
+  // No search by default (short lists don't need it); data-search="true" opts
+  // in. pick() dispatches a real change event, so the .onchange wiring above
+  // keeps working untouched. Labels re-sync after language swaps.
+  try{ upgradeSelects(); }catch(e){}
+  onDoc(document,"app:lang",()=>{ try{ resyncSelects(); }catch(e){} });
   // ---- topbar dropdowns (theme / lang / notif / profile): one open at a time
   document.querySelectorAll("[data-tmenu]").forEach(btn=>{
     bindOnce(btn,"tmenu",()=>btn.addEventListener("click",e=>{

@@ -59,6 +59,17 @@ html[dir="rtl"] .switch.switch-sm input:checked+i::after{transform:translateX(-1
 [data-theme="dark"] .dd-opt:hover,[data-theme="dark"] .dd-opt.hl{color:var(--primary)}
 .dd-opt .tick{margin-inline-start:auto;display:none;font-size:12px;color:var(--success)}
 .dd-opt.sel .tick{display:inline}
+/* compact variant for short option lists (settings rows, dial-code, pager,
+   datepicker jumps): no search box needed, fits tight rows. Applied by the
+   shell upgrader; opt into search per-select with data-search="true". */
+.dd-compact{min-width:0}
+.dd-compact .dd-btn{padding:8px 11px;font-size:13px}
+.dd-compact .dd-btn [data-s="label"]{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.set-row .dd-compact{flex:0 1 185px;min-width:140px;max-width:190px}
+.phone-row .dd-compact{min-width:0;max-width:100%;width:100%}
+.tbl-pager .dd-compact{min-width:120px}
+.dp-jump .dd-compact{flex:1 1 0;min-width:0}
+.dp-jump .dd-compact .dd-btn{padding:6px 8px;font-size:12.5px}
 /* transient menus: thicker glass than bars (Apple: material gains substance as
    it morphs larger) — specular top rim + deeper shadow */
 .dd-panel,.colvis-panel,.dp-pop,.hmenu .drop{box-shadow:var(--shadow),inset 0 1px 0 rgba(255,255,255,.5)}

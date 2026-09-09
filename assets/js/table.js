@@ -80,7 +80,10 @@ class DataGrid{
     box.querySelectorAll('[data-g="sort"]').forEach(th=>th.addEventListener("click",()=>{const k=th.dataset.k; if(this.sortKey===k)this.sortDir*=-1; else{this.sortKey=k;this.sortDir=1;} this.renderBody();}));
     const prev=box.querySelector('[data-g="prev"]'); if(prev)prev.onclick=()=>{if(this.page>1){this.page--;this.renderBody();}};
     const next=box.querySelector('[data-g="next"]'); if(next)next.onclick=()=>{this.page++;this.renderBody();};
-    const psSel=box.querySelector('[data-g="ps"]'); if(psSel)psSel.onchange=()=>{this.o.pageSize=+psSel.value;this.page=1;this.renderBody();};
+    const psSel=box.querySelector('[data-g="ps"]'); if(psSel){ psSel.onchange=()=>{this.o.pageSize=+psSel.value;this.page=1;this.renderBody();};
+      // custom dropdown (no search: 5 options). Rebuilt with the pager on every
+      // render, so upgrade fresh each time; stale instances self-clean.
+      try{ if(window.NiceSelect&&(!psSel._nice||!psSel._nice.root.isConnected)){ new NiceSelect(psSel,{search:false}); const r=psSel.nextElementSibling; if(r&&r.classList&&r.classList.contains("dd"))r.classList.add("dd-compact"); } }catch(e){} }
   }
 }
 g.DataGrid=DataGrid;

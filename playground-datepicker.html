@@ -171,7 +171,7 @@ var out=document.getElementById('dpOut');
 var dpA=new DatePicker(document.getElementById('dpFa'),{locale:'fa',onChange:d=>out.textContent=d?d.toString():'—'});
 var dpB=new DatePicker(document.getElementById('dpEn'),{locale:'en',format:'YYYY-MM-DD',onChange:d=>out.textContent=d?d.toString():'—'});
 var dpC=new DatePicker(document.getElementById('dpMin'),{locale:'en',format:'YYYY-MM-DD',presets:false,min:new Date(2024,0,1),max:new Date(2024,11,31),onChange:d=>out.textContent=d?d.toString():'—'});
-async function paintDp(){try{const d=await I18N.dict(ThemeStore.get().lang);[dpA,dpB,dpC].forEach(p=>p.setStrings({today:d.dpToday,clear:d.dpClear,now:d.dpNow}));}catch(e){}}
+async function paintDp(){try{const d=await I18N.dict(ThemeStore.get().lang);[dpA,dpB,dpC].forEach(p=>p.setStrings({today:d.dpToday,clear:d.dpClear,now:d.dpNow,searchPh:d.ddSearchPh,noResults:d.ddNoResults}));}catch(e){}}
 paintDp();
 if(!window.__akLangDp){window.__akLangDp=true;document.addEventListener('app:lang',()=>{try{paintDp();}catch(e){}});}
 document.getElementById('btnFa').onclick=()=>App.setLang('fa');

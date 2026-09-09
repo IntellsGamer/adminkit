@@ -207,6 +207,9 @@ body[data-glass="off"] .topbar,body[data-glass="off"] .sidebar,body[data-glass="
   padding:8px;display:none;z-index:80;animation:pop-in .18s cubic-bezier(.2,.9,.3,1.15);
 }
 .hmenu>div:hover .drop,.hmenu>div:focus-within .drop,.hmenu>div.open .drop{display:block}
+/* invisible hover bridge: covers the 10px gap so moving from button to menu
+   never leaves :hover (otherwise the menu flickers shut mid-travel) */
+.hmenu .drop::before{content:"";position:absolute;top:-10px;inset-inline-start:0;inset-inline-end:0;height:10px;background:transparent}
 .drop a{display:flex;gap:11px;align-items:center;padding:9px 10px;border-radius:12px;color:var(--text);font-weight:600;font-size:13.5px}
 .drop a:hover{background:color-mix(in srgb,var(--primary) 8%,transparent)}
 .drop a small{font-weight:500}
@@ -381,8 +384,13 @@ body[data-sidebar="mini"] .sidebar{background:var(--surface);backdrop-filter:non
 body[data-layout="horizontal"] .sidebar{display:none}
 body[data-layout="horizontal"] .hmenu{display:flex}
 body[data-layout="vertical"] .hmenu{display:none}
-/* horizontal bar owns the row: it shrinks, clips, and overflows into #hMore */
-body[data-layout="horizontal"] .hmenu{flex:1 1 auto;min-width:0;overflow:hidden;flex-wrap:nowrap}
+/* horizontal bar owns the row: it shrinks and overflows into #hMore.
+   NOTE: must stay overflow:visible — the .drop menus are absolutely positioned
+   below the bar and would be clipped invisible by overflow:hidden (which made
+   the horizontal buttons look dead: JS toggled .open + display:block, but the
+   menu was clipped, with zero console errors). Overflow detection is done in
+   JS by summing child widths (see fitHmenu in app.js), not via scrollWidth. */
+body[data-layout="horizontal"] .hmenu{flex:1 1 auto;min-width:0;overflow:visible;flex-wrap:nowrap}
 body[data-layout="horizontal"] .hmenu>div{flex:0 0 auto}
 body[data-layout="vertical"] .topbar-spacer{flex:1}
 

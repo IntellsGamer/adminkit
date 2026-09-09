@@ -84,14 +84,15 @@
     save(settings);apply();
     if(!opts.silent&&window.App&&App.toastChanged)App.toastChanged(patch);
   }
+  function syncNice(sel){ try{ if(sel&&sel._nice&&sel._nice.root&&sel._nice.root.isConnected)sel._nice.syncFromSrc(); }catch(e){} }
   function syncControls(){
     document.querySelectorAll("[data-set-theme]").forEach(el=>{el.checked=(el.value===settings.theme); if(el.tagName==="SELECT")el.value=settings.theme;});
-    const sel=document.getElementById("setTheme"); if(sel)sel.value=settings.theme;
-    const lay=document.getElementById("setLayout"); if(lay)lay.value=settings.layout;
-    const sb=document.getElementById("setSidebar"); if(sb)sb.value=settings.sidebar;
+    const sel=document.getElementById("setTheme"); if(sel){ sel.value=settings.theme; syncNice(sel); }
+    const lay=document.getElementById("setLayout"); if(lay){ lay.value=settings.layout; syncNice(lay); }
+    const sb=document.getElementById("setSidebar"); if(sb){ sb.value=settings.sidebar; syncNice(sb); }
     const gl=document.getElementById("setGlass"); if(gl)gl.checked=!!settings.glass;
-    const lg=document.getElementById("setLang"); if(lg)lg.value=settings.lang;
-    const dr=document.getElementById("setDir"); if(dr)dr.value=settings.dirAuto?"auto":settings.dir;
+    const lg=document.getElementById("setLang"); if(lg){ lg.value=settings.lang; syncNice(lg); }
+    const dr=document.getElementById("setDir"); if(dr){ dr.value=settings.dirAuto?"auto":settings.dir; syncNice(dr); }
     const im=document.getElementById("setIdle"); if(im)im.value=String(settings.idleMinutes);
     const pr=document.getElementById("setPrimary"); if(pr)pr.value=settings.primary;
     const tp=document.getElementById("topPrimary"); if(tp)tp.value=settings.primary;
