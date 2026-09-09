@@ -229,6 +229,14 @@ body[data-glass="off"] .topbar,body[data-glass="off"] .sidebar,body[data-glass="
 .search-hit small{color:var(--muted);font-weight:500;margin-inline-start:auto}
 .search-hit.hl,.search-hit:hover{background:var(--primary-soft)}
 .search-empty{padding:10px 12px;font-size:13px}
+/* sidebar search: lives at the top of the rail, above Main. The topbar keeps
+   its own copy for horizontal mode (the rail is hidden there); per-layout
+   rules below decide which one shows. Mini rail has no room: hidden there. */
+.sidebar .searchbox{margin:0 12px 10px;min-width:0}
+.sidebar .searchbox .search-results{inset-inline-start:0;inset-inline-end:0;min-width:0}
+body[data-layout="vertical"] .topbar .searchbox{display:none}
+body[data-layout="vertical"] .top-sep{display:none}
+body[data-sidebar="mini"] .sidebar .searchbox{display:none}
 .color-dot{width:22px;height:22px;border-radius:50%;border:2px solid var(--border);padding:0;cursor:pointer;background:none}
 .color-dot::-webkit-color-swatch-wrapper{padding:0}
 .color-dot::-webkit-color-swatch{border:0;border-radius:50%}
@@ -366,7 +374,7 @@ pre.code code{color:inherit}
   body[data-sidebar="mini"] .nav-sub .nav-text{display:inline}
   .hamburger{display:inline-grid}
   .content{padding:16px}
-  .searchbox{display:none}
+  body[data-sidebar="mini"] .sidebar .searchbox{display:flex}
   body[data-layout="horizontal"] .sidebar{display:flex}
   .grid.kpi{grid-template-columns:repeat(2,1fr)}
   .top-sep{display:none}
@@ -375,8 +383,8 @@ pre.code code{color:inherit}
 @media(max-width:600px){
   .topbar{padding:0 10px;gap:7px}
   .icon-btn{min-width:36px;height:36px}
-  .searchbox{min-width:0;width:38px;overflow:hidden}
-  .searchbox input{display:none}
+  .topbar .searchbox{min-width:0;width:38px;overflow:hidden}
+  .topbar .searchbox input{display:none}
 }
 /* mini rail: solid background so fixed popups anchor to the viewport
    (backdrop-filter would re-anchor them to the sidebar box) */

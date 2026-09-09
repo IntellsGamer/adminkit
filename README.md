@@ -62,7 +62,8 @@ idle/lock overlays. Change the theme once — it follows you across pages via
 
 **Top bar (always visible, identical on every page):** hamburger (mobile) ·
 horizontal menus (horizontal layout only; extra entries auto-collapse into a
-`More ⌄` overflow entry) · search (command-palette page jumper, ↓↑ + Enter) ·
+`More ⌄` overflow entry) · search at the top of the sidebar — topbar in
+horizontal mode (command-palette page jumper, ↓↑ + Enter) ·
 theme dropdown (System default / Light / Dark + primary color + 6 swatches +
 layout + sidebar mode + glass switch) · language dropdown (English / فارسی) ·
 notifications dropdown (badge + mark-all-read) · profile dropdown (profile /
