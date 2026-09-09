@@ -225,20 +225,13 @@ document.addEventListener('app:lang', () => rebuildWithNewStrings());
 `App.setLang()` applies the dictionary **and** fires `app:lang` so live
 modules rebuild in the new language.
 
-**Persian digits:** when `lang=fa`, Latin digits render as Persian digits
-(۰۱۲۳۴۵۶۷۸۹) in opted-in spots — any `[data-num]` element, `.kpi-num` tiles,
-`.pill` badges, `#idleTxt` countdown and `[data-year]` footer year (helpers:
-`I18N.toFa()` / `I18N.toEn()` / `I18N.localizeNumbers(lang)`). Originals are
-cached so switching back to `en` restores Latin digits. Static text across the
-shell (content, footer, drawer, topbar) follows the locale too — code blocks,
-tables, form controls and live picker/dropdown panels always stay Latin. The
-data-grid pager converts its own labels automatically in `fa` mode (option
-values stay Latin under the hood). To opt a new number
-in, just add `data-num`:
-
-```html
-<div class="kpi-num" data-num>8,412</div>
-```
+**Persian digits:** digits are never rewritten — they stay plain Latin (`0-9`)
+in the DOM everywhere (values, exports, sorting and search untouched). Their
+*look* follows the locale through fonts alone: in `fa` mode the vendored
+B Koodak face (digit-only `unicode-range`, Persian-style drawings shared
+across Latin/Arabic-Indic/Persian codepoints) renders every digit Persian;
+in `en` mode the same characters render in Inter. Persian text stays
+Vazirmatn via its own range, so each script always gets its correct font.
 
 ## 8. Sonner toasts (exact vanilla port of `emilkowalski/sonner`)
 
@@ -452,6 +445,7 @@ Idle.setWarnSecs(30);   // warning window seconds (default 60)
 |---|---|---|
 | Inter 400–800 (latin) | `assets/fonts/inter-*.woff2` | EN UI font |
 | Vazirmatn 400–900 (arabic subset = Persian) | `assets/fonts/vazirmatn-*.woff2` | auto-used when `lang=fa` |
+| B Koodak Bold, subset to digits only (~2 KB) | `assets/fonts/bkoodak-700.woff2` | FA digits render Persian via `unicode-range` (`U+0030–0039,U+0660–0669,U+06F0–06F9`) |
 | Font Awesome 6.5.2 css | `assets/vendor/fontawesome/all.min.css` | unmodified |
 | FA webfonts (solid/regular/brands/v4compat) | `assets/vendor/webfonts/` | relative `../webfonts/` intact |
 | Jalali math (jalaali-js UMD) | `assets/js/jalaali-vendor.js` | byte-identical vendor |

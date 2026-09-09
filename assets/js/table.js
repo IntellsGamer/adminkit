@@ -7,10 +7,6 @@
 (function(g){
 "use strict";
 function esc(s){return String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));}
-const FA_D="۰۱۲۳۴۵۶۷۸۹";
-function faN(s){ return String(s).replace(/[0-9]/g,d=>FA_D[+d]); }
-// Persian digits for fa locale (labels only — option values/keys stay Latin).
-function faLang(){ try{ return window.ThemeStore&&ThemeStore.get().lang==="fa"; }catch(e){ return false; } }
 function toCSV(cols,rows){ const q=v=>'"'+String(v??"").replace(/"/g,'""')+'"';
   return [cols.map(c=>q(c.title)).join(","),...rows.map(r=>cols.map(c=>q(r[c.key])).join(","))].join("\n"); }
 function download(name,content,type){ const b=new Blob([content],{type:type||"text/plain"}); const a=document.createElement("a"); a.href=URL.createObjectURL(b); a.download=name; a.click(); setTimeout(()=>URL.revokeObjectURL(a.href),2000); }
@@ -37,7 +33,7 @@ class DataGrid{
     if(this.sortKey){const k=this.sortKey,d=this.sortDir; r.sort((a,b)=>{const x=a[k],y=b[k];return(typeof x==="number"&&typeof y==="number"?x-y:String(x??"").localeCompare(String(y??"")))*d;});}
     return r;
   }
-  colCountLabel(){ const s=this.visibleCols().length+"/"+this.o.columns.length; return faLang()?faN(s):s; }
+  colCountLabel(){ return this.visibleCols().length+"/"+this.o.columns.length; }
   renderTools(){
     const box=this.el.querySelector(".tbl-tools");
     let h="";
@@ -76,9 +72,8 @@ class DataGrid{
     h+="</tbody></table></div>";
     if(this.o.paging||this.o.info){
       h+='<div class="tbl-pager">';
-      if(this.o.info){const a=total?(start+1):0,b=Math.min(start+ps,total);
-        h+='<span class="muted">'+esc(this.o.strings.showing)+' '+(faLang()?faN(a+"–"+b):a+"–"+b)+" "+esc(this.o.strings.from)+" "+(faLang()?faN(total):total)+"</span>";}
-      if(this.o.paging){const FA=faLang();h+='<span style="flex:1"></span><button type="button" class="btn btn-ghost btn-sm" data-g="prev"><i class="fa-solid fa-chevron-left"></i></button><span>'+esc(this.o.strings.page)+' '+(FA?faN(this.page+" / "+pages):this.page+" / "+pages)+'</span><button type="button" class="btn btn-ghost btn-sm" data-g="next"><i class="fa-solid fa-chevron-right"></i></button><select data-g="ps" aria-label="Rows per page">'+[5,8,15,25,50].map(n=>'<option value="'+n+'"'+(ps===n?" selected":"")+">"+(FA?faN(n):n)+" "+esc(this.o.strings.perPage)+"</option>").join("")+"</select>";}
+      if(this.o.info)h+='<span class="muted">'+esc(this.o.strings.showing)+' '+(total?(start+1):0)+"–"+Math.min(start+ps,total)+" "+esc(this.o.strings.from)+" "+total+"</span>";
+      if(this.o.paging){h+='<span style="flex:1"></span><button type="button" class="btn btn-ghost btn-sm" data-g="prev"><i class="fa-solid fa-chevron-left"></i></button><span>'+esc(this.o.strings.page)+' '+this.page+" / "+pages+'</span><button type="button" class="btn btn-ghost btn-sm" data-g="next"><i class="fa-solid fa-chevron-right"></i></button><select data-g="ps" aria-label="Rows per page">'+[5,8,15,25,50].map(n=>'<option value="'+n+'"'+(ps===n?" selected":"")+">"+n+" "+esc(this.o.strings.perPage)+"</option>").join("")+"</select>";}
       h+="</div>";
     }
     box.innerHTML=h;

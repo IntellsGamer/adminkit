@@ -107,3 +107,11 @@ CSS (`theme.css` + `components.css`, ~20 KB) gives the same utility feel
   per-module playgrounds ("everything ported has a playground of its own").
 - Settings key is `adminkit.settings.v2` (v1 values won't clash with the new
   amber-default theme).
+
+## B Koodak (FA numbers) — Borna Rayaneh (free download)
+- `BKOODB.woff2` (B Koodak Bold) fetched from the fontchi B-series package,
+  subset with `pyftsubset` to Persian digits `U+06F0–06F9` only (10 glyphs,
+  1.8 KB) → vendored as `assets/fonts/bkoodak-700.woff2` (family kept
+  "B Koodak"). Wired as `BKoodak` with a digit-only `unicode-range`, first in
+  the `fa` font stacks, so FA numbers render B Koodak while text stays
+  Vazirmatn/Inter.

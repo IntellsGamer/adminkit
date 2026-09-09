@@ -46,6 +46,11 @@
 @font-face{font-family:"Vazirmatn";font-style:normal;font-weight:500;font-display:swap;src:local("Vazirmatn Medium"),url("../fonts/vazirmatn-500.woff2") format("woff2");unicode-range:U+0600-06FF,U+0750-077F,U+08A0-08FF,U+200C-200D,U+FB50-FDFF,U+FE70-FEFF}
 @font-face{font-family:"Vazirmatn";font-style:normal;font-weight:700;font-display:swap;src:local("Vazirmatn Bold"),url("../fonts/vazirmatn-700.woff2") format("woff2");unicode-range:U+0600-06FF,U+0750-077F,U+08A0-08FF,U+200C-200D,U+FB50-FDFF,U+FE70-FEFF}
 @font-face{font-family:"Vazirmatn";font-style:normal;font-weight:900;font-display:swap;src:local("Vazirmatn Black"),url("../fonts/vazirmatn-900.woff2") format("woff2");unicode-range:U+0600-06FF,U+0750-077F,U+08A0-08FF,U+200C-200D,U+FB50-FDFF,U+FE70-FEFF}
+/* B Koodak (Borna Rayaneh, free) subset to digits only (30 glyphs, ~2KB):
+   its Persian-style digit drawings back Latin, Arabic-Indic AND Persian
+   codepoints, so plain 0-9 text renders Persian-looking in fa mode with zero
+   character rewriting. Single Bold face serves every weight. */
+@font-face{font-family:"BKoodak";font-style:normal;font-weight:100 900;font-display:swap;src:url("../fonts/bkoodak-700.woff2") format("woff2");unicode-range:U+0030-0039,U+0660-0669,U+06F0-06F9}
 
 *{box-sizing:border-box}
 html,body{height:100%}
@@ -57,10 +62,13 @@ body{
   overflow-x:clip; /* clip (not hidden): contains off-canvas layers without
     becoming a scroll container, so position:sticky descendants keep working */
 }
-/* FA mode: Vazirmatn is range-limited to Arabic script above, so Latin text
-   and digits fall through to Inter (their correct font); Persian digits and
-   Arabic script stay in Vazirmatn. */
-html[lang="fa"] body{font-family:"Vazirmatn","Inter",Tahoma,Arial,sans-serif}
+/* FA mode: BKoodak claims Persian digits only, Vazirmatn is range-limited to
+   Arabic script above, so Latin text and digits fall through to Inter (their
+   correct font); Persian digits render B Koodak, Persian text Vazirmatn. */
+html[lang="fa"] body{font-family:"BKoodak","Vazirmatn","Inter",Tahoma,Arial,sans-serif}
+/* FA locale: toasts carry upstream sonner's own font stack (verbatim port),
+   so they need an explicit override to join the same system */
+html[lang="fa"] [data-sonner-toaster]{font-family:"BKoodak","Vazirmatn","Inter",Tahoma,Arial,sans-serif}
 /* ambient background: soft orbs, whisper-subtle in light */
 body::before{content:"";position:fixed;inset:0;z-index:-2;pointer-events:none;opacity:var(--orb-op);
   background:
@@ -198,6 +206,7 @@ body[data-glass="off"] .topbar,body[data-glass="off"] .sidebar,body[data-glass="
 .nav-close{display:none;margin-inline-start:auto}
 @media(max-width:860px){
   .nav-close{display:inline-grid}
+}
 /* horizontal menu */
 .hmenu{display:flex;align-items:center;gap:4px;margin-inline-start:6px}
 .hmenu>div{position:relative}

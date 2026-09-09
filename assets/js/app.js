@@ -7,7 +7,7 @@
 (function(){
 "use strict";
 function setLang(l){ThemeStore.set({lang:l});Promise.resolve(window.I18N?I18N.apply(l):null).then(()=>document.dispatchEvent(new CustomEvent("app:lang",{detail:{lang:l}})));}
-function refreshNumbers(){ try{ if(window.I18N&&I18N.localizeNumbers)I18N.localizeNumbers(ThemeStore.get().lang); }catch(e){} try{ fitHmenu(); }catch(e){} }
+function refreshNumbers(){ try{ fitHmenu(); }catch(e){} }
 function toastChanged(patch){
   if(patch.theme!==undefined&&window.Sonner)Sonner.setTheme(ThemeStore.effectiveTheme());
   if(patch.toasterPosition!==undefined&&window.Sonner)Sonner.setPosition(patch.toasterPosition);
@@ -286,11 +286,10 @@ function initShell(){
   }catch(e){}
   // ---- active link sync: same shell on every page, current page highlights itself
   try{ syncActive(); }catch(e){}
-  // ---- footer year (localized digits when fa)
+  // ---- footer year (plain Latin digits; fa styling comes from fonts)
   try{
     document.querySelectorAll("[data-year]").forEach(el=>{
-      const y=String(new Date().getFullYear());
-      el.textContent=(ThemeStore.get().lang==="fa"&&window.I18N)?I18N.toFa(y):y;
+      el.textContent=String(new Date().getFullYear());
     });
   }catch(e){}
   // scroll edge effect: content dissolving beneath lifts the glass bar
