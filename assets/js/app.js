@@ -216,15 +216,19 @@ function initShell(){
     if(document.body.dataset.sidebar!=="mini")return;
     if(!e.target.closest(".sidebar .nav-item"))document.querySelectorAll(".sidebar .nav-item.open").forEach(o=>o.classList.remove("open"));
   });
-  // hamburger
-  document.querySelectorAll("[data-act='nav']").forEach(b=>bindOnce(b,"nav",()=>b.addEventListener("click",()=>document.body.classList.toggle("nav-open"))));
+  // hamburger: mobile sidebar overlay. The shared scrim covers the content
+  // whenever the sidebar OR the settings drawer is open; overlay click and
+  // the sidebar X button both collapse it (hamburger restores it).
+  document.querySelectorAll("[data-act='nav']").forEach(b=>bindOnce(b,"nav",()=>b.addEventListener("click",()=>{document.body.classList.toggle("nav-open");syncScrim();})));
+  document.querySelectorAll("[data-act='nav-close']").forEach(b=>bindOnce(b,"navx",()=>b.addEventListener("click",()=>{document.body.classList.remove("nav-open");syncScrim();})));
   // settings drawer (opposite of sidebar side)
   const drawer=document.getElementById("settingsDrawer"), scrim=document.getElementById("scrim");
-  function openSettings(){ThemeStore.apply();document.querySelectorAll(".tmenu.open").forEach(o=>o.classList.remove("open"));if(drawer)drawer.classList.add("open");if(scrim)scrim.classList.add("show");}
-  function closeSettings(){if(drawer)drawer.classList.remove("open");if(scrim)scrim.classList.remove("show");}
+  function syncScrim(){const sc=document.getElementById("scrim"),dr=document.getElementById("settingsDrawer");if(!sc)return;sc.classList.toggle("show",document.body.classList.contains("nav-open")||(dr&&dr.classList.contains("open")));}
+  function openSettings(){ThemeStore.apply();document.querySelectorAll(".tmenu.open").forEach(o=>o.classList.remove("open"));if(drawer)drawer.classList.add("open");syncScrim();}
+  function closeSettings(){if(drawer)drawer.classList.remove("open");syncScrim();}
   document.querySelectorAll("[data-act='settings']").forEach(b=>bindOnce(b,"set",()=>b.addEventListener("click",openSettings)));
   document.querySelectorAll("[data-act='settings-close']").forEach(b=>bindOnce(b,"setx",()=>b.addEventListener("click",closeSettings)));
-  if(scrim)bindOnce(scrim,"scrim",()=>scrim.addEventListener("click",()=>{closeSettings();document.body.classList.remove("nav-open");}));
+  if(scrim)bindOnce(scrim,"scrim",()=>scrim.addEventListener("click",()=>{closeSettings();document.body.classList.remove("nav-open");syncScrim();}));
   // first load -> open up settings (per spec: pull menu opens on first load)
   try{if(!localStorage.getItem("adminkit.seen")){localStorage.setItem("adminkit.seen","1");setTimeout(openSettings,600);}}catch(e){}
   // controls (drawer keeps canonical IDs; topbar dropdown mirrors them)
@@ -352,8 +356,8 @@ function initShell(){
   // demo progress bars + reveal on load
   document.querySelectorAll("[data-bar]").forEach(el=>{setTimeout(()=>el.style.width=el.dataset.bar+"%",300);});
   setTimeout(()=>document.querySelectorAll(".reveal").forEach(el=>el.classList.add("in")),60);
-  // Escape closes drawer + any open menu
-  onDoc(document,"keydown",e=>{if(e.key==="Escape"){closeSettings();document.querySelectorAll(".hmenu > div.open").forEach(o=>o.classList.remove("open"));document.querySelectorAll(".tmenu.open").forEach(o=>o.classList.remove("open"));}});
+  // Escape closes drawer + mobile sidebar + any open menu
+  onDoc(document,"keydown",e=>{if(e.key==="Escape"){closeSettings();document.body.classList.remove("nav-open");syncScrim();document.querySelectorAll(".hmenu > div.open").forEach(o=>o.classList.remove("open"));document.querySelectorAll(".tmenu.open").forEach(o=>o.classList.remove("open"));}});
 }
 document.addEventListener("DOMContentLoaded",initShell);
 document.addEventListener("turbo:load",initShell);

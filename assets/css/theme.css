@@ -191,6 +191,10 @@ body[data-glass="off"] .topbar,body[data-glass="off"] .sidebar,body[data-glass="
 [data-theme="dark"] .icon-btn .icon-moon{display:none}
 .icon-btn.on{border-color:color-mix(in srgb,var(--primary) 55%,transparent);color:var(--primary-600);background:var(--primary-soft)}
 .hamburger{display:none}
+/* sidebar close (mobile overlay only; desktop rail needs none) */
+.nav-close{display:none;margin-inline-start:auto}
+@media(max-width:860px){
+  .nav-close{display:inline-grid}
 /* horizontal menu */
 .hmenu{display:flex;align-items:center;gap:4px;margin-inline-start:6px}
 .hmenu>div{position:relative}
@@ -247,6 +251,11 @@ body[data-sidebar="mini"] .sidebar .searchbox{display:none}
 /* collapsing content grids (replaces inline grid-template-columns) */
 .grid.cols-2{grid-template-columns:1fr 1fr}
 .grid.cols-21{grid-template-columns:2fr 1fr}
+/* grid items must shrink below their content min-width, or one long token
+   (code path, URL) pushes the whole track past the screen on mobile */
+.grid>*{min-width:0}
+.card{overflow-wrap:break-word}
+pre.code{overflow-wrap:normal;max-width:100%}
 @media(max-width:900px){.grid.cols-2,.grid.cols-21{grid-template-columns:1fr}}
 /* skip link */
 .skip{position:fixed;top:-60px;inset-inline-start:12px;z-index:999;background:var(--primary);color:#fff;padding:10px 16px;border-radius:10px;font-weight:700;transition:top .18s}
@@ -360,7 +369,7 @@ pre.code code{color:inherit}
 /* responsive */
 @media(max-width:1100px){.grid.kpi{grid-template-columns:repeat(2,1fr)}}
 @media(max-width:860px){
-  .sidebar{position:fixed;inset-block:0;inset-inline-start:0;transform:translateX(-105%);background:var(--surface)}
+  .sidebar{position:fixed;inset-block:0;inset-inline-start:0;transform:translateX(-105%);background:var(--surface);z-index:160}
   html[dir="rtl"] .sidebar{transform:translateX(105%)}
   body.nav-open .sidebar{transform:none}
   /* mobile nav is always full-width style, even in mini mode */
@@ -492,4 +501,9 @@ body[data-glass="off"][data-footer="sticky"] .footer{background:var(--surface);b
    changes height, which is safe: the hysteresis band below is wider than the
    height delta, and the border pixel is reserved in both states. */
 body[data-footer="sticky"].at-bottom .footer{position:static;max-width:1280px;margin:8px auto 0;padding:18px 24px 26px;background:transparent;backdrop-filter:none;-webkit-backdrop-filter:none;border-top-color:transparent}
+/* mobile override: the floating bar is too tall on small screens, so sticky
+   is forced back to a plain static footer (setting itself untouched) */
+@media(max-width:860px){
+  body[data-footer="sticky"] .footer{position:static;max-width:1280px;margin:8px auto 0;padding:18px 24px 26px;background:transparent;backdrop-filter:none;-webkit-backdrop-filter:none;border-top-color:transparent}
+}
 .auth-foot{width:min(440px,94vw);margin:14px auto 26px;text-align:center;color:var(--muted);font-size:12.5px}

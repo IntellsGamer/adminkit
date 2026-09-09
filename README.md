@@ -116,7 +116,7 @@ ThemeStore.effectiveTheme() // 'light' | 'dark' (resolves 'system' via OS)
   When entries overflow the bar width, extras move into a trailing `More ⌄`
   entry automatically (`fitHmenu()` in `app.js`; re-runs on resize, layout
   switch and language change — see §6b).
-- **Mobile (≤860px):** hamburger toggles the sidebar as an overlay drawer.
+- **Mobile (≤860px):** hamburger toggles the sidebar as an overlay drawer with a grey overlay; overlay click, the X button, or Esc closes it.
 - Active states are quiet (neutral gray block), Vercel-style — parents are
   never "active", only the current leaf page is bold. The shared shell is
   identical on all pages; `syncActive()` in `app.js` highlights the current
