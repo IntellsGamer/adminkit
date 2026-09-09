@@ -172,21 +172,45 @@ function initShell(){
       if(!was)placeMini(item);
     }));
   });
-  // horizontal top menu: click toggles (touch), hover still works on desktop
-  // (#hMore has its own dedicated toggle — skip it here to avoid double-binding)
-  document.querySelectorAll(".hmenu > div:not(#hMore)").forEach(wrap=>{
-    const btn=wrap.querySelector(":scope > button.hlink"), drop=wrap.querySelector(":scope > .drop");
-    if(!btn||!drop)return;
-    btn.setAttribute("aria-expanded","false");
-    bindOnce(btn,"hdrop",()=>btn.addEventListener("click",e=>{
-      e.stopPropagation();
-      const was=wrap.classList.contains("open");
-      document.querySelectorAll(".hmenu > div.open").forEach(o=>{o.classList.remove("open");o.querySelector(":scope > button.hlink").setAttribute("aria-expanded","false");});
-      wrap.classList.toggle("open",!was);
-      btn.setAttribute("aria-expanded",String(!was));
-    }));
-  });
+  // horizontal top menu is hover/focus-only: nothing pins on click. Clicking
+  // a parent behaves exactly like hovering it — move the pointer away (or tab
+  // away) and it closes. Touch taps still preview via :hover; only #hMore
+  // (the overflow entry) keeps a click toggle, for small screens without hover.
   onDoc(document,"click",e=>{if(!e.target.closest(".hmenu"))document.querySelectorAll(".hmenu > div.open").forEach(o=>o.classList.remove("open"));});
+  // pointer clicks focus the button, and that focus alone would keep the menu
+  // open via :focus-within after the pointer leaves. Drop pointer focus so a
+  // click behaves exactly like a hover; keyboard activation (Enter/Space,
+  // which fires click with detail 0) keeps focus so keyboard users can still
+  // tab into the open menu.
+  onDoc(document,"click",e=>{
+    try{
+      if(e.detail>0&&e.target&&e.target.closest){
+        const b=e.target.closest(".hmenu button.hlink");
+        if(b&&document.activeElement===b)b.blur();
+      }
+    }catch(_){}
+  });
+  // hover/focus exclusivity: entering another top-level entry closes the
+  // #hMore overflow toggle if it was pinned open, so two dropdowns never show
+  // at once. Delegated on the bar (mouseover/focusin bubble), so entries moved
+  // into #hMore by fitHmenu are covered too. Main entries need no .open at
+  // all — CSS :hover/:focus-within shows them and leaving hides them.
+  document.querySelectorAll(".hmenu").forEach(bar=>{
+    bindOnce(bar,"hexcl",()=>{
+      const closeOthers=e=>{
+        const wrap=e.target&&e.target.closest?e.target.closest(".hmenu > div"):null;
+        if(!wrap||wrap.parentElement!==bar)return;
+        bar.querySelectorAll(":scope > div.open").forEach(o=>{
+          if(o===wrap)return;
+          o.classList.remove("open");
+          const b=o.querySelector(":scope > button.hlink");
+          if(b)b.setAttribute("aria-expanded","false");
+        });
+      };
+      bar.addEventListener("mouseover",closeOthers);
+      bar.addEventListener("focusin",closeOthers);
+    });
+  });
   // close mini popup on outside click
   onDoc(document,"click",e=>{
     if(document.body.dataset.sidebar!=="mini")return;
@@ -211,12 +235,14 @@ function initShell(){
   if($("setGlass"))$("setGlass").onchange=e=>ThemeStore.set({glass:e.target.checked});
   if($("setLang"))$("setLang").onchange=e=>setLang(e.target.value);
   if($("setDir"))$("setDir").onchange=e=>{const v=e.target.value;ThemeStore.set(v==="auto"?{dirAuto:true}:{dirAuto:false,dir:v});};
+  if($("setFooter"))$("setFooter").onchange=e=>ThemeStore.set({footerSticky:e.target.value==="sticky"});
   if($("setIdle"))$("setIdle").onchange=e=>{ThemeStore.set({idleMinutes:+e.target.value});if(window.Idle)Idle.tick();};
   if($("setPrimary"))$("setPrimary").oninput=e=>ThemeStore.set({primary:e.target.value});
   document.querySelectorAll(".swatch").forEach(b=>b.onclick=()=>ThemeStore.set({primary:b.dataset.color}));
   document.querySelectorAll("[data-theme-pick]").forEach(b=>b.onclick=()=>ThemeStore.set({theme:b.dataset.themePick}));
   document.querySelectorAll("[data-layout-pick]").forEach(b=>b.onclick=()=>ThemeStore.set({layout:b.dataset.layoutPick}));
   document.querySelectorAll("[data-sidebar-pick]").forEach(b=>b.onclick=()=>ThemeStore.set({sidebar:b.dataset.sidebarPick}));
+  document.querySelectorAll("[data-footer-pick]").forEach(b=>b.onclick=()=>ThemeStore.set({footerSticky:b.dataset.footerPick==="sticky"}));
   // legacy topbar buttons (kept working if a page still has them)
   if($("themeToggle"))$("themeToggle").onclick=()=>{const cur=ThemeStore.effectiveTheme();ThemeStore.set({theme:cur==="dark"?"light":"dark"});};
   if($("layoutToggle"))$("layoutToggle").onclick=()=>{const cur=ThemeStore.get().layout;ThemeStore.set({layout:cur==="vertical"?"horizontal":"vertical"});};
@@ -266,6 +292,23 @@ function initShell(){
   // scroll edge effect: content dissolving beneath lifts the glass bar
   function onScroll(){const y=window.scrollY||document.documentElement.scrollTop||0;document.querySelectorAll(".topbar").forEach(t=>t.classList.toggle("scrolled",y>8));}
   onDoc(document,"scroll",onScroll,{passive:true});onDoc(window,"scroll",onScroll,{passive:true});onScroll();
+  // footer landing: in sticky mode the bar sheds its glass shell and sits
+  // like a normal footer once you reach the very bottom of the page (and
+  // floats again when you scroll up). Pure style — body class only, the
+  // footerSticky setting itself is never changed or persisted. Wide
+  // hysteresis (dock within 2px, undock past 40px): the morph changes the
+  // footer height by ~28px mid-transition, and the band swallows that delta
+  // so borderline positions can't flap.
+  function syncAtBottom(){
+    try{
+      const gap=(document.documentElement.scrollHeight||0)-((window.innerHeight||0)+(window.scrollY||document.documentElement.scrollTop||0));
+      const landed=document.body.classList.contains("at-bottom");
+      document.body.classList.toggle("at-bottom",landed?gap<=40:gap<=2);
+    }catch(e){}
+  }
+  onDoc(window,"scroll",syncAtBottom,{passive:true});
+  onDoc(window,"resize",syncAtBottom);
+  syncAtBottom();
   // ---- command-palette search: jump to any page ----
   const PAGES=[
     {url:"index.html",icon:"fa-table-columns",en:"Dashboard",fa:"داشبورد",keys:"home main kpi overview analytics reports خانه اصلی نمودار گزارش"},

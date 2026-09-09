@@ -83,6 +83,7 @@ but new pages should copy the unified `<header class="topbar">` shell.
 | Primary color | color input + 6 swatches | Default amber `#f59e0b`; recolors accents, tiles, progress, focus rings |
 | Menu layout | Vertical / Horizontal | Horizontal hides sidebar, shows top mega-menu |
 | Sidebar mode | Full / Mini | Mini = icons + tiny labels; submenus pop **outside** as waterfall cards |
+| Footer | Sticky / Static | Sticky keeps the footer always visible at the viewport bottom (default: Sticky); at the very bottom it docks back into a plain footer — style only, never persisted |
 | Liquid glass | on / off | Kill-switch for all nav-layer glass |
 | Language | English / فارسی | Switches dictionary + direction |
 | Direction | Auto / LTR / RTL | Auto follows language (FA→RTL) |
@@ -110,6 +111,7 @@ ThemeStore.effectiveTheme() // 'light' | 'dark' (resolves 'system' via OS)
   **floating card outside** the sidebar, anchored to the clicked row.
 - **Horizontal:** sidebar hides; top bar shows dropdown menus incl. a
   **mega-menu with images** (offline inline-SVG covers — swap `src` for yours).
+  Menus are hover/focus-only: nothing pins on click, moving away closes them.
   When entries overflow the bar width, extras move into a trailing `More ⌄`
   entry automatically (`fitHmenu()` in `app.js`; re-runs on resize, layout
   switch and language change — see §6b).
@@ -548,7 +550,7 @@ adminkit/
 
 | Key | Shape |
 |---|---|
-| `adminkit.settings.v2` | `{theme:'system', primary:'#f59e0b', layout:'vertical', sidebar:'full', glass:true, lang:'en', dir:'ltr', dirAuto:true, idleMinutes:15, toasterPosition:'bottom-right'}` |
+| `adminkit.settings.v2` | `{theme:'system', primary:'#f59e0b', layout:'vertical', sidebar:'full', footerSticky:true, glass:true, lang:'en', dir:'ltr', dirAuto:true, idleMinutes:15, toasterPosition:'bottom-right'}` |
 | `adminkit.seen` | `'1'` once the settings drawer auto-opened |
 
 ## 21. Keyboard shortcuts & accessibility
@@ -646,7 +648,7 @@ Nginx، IIS، پوشه `wwwroot` در VB.NET و…). هیچ کد سمت سرور
 
 **کشوی تنظیمات** (سمت **مخالف** سایدبار؛ در **اولین بازدید خودش باز می‌شود**):
 پوسته (سیستم/روشن/تیره) · رنگ اصلی (پیش‌فرض کهربایی `#f59e0b`) · چیدمان منو ·
-حالت سایدبار (کامل/مینی با پاپ‌آپ شناور) · شیشه مایع · زبان · جهت (خودکار:
+حالت سایدبار (کامل/مینی با پاپ‌آپ شناور) · فوتر (چسبان/عادی) · شیشه مایع · زبان · جهت (خودکار:
 فارسی→راست‌به‌چپ) · قفل خودکار (دقیقه، `۰` = خاموش).
 
 ## ۵. منطق روشن/تیره

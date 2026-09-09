@@ -11,6 +11,7 @@
     primary:"#f59e0b",
     layout:"vertical",     // vertical | horizontal
     sidebar:"full",        // full | mini
+    footerSticky:true,      // always-visible bottom bar | static after content
     glass:true,
     lang:"en",             // en | fa
     dir:"ltr",             // ltr | rtl (auto from lang unless overridden)
@@ -32,6 +33,7 @@
     document.body.dataset.layout=settings.layout;
     document.body.dataset.sidebar=settings.sidebar;
     document.body.dataset.glass=settings.glass?"on":"off";
+    document.body.dataset.footer=settings.footerSticky?"sticky":"static";
     document.documentElement.lang=settings.lang;
     const dir=settings.dirAuto?(settings.lang==="fa"?"rtl":"ltr"):settings.dir;
     document.documentElement.dir=dir;
@@ -90,6 +92,7 @@
     const sel=document.getElementById("setTheme"); if(sel){ sel.value=settings.theme; syncNice(sel); }
     const lay=document.getElementById("setLayout"); if(lay){ lay.value=settings.layout; syncNice(lay); }
     const sb=document.getElementById("setSidebar"); if(sb){ sb.value=settings.sidebar; syncNice(sb); }
+    const ft=document.getElementById("setFooter"); if(ft){ ft.value=settings.footerSticky?"sticky":"static"; syncNice(ft); }
     const gl=document.getElementById("setGlass"); if(gl)gl.checked=!!settings.glass;
     const lg=document.getElementById("setLang"); if(lg){ lg.value=settings.lang; syncNice(lg); }
     const dr=document.getElementById("setDir"); if(dr){ dr.value=settings.dirAuto?"auto":settings.dir; syncNice(dr); }
@@ -103,6 +106,7 @@
     document.querySelectorAll("[data-theme-pick]").forEach(b=>b.classList.toggle("on",b.dataset.themePick===settings.theme));
     document.querySelectorAll("[data-layout-pick]").forEach(b=>b.classList.toggle("on",b.dataset.layoutPick===settings.layout));
     document.querySelectorAll("[data-sidebar-pick]").forEach(b=>b.classList.toggle("on",b.dataset.sidebarPick===settings.sidebar));
+    document.querySelectorAll("[data-footer-pick]").forEach(b=>b.classList.toggle("on",(b.dataset.footerPick==="sticky")===!!settings.footerSticky));
     document.querySelectorAll("[data-lang]").forEach(b=>b.classList.toggle("on",b.dataset.lang===settings.lang));
     const ll=document.getElementById("tbLangLabel"); if(ll)ll.textContent=(settings.lang==="fa")?"فا":"EN";
     const ti=document.getElementById("tbThemeIcon");

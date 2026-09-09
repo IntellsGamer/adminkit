@@ -54,7 +54,8 @@ body{
   margin:0; background:var(--bg); color:var(--text);
   font-family:var(--font-en); font-size:14.5px; line-height:1.6;
   -webkit-font-smoothing:antialiased; text-rendering:optimizeLegibility;
-  overflow-x:hidden;
+  overflow-x:clip; /* clip (not hidden): contains off-canvas layers without
+    becoming a scroll container, so position:sticky descendants keep working */
 }
 html[lang="fa"] body{font-family:var(--font-fa)}
 /* ambient background: soft orbs, whisper-subtle in light */
@@ -460,10 +461,27 @@ html[dir="rtl"] .avatar-btn{padding:0 4px 0 10px}
   max-width:1280px;width:100%;margin:8px auto 0;padding:18px 24px 26px;
   display:flex;align-items:center;gap:12px;flex-wrap:wrap;
   color:var(--muted);font-size:12.5px;
+  border-top:1px solid transparent; /* reserves the pixel so only padding/margin morph, never the border */
+  /* animate the sticky <-> landed morph: padding/margin/max-width/surface all
+     fade over .3s. The height change mid-transition is absorbed by the wide
+     hysteresis band in syncAtBottom, so it can't flap. */
+  transition:background .3s ease,padding .3s ease,margin .3s ease,max-width .3s ease,border-color .3s ease,box-shadow .3s ease;
 }
 .footer .fbrand{display:inline-flex;align-items:center;gap:8px;font-weight:800;color:var(--text)}
 .footer .fbrand i{color:var(--primary)}
 .footer nav{display:inline-flex;gap:4px;flex-wrap:wrap;margin-inline-start:auto}
 .footer nav a{color:var(--muted);font-weight:600;padding:6px 10px;border-radius:8px}
 .footer nav a:hover{color:var(--text);background:color-mix(in srgb,var(--text) 6%,transparent)}
+/* sticky footer toggle (body[data-footer]): "sticky" keeps the footer pinned
+   to the viewport bottom while the page scrolls beneath it (always on
+   screen); "static" leaves it right after the content. Full-width glass bar
+   so scrolled content stays readable behind its edges. */
+body[data-footer="sticky"] .footer{position:sticky;bottom:0;z-index:40;max-width:none;margin:0;padding:12px 24px;background:var(--glass);backdrop-filter:blur(16px) saturate(1.5);-webkit-backdrop-filter:blur(16px) saturate(1.5);border-top:1px solid var(--border)}
+body[data-glass="off"][data-footer="sticky"] .footer{background:var(--surface);backdrop-filter:none;-webkit-backdrop-filter:none}
+/* footer landing: at the very bottom of the page the sticky bar docks back
+   into a plain static footer (and floats again on scroll-up). Toggled via
+   body.at-bottom by the shell — style only, never persisted. The morph
+   changes height, which is safe: the hysteresis band below is wider than the
+   height delta, and the border pixel is reserved in both states. */
+body[data-footer="sticky"].at-bottom .footer{position:static;max-width:1280px;margin:8px auto 0;padding:18px 24px 26px;background:transparent;backdrop-filter:none;-webkit-backdrop-filter:none;border-top-color:transparent}
 .auth-foot{width:min(440px,94vw);margin:14px auto 26px;text-align:center;color:var(--muted);font-size:12.5px}
