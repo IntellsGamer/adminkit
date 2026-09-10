@@ -55,17 +55,19 @@
   function sysTheme(){ return (window.matchMedia&&matchMedia("(prefers-color-scheme: dark)").matches)?"dark":"light"; }
   function effectiveTheme(){ return settings.theme==="system"?sysTheme():settings.theme; }
   function apply(){
-    // Homepage lock: <body data-lock-layout="horizontal"> forces horizontal and
-    // hides layout switching (homepage is an index, not the dashboard).
+    // Homepage lock (view-only): <body data-lock-layout="horizontal"> renders
+    // horizontal without touching the stored setting, so leaving the homepage
+    // restores your previous layout (e.g. vertical). Never save here.
+    let effLayout=settings.layout;
     try{
       if(document.body && document.body.getAttribute("data-lock-layout")==="horizontal"){
-        if(settings.layout!=="horizontal"){ settings.layout="horizontal"; save(settings); }
+        effLayout="horizontal";
       }
     }catch(e){}
     const eff=effectiveTheme();
     document.documentElement.dataset.theme=eff;
     document.documentElement.setAttribute("data-theme",eff);
-    document.body.dataset.layout=settings.layout;
+    document.body.dataset.layout=effLayout;
     document.body.dataset.sidebar=settings.sidebar;
     document.body.dataset.hstyle=settings.hstyle||"bar";
     document.body.dataset.glass=settings.glass?"on":"off";

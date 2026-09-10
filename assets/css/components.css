@@ -128,7 +128,7 @@ html[dir="rtl"] .dp-head .icon-btn i{transform:scaleX(-1)}
 /* ============ AdminKit v5 components: tabs, tooltip, carousel, input-group ============ */
 
 /* ---------- Tabs ---------- */
-.tabs{display:flex;gap:4px;border-bottom:1px solid var(--border);margin-bottom:14px;overflow-x:auto}
+.tabs{display:flex;gap:4px;border-bottom:1px solid var(--border);margin-bottom:14px;overflow-x:auto;overflow-y:hidden;padding-bottom:1px;scrollbar-width:thin}
 .tab-btn{border:0;background:transparent;padding:10px 14px;font:inherit;font-weight:700;font-size:13.5px;color:var(--muted);cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-1px;white-space:nowrap;display:inline-flex;align-items:center;gap:8px}
 .tab-btn i{font-size:12px}
 .tab-btn:hover{color:var(--text)}
@@ -139,7 +139,7 @@ html[dir="rtl"] .dp-head .icon-btn i{transform:scaleX(-1)}
 .tabs-pills .tab-btn[aria-selected="true"]{background:#171717;color:#fafafa;border-color:#171717}
 [data-theme="dark"] .tabs-pills .tab-btn[aria-selected="true"]{background:#ededed;color:#0a0a0a;border-color:#ededed}
 .tabs-vertical{display:flex;gap:16px}
-.tabs-vertical .tabs{flex-direction:column;border-bottom:0;border-inline-end:1px solid var(--border);margin:0;padding-inline-end:10px;min-width:170px}
+.tabs-vertical .tabs{flex-direction:column;border-bottom:0;border-inline-end:1px solid var(--border);margin:0;padding-bottom:0;padding-inline-end:10px;min-width:170px;overflow:visible}
 .tabs-vertical .tab-btn{border-bottom:0;border-inline-end:2px solid transparent;margin:0;text-align:start;justify-content:flex-start}
 .tabs-vertical .tab-btn[aria-selected="true"]{border-inline-end-color:var(--primary)}
 

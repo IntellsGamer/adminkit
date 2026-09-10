@@ -143,10 +143,11 @@ ThemeStore.effectiveTheme() // 'light' | 'dark' (resolves 'system' via OS)
   auto-clones the topbar menu so `dock` works on pages without physical `.hnbar`
   markup; `fitHmenu()` only measures the active bar. Toggle via drawer
   `#setHstyle` or `data-hstyle-pick="bar|dock"`.
-- **Homepage lock:** `<body data-lock-layout="horizontal">` (only `homepage.html`)
-  forces `layout=horizontal`, ignores `ThemeStore.set({layout})` away from it,
-  disables layout controls, and that page ships theme + language dropdowns only.
-  The homepage is an index describing AdminKit — not the dashboard.
+- **Homepage lock (view-only):** `<body data-lock-layout="horizontal">` (only `homepage.html`)
+  renders horizontal without saving — your stored layout is untouched, so leaving
+  the homepage restores it. `ThemeStore.set({layout})` away from horizontal is
+  ignored there, layout controls disable, and that page ships theme + language
+  dropdowns only. The homepage is an index describing AdminKit — not the dashboard.
 - **Mobile (≤860px):** hamburger toggles the sidebar as an overlay drawer with a grey overlay; overlay click, the X button, or Esc closes it.
 - Active states are quiet (neutral gray block), Vercel-style — parents are
   never "active", only the current leaf page is bold. The shared shell is
