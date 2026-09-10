@@ -210,18 +210,33 @@
 <span data-tipbox data-pos="bottom"><button class="btn btn-ghost">Release notes</button><span class="tip-box"><h4>v5.2 — Dock merge</h4><p>Dry-run the island morph, mirrored input-group radii, Latin error codes.</p><span class="pill pill-ok"><span class="dot"></span>Stable</span></span></span>
 <span data-tipbox data-pos="right"><button class="icon-btn" aria-label="Help"><i class="fa-solid fa-circle-question"></i></button><span class="tip-box"><h4>Why no JS?</h4><p><code>:hover</code> + <code>:focus-within</code> show the box; it stays open while you hover the box itself, so buttons stay clickable.</p></span></span>
 </div></div>
-<div class="card" style="margin-top:16px"><h3 data-i18n="copypaste">Copy-paste</h3><pre class="code">&lt;button class="btn btn-ghost" data-tip="Save changes"&gt;Save&lt;/button&gt;
-&lt;button class="btn btn-ghost" data-tip="Bottom" data-pos="bottom"&gt;Bottom&lt;/button&gt;
-&lt;button class="btn btn-ghost" data-tip="Left" data-pos="left"&gt;Left&lt;/button&gt;
-&lt;button class="btn btn-ghost" data-tip="Right" data-pos="right"&gt;Right&lt;/button&gt;
-&lt;!-- no JS needed; focus shows it too --&gt;
+<div class="card" style="margin-top:16px"><h3 data-i18n="copypaste">Copy-paste</h3>
+<h4 style="margin:12px 0 6px">1 · Plain text hint</h4>
+<p class="muted" style="margin:0 0 8px"><code>data-tip</code> is the text. <code>data-pos</code> is optional — <code>top</code> (default), <code>bottom</code>, <code>left</code> or <code>right</code>. Works on any element, shows on hover <em>and</em> keyboard focus. No JS.</p>
+<pre class="code">&lt;!-- simplest: text above the button --&gt;
+&lt;button class="btn btn-ghost" data-tip="Save changes"&gt;Save&lt;/button&gt;
 
-&lt;!-- rich: any HTML --&gt;
+&lt;!-- pick a side with data-pos --&gt;
+&lt;button class="btn btn-ghost" data-tip="Bottom" data-pos="bottom"&gt;Bottom&lt;/button&gt;
+&lt;button class="icon-btn" data-tip="Edit row" data-pos="right" aria-label="Edit"&gt;
+  &lt;i class="fa-solid fa-pen"&gt;&lt;/i&gt;
+&lt;/button&gt;</pre>
+<h4 style="margin:14px 0 6px">2 · Rich box (any HTML)</h4>
+<p class="muted" style="margin:0 0 8px">Need headings, buttons, avatars? Wrap the trigger in <code>data-tipbox</code> and put <strong>one</strong> <code>.tip-box</code> child next to it. Same <code>data-pos</code> values, same zero JS — the box (and its buttons) stays open while hovered, and a invisible bridge covers the gap so it never flickers shut mid-travel.</p>
+<pre class="code">&lt;!-- wrapper carries data-tipbox (+ optional data-pos) --&gt;
 &lt;span data-tipbox&gt;
+  &lt;!-- 1. the trigger: whatever you like --&gt;
   &lt;button class="btn btn-primary"&gt;Profile card&lt;/button&gt;
-  &lt;span class="tip-box"&gt;&lt;h4&gt;Sara Ahmadi&lt;/h4&gt;&lt;p&gt;Admin&lt;/p&gt;&lt;/span&gt;
+  &lt;!-- 2. the box: any HTML, directly after the trigger --&gt;
+  &lt;span class="tip-box"&gt;
+    &lt;h4&gt;Sara Ahmadi&lt;/h4&gt;
+    &lt;p&gt;Admin · Tehran&lt;/p&gt;
+    &lt;span class="btn-row"&gt;
+      &lt;button class="btn btn-ghost btn-sm"&gt;Message&lt;/button&gt;
+    &lt;/span&gt;
+  &lt;/span&gt;
 &lt;/span&gt;</pre>
-<p class="muted">Positions: default/top, bottom, left, right. Plain <code>data-tip</code> stays one line (keep hints short); <code>.tip-box</code> wraps and fits buttons, pills, avatars. No JS file required (<code>tooltip.js</code> is a documented no-op).</p></div></main>
+<p class="muted">Plain <code>data-tip</code> stays on one line — keep hints short. <code>.tip-box</code> wraps up to <code>300px</code>. <code>tooltip.js</code> is a documented no-op; nothing to import.</p></div></main>
     <footer class="footer">
       <span class="fbrand"><i class="fa-solid fa-layer-group"></i><span data-i18n="appName">AdminKit</span></span>
       <span class="muted" data-i18n="footerTag">Offline-first admin template. No CDN, no build step.</span>
