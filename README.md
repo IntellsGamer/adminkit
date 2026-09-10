@@ -74,7 +74,9 @@ idle/lock overlays. Change the theme once — it follows you across pages via
 **Top bar (always visible, identical on every page except `homepage.html`):** hamburger (mobile + overlay mode) ·
 horizontal menus (horizontal layout only; extra entries auto-collapse into a
 `More ⌄` overflow entry) · search at the top of the sidebar (vertical mode;
-dummy site entries in a Modal, ↓↑ + Enter) · magnifier button inline-start of
+real same-origin index over page text + resolved i18n keys, so FA queries
+match too — needs HTTP, ↓↑ + Enter) · topbar pill (dummy demo entries in a
+Modal) · magnifier button inline-start of
 the menu in horizontal mode only (hover or click pops the same search) · cart shortcut
 (badge `data-cart-count`, hides at 0) ·
 theme dropdown (System default / Light / Dark + primary color + 6 swatches +

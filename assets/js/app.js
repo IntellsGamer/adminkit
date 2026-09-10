@@ -53,16 +53,6 @@ function ensureDockBar(){
     // de-duplicate IDs inside the clone (fitHmenu injects its own More per bar)
     clone.querySelectorAll("[id]").forEach(n=>n.removeAttribute("id"));
     clone.removeAttribute("id");
-    // magnifier button also lives in the dock (inline-start of the menu)
-    const sbtn=document.querySelector(".topbar > .sbtn");
-    if(sbtn){
-      const sc=sbtn.cloneNode(true);
-      sc.querySelectorAll("[id]").forEach(n=>n.removeAttribute("id"));
-      sc.classList.remove("open");
-      const oldPanel=sc.querySelector(".search-results"); if(oldPanel)oldPanel.remove();
-      const inp=sc.querySelector("input"); if(inp)inp.value="";
-      inner.prepend(sc);
-    }
     inner.appendChild(clone);
     wrap.appendChild(inner);
     const topbar=document.querySelector(".topbar");
@@ -185,7 +175,7 @@ function syncActive(){
 function initShell(){
   teardown();
   ThemeStore.apply();
-  ensureSearchBtn();ensureDockBar();
+  ensureSearchBtn();ensureDockBar();syncSearchBtnPlace();
   const s=ThemeStore.get(); if(window.I18N)I18N.apply(s.lang);
   function bindOnce(el,key,fn){ if(!el)return; el.__ak=el.__ak||{}; if(el.__ak[key])return; el.__ak[key]=true; fn(el); }
   // sidebar accordion: expanding another collapses the rest (full/mini/overlay).
@@ -314,7 +304,7 @@ function initShell(){
   onDoc(document,"app:lang",()=>{ try{setTimeout(fitHmenu,50);}catch(e){} });
   try{
     if(window.__akHmenuObs)window.__akHmenuObs.disconnect();
-    window.__akHmenuObs=new MutationObserver(()=>{ try{fitHmenu();}catch(e){} try{syncDockMerge();}catch(e){} });
+    window.__akHmenuObs=new MutationObserver(()=>{ try{fitHmenu();}catch(e){} try{syncDockMerge();}catch(e){} try{syncSearchBtnPlace();}catch(e){} });
     window.__akHmenuObs.observe(document.body,{attributes:true,attributeFilter:["data-layout","data-hstyle"]});
   }catch(e){}
   try{ syncActive(); }catch(e){}
@@ -351,10 +341,66 @@ function initShell(){
   // carousels / tabs boot (their own files also boot; this covers Turbo re-visits)
   try{ if(window.Carousel)Carousel.init(document); }catch(e){}
   try{ if(window.Tabs)Tabs.init(document); }catch(e){}
-  // ---- site search (dummy entries, no page-jumping): sidebar box (vertical)
-  // keeps working; horizontal mode gets a magnifier button + popup instead.
-  // Results open in a Modal — wire openEntry() to a real index later.
-  const FINDER=[
+  // ---- site search, three scopes: sidebar box = REAL same-origin index,
+  // topbar pill = DUMMY demo entries in a Modal, magnifier popup = sidebar
+  // nav items. Vertical untouched; magnifier placement syncs below.
+  const FINDER_PAGES=[
+    {url:"homepage.html",icon:"fa-house",tkey:"homepage"},
+    {url:"index.html",icon:"fa-table-columns",tkey:"dashboard"},
+    {url:"products.html",icon:"fa-bag-shopping",tkey:"products"},
+    {url:"cart.html",icon:"fa-cart-shopping",tkey:"cart"},
+    {url:"gallery.html",icon:"fa-images",tkey:"gallery"},
+    {url:"tickets.html",icon:"fa-ticket",tkey:"tickets"},
+    {url:"playground-sonner.html",icon:"fa-bell",tkey:"sonner"},
+    {url:"playground-modal.html",icon:"fa-window-restore",tkey:"modal"},
+    {url:"playground-table.html",icon:"fa-table",tkey:"table"},
+    {url:"playground-dropdown.html",icon:"fa-chevron-down",tkey:"dropdown"},
+    {url:"playground-datepicker.html",icon:"fa-calendar-days",tkey:"datepicker"},
+    {url:"playground-buttons.html",icon:"fa-circle-dot",tkey:"buttons"},
+    {url:"playground-tabs.html",icon:"fa-folder",tkey:"tabs"},
+    {url:"playground-tooltip.html",icon:"fa-comment",tkey:"tooltip"},
+    {url:"playground-carousel.html",icon:"fa-images",tkey:"carousel"},
+    {url:"playground-grid.html",icon:"fa-table-cells",tkey:"gridSys"},
+    {url:"playground-inputgroup.html",icon:"fa-i-cursor",tkey:"inputGroup"},
+    {url:"login.html",icon:"fa-key",tkey:"login"}
+  ];
+  let finderIndex=null, finderBusy=null;
+  function stripTags(s){return String(s||"").replace(/<[^>]+>/g," ").replace(/\s+/g," ").trim();}
+  async function finderEnsure(){
+    if(finderIndex)return finderIndex;
+    if(finderBusy)return finderBusy;
+    finderBusy=(async()=>{
+      const out=[]; let enD={},faD={};
+      try{enD=await I18N.dict("en");}catch(e){enD={};}
+      try{faD=await I18N.dict("fa");}catch(e){faD={};}
+      for(const p of FINDER_PAGES){
+        try{
+          const r=await fetch(p.url,{cache:"force-cache"});
+          if(!r.ok)continue;
+          const html=await r.text();
+          const chunk=((html.split('<main class="content">')[1]||html).split("</main>")[0]||"").replace(/<script[\s\S]*?<\/script>/gi," ").replace(/<pre[\s\S]*?<\/pre>/gi," ").replace(/<div class="pagenav">[\s\S]*?<\/div>/," ");
+          const text=stripTags(chunk).slice(0,3000);
+          const keys={}; const re=/data-i18n="([^"]+)"/g; let m;
+          while((m=re.exec(chunk))){keys[m[1]]=1;}
+          const klist=Object.keys(keys);
+          out.push({url:p.url,icon:p.icon,
+            titleEn:enD[p.tkey]||stripTags((html.match(/<title>(.*?)<\/title>/i)||[])[1]||p.url).replace(/ — AdminKit.*$/,""),
+            titleFa:faD[p.tkey]||"",
+            hay:(text+" "+klist.map(k=>enD[k]||"").join(" ")+" "+klist.map(k=>faD[k]||"").join(" ")).toLowerCase()});
+        }catch(e){}
+      }
+      finderIndex=out; return out;
+    })();
+    return finderBusy;
+  }
+  function finderLang(){ try{return ThemeStore.get().lang==="fa"?"fa":"en";}catch(e){return "en";} }
+  function openEntry(p){
+    if(!p)return;
+    try{document.querySelectorAll(".sbtn.open").forEach(o=>{o.classList.remove("open");const b=o.querySelector(":scope > button");if(b)b.setAttribute("aria-expanded","false");});}catch(e){}
+    go(p.url);
+  }
+  // dummy entries for the TOPBAR pill: fixed demo list opened in a Modal.
+  const DUMMY=[
     {icon:"fa-table-columns",en:"Dashboard overview",fa:"نمای کلی داشبورد",den:"KPI tiles, sparklines and capacity bars.",dfa:"کارت‌های شاخص، نمودارها و نوار ظرفیت.",keys:"kpi home main شاخص خانه"},
     {icon:"fa-chart-line",en:"Analytics charts",fa:"نمودارهای تحلیل",den:"Traffic area chart with live badge.",dfa:"نمودار ناحیه‌ای بازدید با نشان زنده.",keys:"chart traffic views نمودار بازدید"},
     {icon:"fa-bag-shopping",en:"Products catalog",fa:"کاتالوگ محصولات",den:"Nine demo products with category filter.",dfa:"نه محصول نمایشی با فیلتر دسته.",keys:"shop store price buy فروشگاه خرید قیمت"},
@@ -368,12 +414,11 @@ function initShell(){
     {icon:"fa-circle-dot",en:"Buttons set",fa:"ست دکمه‌ها",den:"Quiet Vercel-style variants and sizes.",dfa:"حالت‌ها و اندازه‌های آرام.",keys:"primary danger success دکمه"},
     {icon:"fa-folder",en:"Tabs and layout",fa:"تب‌ها و چیدمان",den:"Underline, pills and vertical tabs.",dfa:"تب‌های خطی، قرصی و عمودی.",keys:"tabs grid panel تب گرید"}
   ];
-  function finderLang(){ try{return ThemeStore.get().lang==="fa"?"fa":"en";}catch(e){return "en";} }
-  function openEntry(p){
+  function openDummy(p){
     if(!p)return;
     try{ Modal.open({title:p.label,desc:(finderLang()==="fa"?"ورودی نمایشی":"Demo entry"),body:'<p class="muted">'+p.desc+"</p>"}); }catch(e){}
   }
-  function bindFinder(box){
+  function bindDummy(box){
     const input=box.querySelector("input"); if(!input||box.querySelector(".search-results"))return;
     const panel=document.createElement("div"); panel.className="search-results"; panel.hidden=true; box.appendChild(panel);
     let items=[],hl=0;
@@ -382,15 +427,52 @@ function initShell(){
       if(!items.length){panel.innerHTML='<div class="search-empty muted">No matches</div>';panel.hidden=false;return;}
       panel.innerHTML=items.map((p,i)=>'<button type="button" class="search-hit'+(i===hl?" hl":"")+'"><i class="fa-solid '+p.icon+' fa-fw"></i><span>'+p.label+'</span><small>'+p.kind+'</small></button>').join("");
       panel.hidden=false;
-      panel.querySelectorAll(".search-hit").forEach((b,i)=>{b.onmousedown=(e)=>{e.preventDefault();openEntry(items[i]);close();};b.onmouseenter=()=>{hl=i;draw();};});
+      panel.querySelectorAll(".search-hit").forEach((b,i)=>{b.onmousedown=(e)=>{e.preventDefault();openDummy(items[i]);close();};b.onmouseenter=()=>{hl=i;draw();};});
     }
     input.addEventListener("input",()=>{
       const q=input.value.trim().toLowerCase();
       if(!q){close();return;}
       const fa=(finderLang()==="fa");
-      items=FINDER.filter(f=>(f.en+" "+f.fa+" "+f.den+" "+f.dfa+" "+f.keys).toLowerCase().includes(q)).slice(0,7)
+      items=DUMMY.filter(f=>(f.en+" "+f.fa+" "+f.den+" "+f.dfa+" "+f.keys).toLowerCase().indexOf(q)>=0).slice(0,7)
         .map(f=>({icon:f.icon,label:fa?f.fa:f.en,desc:fa?f.dfa:f.den,kind:fa?"نمایشی":"demo"}));
       hl=0;draw();
+    });
+    input.addEventListener("keydown",(e)=>{
+      if(panel.hidden)return;
+      if(e.key==="ArrowDown"){e.preventDefault();hl=Math.min(items.length-1,hl+1);draw();}
+      else if(e.key==="ArrowUp"){e.preventDefault();hl=Math.max(0,hl-1);draw();}
+      else if(e.key==="Enter"){e.preventDefault();if(items[hl]){openDummy(items[hl]);close();}}
+      else if(e.key==="Escape"){close();input.blur();}
+    });
+    onDoc(document,"click",(e)=>{if(!box.contains(e.target))close();});
+  }
+  function bindFinder(box){
+    const input=box.querySelector("input"); if(!input||box.querySelector(".search-results"))return;
+    const panel=document.createElement("div"); panel.className="search-results"; panel.hidden=true; box.appendChild(panel);
+    let items=[],hl=0;
+    function close(){panel.hidden=true;items=[];hl=0;}
+    function draw(){
+      if(!items.length){panel.innerHTML='<div class="search-empty muted">No matches</div>';panel.hidden=false;return;}
+      panel.innerHTML=items.map((p,i)=>'<button type="button" class="search-hit'+(i===hl?" hl":"")+'" data-u="'+p.url+'"><i class="fa-solid '+p.icon+' fa-fw"></i><span>'+p.label+'</span><small>'+p.kind+'</small></button>').join("");
+      panel.hidden=false;
+      panel.querySelectorAll(".search-hit").forEach((b,i)=>{b.onmousedown=(e)=>{e.preventDefault();openEntry(items[i]);close();};b.onmouseenter=()=>{hl=i;draw();};});
+    }
+    let finderSeq=0;
+    input.addEventListener("input",()=>{
+      const q=input.value.trim().toLowerCase();
+      if(!q){close();return;}
+      const my=++finderSeq, fa=(finderLang()==="fa");
+      function run(idx){
+        if(my!==finderSeq)return;
+        items=idx.filter(e=>e.hay.indexOf(q)>=0).slice(0,7)
+          .map(e=>({url:e.url,icon:e.icon,label:(fa&&e.titleFa)?e.titleFa:e.titleEn,kind:fa?"صفحه":"page"}));
+        hl=0;draw();
+      }
+      if(finderIndex)run(finderIndex);
+      else{
+        panel.innerHTML='<div class="search-empty muted">'+(fa?"در حال فهرست‌سازی…":"Indexing site…")+"</div>";panel.hidden=false;
+        finderEnsure().then(run).catch(()=>{if(my===finderSeq){items=[];hl=0;draw();}});
+      }
     });
     input.addEventListener("keydown",(e)=>{
       if(panel.hidden)return;
@@ -401,9 +483,62 @@ function initShell(){
     });
     onDoc(document,"click",(e)=>{if(!box.contains(e.target))close();});
   }
-  // magnifier button for horizontal mode only (vertical untouched): sits
-  // inline-start of the topbar hmenu (left of Dashboards in LTR, right in
-  // RTL); hover or click pops the same finder search.
+  // nav finder for the magnifier popup: searches the live sidebar items
+  // (the hidden rail in horizontal modes), so the icon replaces rail search.
+  function navIcon(a){
+    try{
+      const toks=(Array.from(a.querySelectorAll("i")).map(i=>i.className).join(" ").match(/fa-[a-z0-9-]+/g)||[]);
+      const bad={solid:1,regular:1,light:1,thin:1,duotone:1,brands:1,fw:1,xl:1,"2xl":1,sm:1,lg:1};
+      for(const t of toks){if(!bad[t.slice(3)])return t;}
+    }catch(e){}
+    return "fa-circle";
+  }
+  function sidebarLinks(){
+    const out=[];
+    document.querySelectorAll(".sidebar .nav-item").forEach(item=>{
+      let group="";
+      try{const g=item.querySelector(":scope > .nav-link .nav-text");if(g)group=g.textContent.trim();}catch(e){}
+      item.querySelectorAll(":scope .nav-sub a.nav-link").forEach(a=>{
+        if(a.hasAttribute("data-act"))return;
+        const full=a.getAttribute("href")||"";
+        if(!full||full==="#")return;
+        const t=(a.textContent||"").trim(); if(!t)return;
+        out.push({label:t,full:full,icon:navIcon(a),group:group});
+      });
+    });
+    return out;
+  }
+  function bindNavFinder(box){
+    const input=box.querySelector("input"); if(!input||box.querySelector(".search-results"))return;
+    const panel=document.createElement("div"); panel.className="search-results"; panel.hidden=true; box.appendChild(panel);
+    let items=[],hl=0;
+    function close(){panel.hidden=true;items=[];hl=0;}
+    function closePop(){try{const w=box.closest(".sbtn");if(w){w.classList.remove("open");const b=w.querySelector(":scope > button");if(b)b.setAttribute("aria-expanded","false");}}catch(e){}}
+    function pick(p){ if(!p)return; close(); closePop(); go(p.full); }
+    function draw(){
+      if(!items.length){panel.innerHTML='<div class="search-empty muted">No matches</div>';panel.hidden=false;return;}
+      panel.innerHTML=items.map((p,i)=>'<button type="button" class="search-hit'+(i===hl?" hl":"")+'"><i class="fa-solid '+p.icon+' fa-fw"></i><span>'+p.label+'</span><small>'+p.group+'</small></button>').join("");
+      panel.hidden=false;
+      panel.querySelectorAll(".search-hit").forEach((b,i)=>{b.onmousedown=(e)=>{e.preventDefault();pick(items[i]);};b.onmouseenter=()=>{hl=i;draw();};});
+    }
+    input.addEventListener("input",()=>{
+      const q=input.value.trim().toLowerCase();
+      if(!q){close();return;}
+      items=sidebarLinks().filter(l=>(l.label+" "+l.group).toLowerCase().indexOf(q)>=0).slice(0,7);
+      hl=0;draw();
+    });
+    input.addEventListener("keydown",(e)=>{
+      if(panel.hidden)return;
+      if(e.key==="ArrowDown"){e.preventDefault();hl=Math.min(items.length-1,hl+1);draw();}
+      else if(e.key==="ArrowUp"){e.preventDefault();hl=Math.max(0,hl-1);draw();}
+      else if(e.key==="Enter"){e.preventDefault();if(items[hl])pick(items[hl]);}
+      else if(e.key==="Escape"){close();closePop();input.blur();}
+    });
+    onDoc(document,"click",(e)=>{if(!box.contains(e.target))close();});
+  }
+  // magnifier button for horizontal modes only (vertical untouched): the popup
+  // searches sidebar items; placement syncs below (topbar in bar mode,
+  // inline-start of the island in dock mode, never both).
   function bindSearchBtn(wrap){
     if(!wrap||wrap.__akSbtn)return; wrap.__akSbtn=true;
     const btn=wrap.querySelector(":scope > button"), pop=wrap.querySelector(":scope > .sbtn-pop");
@@ -420,18 +555,35 @@ function initShell(){
   }
   function ensureSearchBtn(){
     try{
-      if(document.querySelector(".topbar > .sbtn"))return;
+      // locked-layout pages (homepage) keep their inline searchbox instead
+      if(document.body&&document.body.getAttribute("data-lock-layout")==="horizontal")return;
+      if(document.querySelector(".sbtn"))return;
       const bar=document.querySelector(".topbar .hmenu"); if(!bar)return;
       const wrap=document.createElement("div"); wrap.className="sbtn";
       wrap.innerHTML='<button type="button" class="icon-btn" aria-label="Search" aria-expanded="false"><i class="fa-solid fa-magnifying-glass"></i></button><div class="sbtn-pop"><label class="searchbox"><i class="fa-solid fa-magnifying-glass"></i><input data-i18n-ph="searchPh" placeholder="Search…"></label></div>';
       bar.before(wrap);
       bindSearchBtn(wrap);
-      const popBox=wrap.querySelector(".searchbox"); if(popBox)bindFinder(popBox);
+      const popBox=wrap.querySelector(".searchbox"); if(popBox)bindNavFinder(popBox);
+    }catch(e){}
+  }
+  // docked mode: magnifier lives inline-start of the island; otherwise in the
+  // topbar. Physical move (handlers + panel survive), re-run on layout flip.
+  function syncSearchBtnPlace(){
+    try{
+      const wrap=document.querySelector(".sbtn"); if(!wrap)return;
+      const docked=document.body.dataset.hstyle==="dock"&&document.body.dataset.layout==="horizontal";
+      if(docked){
+        const inner=document.querySelector(".hnbar-inner");
+        if(inner&&wrap.parentElement!==inner)inner.prepend(wrap);
+      }else{
+        const bar=document.querySelector(".topbar .hmenu");
+        if(bar&&wrap.parentElement!==document.querySelector(".topbar"))bar.before(wrap);
+      }
     }catch(e){}
   }
   ensureSearchBtn();
   document.querySelectorAll(".sbtn").forEach(w=>{ try{bindSearchBtn(w);}catch(e){} });
-  document.querySelectorAll(".searchbox").forEach(box=>{ try{bindFinder(box);}catch(e){} });
+  document.querySelectorAll(".searchbox").forEach(box=>{ if(box.closest(".sbtn-pop"))return; try{(box.closest(".topbar")?bindDummy:bindFinder)(box);}catch(e){} });
   onDoc(document,"click",e=>{
     if(!e.target.closest(".sbtn"))document.querySelectorAll(".sbtn.open").forEach(o=>{o.classList.remove("open");const b=o.querySelector(":scope > button");if(b)b.setAttribute("aria-expanded","false");});
   });

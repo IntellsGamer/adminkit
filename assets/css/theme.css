@@ -645,6 +645,15 @@ body[data-hstyle="bar"][data-layout="horizontal"] .topbar .hmenu{display:flex}
    restores the floating dock. Mirrors the elib-web docked-island morph. */
 body[data-hstyle="dock"][data-layout="horizontal"].dock-merged .hnbar{top:var(--topbar-h);padding:0}
 body[data-hstyle="dock"][data-layout="horizontal"].dock-merged .hnbar-inner{max-width:none;border-radius:0;border-left-width:0;border-right-width:0}
+/* docked mode keeps the big topbar search; the magnifier lives in the island
+   (moved there physically by syncSearchBtnPlace, bar-style untouched) */
+/* docked mode: glass lives on the ISLAND, not the topbar. Topbar goes solid;
+   the island keeps frost + the liquid lens. data-glass=off still flattens
+   everything via the kill-switch rule. */
+body[data-glass="on"][data-hstyle="dock"][data-layout="horizontal"] .topbar{background:var(--surface);backdrop-filter:none;-webkit-backdrop-filter:none;box-shadow:none}
+@supports (backdrop-filter: url('#ak-liquid')) {
+  body[data-glass="on"][data-hstyle="dock"][data-layout="horizontal"] .hnbar-inner{backdrop-filter:blur(20px) saturate(1.6) url('#ak-liquid');-webkit-backdrop-filter:blur(20px) saturate(1.6)}
+}
 [data-theme="dark"] .hnbar-inner{box-shadow:var(--shadow),inset 0 1px 0 rgba(255,255,255,.1)}
 body[data-glass="off"] .hnbar-inner{background:var(--surface);backdrop-filter:none;-webkit-backdrop-filter:none;box-shadow:var(--shadow)}
 .hnbar .hmenu{display:flex!important;flex:1 1 auto;min-width:0;margin:0;flex-wrap:nowrap}
