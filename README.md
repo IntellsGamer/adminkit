@@ -221,6 +221,10 @@ Rules:
   injected by JS). The More panel itself is a responsive mega grid (3→2→1
   columns, headers + statically-open drops, anchored to the bar end), so
   clipped mega cards stay contained.
+- Edge auto-detection: every horizontal drop (mega, plain, More) measures
+  itself on hover/focus and nudges back on-screen with a direction-aware
+  margin (`placeDrop()` in `app.js`; offsets reset on resize/layout/language
+  refits, so nothing accumulates).
 
 ## 7. i18n + RTL
 

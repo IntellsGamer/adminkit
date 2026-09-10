@@ -68,6 +68,8 @@ function fitHmenu(){
   document.querySelectorAll(".hmenu").forEach((bar,bi)=>{
     const inDock=!!bar.closest(".hnbar");
     const inTop=!!bar.closest(".topbar");
+    // stale edge-detection offsets die here (refit on resize/layout/lang)
+    try{bar.querySelectorAll(":scope .drop").forEach(d=>{d.style.marginInlineStart="";});}catch(e){}
     let more=bar.querySelector(":scope > .hmore, :scope > #hMore");
     let drop=more?more.querySelector(":scope > .drop"):null;
     if(!more){
@@ -249,6 +251,30 @@ function initShell(){
     if(document.body.dataset.sidebar!=="icon")return;
     if(!e.target.closest(".sidebar .nav-item"))document.querySelectorAll(".sidebar .nav-item.open").forEach(o=>o.classList.remove("open"));
   });
+  // viewport edge auto-detection for horizontal drops (mega + normal + More):
+  // measures the opened panel and nudges it back on-screen with a logical
+  // margin (direction-aware, animation-safe). Idempotent: resets first, so
+  // re-entry converges instead of accumulating.
+  function placeDrop(wrap){
+    try{
+      const drop=wrap.querySelector(":scope > .drop"); if(!drop)return;
+      drop.style.marginInlineStart="";
+      const M=8, vw=document.documentElement.clientWidth||innerWidth;
+      const r=drop.getBoundingClientRect();
+      if(r.width<=0||r.height<=0)return; // hidden bar — nothing to place
+      const rtl=document.documentElement.dir==="rtl";
+      if(r.left<M){const L=Math.ceil(M-r.left);drop.style.marginInlineStart=(rtl?-L:L)+"px";}
+      else if(r.right>vw-M){const R=Math.ceil(r.right-(vw-M));drop.style.marginInlineStart=(rtl?R:-R)+"px";}
+    }catch(e){}
+  }
+  function placeFromEvent(e){
+    try{
+      const w=e.target&&e.target.closest?e.target.closest(".hmenu > div"):null;
+      if(w&&w.parentElement&&w.parentElement.classList.contains("hmenu"))placeDrop(w);
+    }catch(_){}
+  }
+  onDoc(document,"mouseover",placeFromEvent);
+  onDoc(document,"focusin",placeFromEvent);
   // hamburger: mobile + overlay sidebar. The shared scrim covers the content
   // whenever the sidebar OR the settings drawer is open.
   document.querySelectorAll("[data-act='nav']").forEach(b=>bindOnce(b,"nav",()=>b.addEventListener("click",()=>{document.body.classList.toggle("nav-open");syncScrim();})));

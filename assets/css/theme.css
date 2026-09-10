@@ -226,7 +226,7 @@ body[data-glass="off"] .topbar,body[data-glass="off"] .sidebar,body[data-glass="
 .drop a:hover{background:color-mix(in srgb,var(--primary) 8%,transparent)}
 .drop a small{font-weight:500}
 .drop img{width:52px;height:38px;object-fit:cover;border-radius:10px;flex:0 0 52px;box-shadow:var(--inset-hi)}
-.mega{min-width:min(660px,92vw);display:grid;grid-template-columns:repeat(3,1fr);gap:4px}
+.hmenu>div:hover .drop.mega,.hmenu>div:focus-within .drop.mega,.hmenu>div.open .drop.mega{width:max-content;max-width:calc(100vw - 16px);min-width:min(620px,calc(100vw - 16px));display:grid;grid-template-columns:repeat(auto-fit,minmax(min(190px,100%),1fr));gap:8px;padding:10px}
 .topbar-spacer{flex:1}
 .top-sep{width:1px;height:24px;background:var(--border)}
 .searchbox{display:flex;align-items:center;gap:9px;background:var(--surface);border:1px solid var(--border);
@@ -445,7 +445,7 @@ pre.code code{color:inherit}
 /* mini rail: solid background so fixed popups anchor to the viewport
    (backdrop-filter would re-anchor them to the sidebar box) */
 body[data-sidebar="mini"] .sidebar{background:var(--surface);backdrop-filter:none;-webkit-backdrop-filter:none}
-@media(max-width:560px){.grid.kpi{grid-template-columns:1fr}.mega{grid-template-columns:1fr}}
+@media(max-width:560px){.grid.kpi{grid-template-columns:1fr}}
 body[data-layout="horizontal"] .sidebar{display:none}
 body[data-layout="horizontal"] .hmenu{display:flex}
 body[data-layout="vertical"] .hmenu{display:none}
@@ -527,17 +527,7 @@ html[dir="rtl"] .avatar-btn{padding:0 4px 0 10px}
 #hMoreDrop .mega img{width:40px;height:30px;flex:0 0 40px}
 .hmenu > #hMore:hover > #hMoreDrop,
 .hmenu > #hMore:focus-within > #hMoreDrop,
-.hmenu > #hMore.open > #hMoreDrop{display:grid;min-width:min(700px,94vw);max-width:94vw;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px;padding:10px}
-@media(max-width:700px){
-  .hmenu > #hMore:hover > #hMoreDrop,
-  .hmenu > #hMore:focus-within > #hMoreDrop,
-  .hmenu > #hMore.open > #hMoreDrop{grid-template-columns:repeat(2,minmax(0,1fr))}
-}
-@media(max-width:480px){
-  .hmenu > #hMore:hover > #hMoreDrop,
-  .hmenu > #hMore:focus-within > #hMoreDrop,
-  .hmenu > #hMore.open > #hMoreDrop{grid-template-columns:1fr}
-}
+.hmenu > #hMore.open > #hMoreDrop{display:grid;min-width:min(640px,94vw);max-width:94vw;grid-template-columns:repeat(auto-fit,minmax(min(200px,100%),1fr));gap:6px;padding:10px}
 
 /* ---------- Footer (all pages) ---------- */
 .footer{
@@ -884,17 +874,7 @@ body[data-hstyle="dock"][data-layout="horizontal"] .topbar{border-bottom:1px sol
    is a real grid (3 cols → 2 → 1) */
 .hmenu > .hmore:hover > .drop.hmore-drop,
 .hmenu > .hmore:focus-within > .drop.hmore-drop,
-.hmenu > .hmore.open > .drop.hmore-drop{display:grid;min-width:min(700px,94vw);max-width:94vw;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px;padding:10px}
-@media(max-width:700px){
-  .hmenu > .hmore:hover > .drop.hmore-drop,
-  .hmenu > .hmore:focus-within > .drop.hmore-drop,
-  .hmenu > .hmore.open > .drop.hmore-drop{grid-template-columns:repeat(2,minmax(0,1fr))}
-}
-@media(max-width:480px){
-  .hmenu > .hmore:hover > .drop.hmore-drop,
-  .hmenu > .hmore:focus-within > .drop.hmore-drop,
-  .hmenu > .hmore.open > .drop.hmore-drop{grid-template-columns:1fr}
-}
+.hmenu > .hmore.open > .drop.hmore-drop{display:grid;min-width:min(640px,94vw);max-width:94vw;grid-template-columns:repeat(auto-fit,minmax(min(200px,100%),1fr));gap:6px;padding:10px}
 
 /* ---------- Horizontal search button + popup (horizontal layout only; vertical untouched) ---------- */
 .sbtn{display:none;position:relative;flex:0 0 auto}
