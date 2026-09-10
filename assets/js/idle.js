@@ -27,6 +27,10 @@ function cancelPending(){
 function tick(){
   // Changing the interval (or Stay/unlock) cancels everything pending first.
   cancelPending();
+  // Page opt-out: <body data-idle="off"> (e.g. homepage, gallery) never arms.
+  try{
+    if(document.body && document.body.getAttribute("data-idle")==="off")return;
+  }catch(e){}
   const m=mins();
   if(!m||m<=0)return; // off
   const wait=m*60*1000;

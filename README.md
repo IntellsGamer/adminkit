@@ -560,6 +560,9 @@ Idle.setWarnSecs(30);   // warning window seconds (default 60)
   restarts the interval. Elements required per page: `#idleWrap #idleBar
   #idleTxt #idleStay #idleLeave #lockWrap #lockBtn` (all playgrounds +
   dashboard include them).
+- Page opt-out: `<body data-idle="off">` never arms the guard (used by
+  `homepage.html` and `gallery.html`). Since `tick()` cancels pending timers
+  first, Turbo visits to/from opted-out pages arm/disarm automatically.
 
 ## 16. Offline assets (all local, zero network)
 
