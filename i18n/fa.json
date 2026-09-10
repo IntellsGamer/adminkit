@@ -271,5 +271,8 @@
   "backHome": "بازگشت به خانه",
   "openDash": "باز کردن داشبورد",
   "dualMonth": "دو ماهه",
-  "singleMonth": "تک‌ماهه"
+  "singleMonth": "تک‌ماهه",
+  "removeAll": "حذف همه",
+  "cartItems": "قلم",
+  "orderPlaced": "سفارش ثبت شد"
 }

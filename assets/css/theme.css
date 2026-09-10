@@ -42,15 +42,10 @@
 @font-face{font-family:"Inter";font-style:normal;font-weight:600;font-display:swap;src:local("Inter SemiBold"),url("../fonts/inter-600.woff2") format("woff2");unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD}
 @font-face{font-family:"Inter";font-style:normal;font-weight:700;font-display:swap;src:local("Inter Bold"),url("../fonts/inter-700.woff2") format("woff2");unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD}
 @font-face{font-family:"Inter";font-style:normal;font-weight:800;font-display:swap;src:local("Inter ExtraBold"),url("../fonts/inter-800.woff2") format("woff2");unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD}
-@font-face{font-family:"Vazirmatn";font-style:normal;font-weight:400;font-display:swap;src:local("Vazirmatn"),url("../fonts/vazirmatn-400.woff2") format("woff2");unicode-range:U+0600-06FF,U+0750-077F,U+08A0-08FF,U+200C-200D,U+FB50-FDFF,U+FE70-FEFF}
-@font-face{font-family:"Vazirmatn";font-style:normal;font-weight:500;font-display:swap;src:local("Vazirmatn Medium"),url("../fonts/vazirmatn-500.woff2") format("woff2");unicode-range:U+0600-06FF,U+0750-077F,U+08A0-08FF,U+200C-200D,U+FB50-FDFF,U+FE70-FEFF}
-@font-face{font-family:"Vazirmatn";font-style:normal;font-weight:700;font-display:swap;src:local("Vazirmatn Bold"),url("../fonts/vazirmatn-700.woff2") format("woff2");unicode-range:U+0600-06FF,U+0750-077F,U+08A0-08FF,U+200C-200D,U+FB50-FDFF,U+FE70-FEFF}
-@font-face{font-family:"Vazirmatn";font-style:normal;font-weight:900;font-display:swap;src:local("Vazirmatn Black"),url("../fonts/vazirmatn-900.woff2") format("woff2");unicode-range:U+0600-06FF,U+0750-077F,U+08A0-08FF,U+200C-200D,U+FB50-FDFF,U+FE70-FEFF}
-/* B Koodak (Borna Rayaneh, free) subset to digits only (30 glyphs, ~2KB):
-   its Persian-style digit drawings back Latin, Arabic-Indic AND Persian
-   codepoints, so plain 0-9 text renders Persian-looking in fa mode with zero
-   character rewriting. Single Bold face serves every weight. */
-@font-face{font-family:"BKoodak";font-style:normal;font-weight:100 900;font-display:swap;src:url("../fonts/bkoodak-700.woff2") format("woff2");unicode-range:U+0030-0039,U+0660-0669,U+06F0-06F9}
+@font-face{font-family:"Vazirmatn";font-style:normal;font-weight:400;font-display:swap;src:local("Vazirmatn"),url("../fonts/vazirmatn-400.woff2") format("woff2");unicode-range:U+0600-06FF,U+0750-077F,U+08A0-08FF,U+200C-200D,U+FB50-FDFF,U+FE70-FEFF,U+0030-0039}
+@font-face{font-family:"Vazirmatn";font-style:normal;font-weight:500;font-display:swap;src:local("Vazirmatn Medium"),url("../fonts/vazirmatn-500.woff2") format("woff2");unicode-range:U+0600-06FF,U+0750-077F,U+08A0-08FF,U+200C-200D,U+FB50-FDFF,U+FE70-FEFF,U+0030-0039}
+@font-face{font-family:"Vazirmatn";font-style:normal;font-weight:700;font-display:swap;src:local("Vazirmatn Bold"),url("../fonts/vazirmatn-700.woff2") format("woff2");unicode-range:U+0600-06FF,U+0750-077F,U+08A0-08FF,U+200C-200D,U+FB50-FDFF,U+FE70-FEFF,U+0030-0039}
+@font-face{font-family:"Vazirmatn";font-style:normal;font-weight:900;font-display:swap;src:local("Vazirmatn Black"),url("../fonts/vazirmatn-900.woff2") format("woff2");unicode-range:U+0600-06FF,U+0750-077F,U+08A0-08FF,U+200C-200D,U+FB50-FDFF,U+FE70-FEFF,U+0030-0039}
 
 *{box-sizing:border-box}
 html,body{height:100%}
@@ -62,13 +57,13 @@ body{
   overflow-x:clip; /* clip (not hidden): contains off-canvas layers without
     becoming a scroll container, so position:sticky descendants keep working */
 }
-/* FA mode: BKoodak claims Persian digits only, Vazirmatn is range-limited to
-   Arabic script above, so Latin text and digits fall through to Inter (their
-   correct font); Persian digits render B Koodak, Persian text Vazirmatn. */
-html[lang="fa"] body{font-family:"BKoodak","Vazirmatn","Inter",Tahoma,Arial,sans-serif}
+/* FA mode: Vazirmatn now also covers Latin digits (U+0030-0039 above), so
+   digits render in Vazirmatn at the correct weight in both languages;
+   Persian text stays Vazirmatn, Latin text falls through to Inter. */
+html[lang="fa"] body{font-family:"Vazirmatn","Inter",Tahoma,Arial,sans-serif}
 /* FA locale: toasts carry upstream sonner's own font stack (verbatim port),
    so they need an explicit override to join the same system */
-html[lang="fa"] [data-sonner-toaster]{font-family:"BKoodak","Vazirmatn","Inter",Tahoma,Arial,sans-serif}
+html[lang="fa"] [data-sonner-toaster]{font-family:"Vazirmatn","Inter",Tahoma,Arial,sans-serif}
 /* ambient background: soft orbs, whisper-subtle in light */
 body::before{content:"";position:fixed;inset:0;z-index:-2;pointer-events:none;opacity:var(--orb-op);
   background:
@@ -321,6 +316,11 @@ textarea{min-height:88px;resize:vertical;line-height:1.6}
 select:focus,input:focus,textarea:focus{outline:none;border-color:color-mix(in srgb,var(--primary) 60%,transparent);box-shadow:0 0 0 4px var(--primary-soft);background:var(--surface)}
 [data-theme="dark"] select,[data-theme="dark"] input[type="text"],[data-theme="dark"] input[type="email"],[data-theme="dark"] input[type="password"],[data-theme="dark"] input[type="tel"],[data-theme="dark"] input[type="number"],[data-theme="dark"] input[type="search"],[data-theme="dark"] input:not([type]),[data-theme="dark"] textarea{background:#242424;border-color:rgba(255,255,255,.14)}
 input::placeholder,textarea::placeholder{color:var(--muted);opacity:.85}
+/* nested search input stays borderless: the .searchbox pill owns the frame,
+   otherwise the generic input rule above double-frames it */
+.searchbox input{border:0;background:transparent;padding:0;box-shadow:none}
+.searchbox input:focus{border:0;background:transparent;box-shadow:none}
+[data-theme="dark"] .searchbox input,[data-theme="dark"] .searchbox input:focus{background:transparent;border:0;box-shadow:none}
 /* icon input wrapper (themed, like login page) */
 .tinp{position:relative}
 .tinp>i{position:absolute;top:13px;inset-inline-start:13px;color:var(--muted);font-size:14px;pointer-events:none}
@@ -618,7 +618,7 @@ body[data-sidebar="overlay"] .sidebar{
   width:min(300px,86vw);flex-basis:auto;box-shadow:var(--shadow);
 }
 html[dir="rtl"] body[data-sidebar="overlay"] .sidebar{transform:translateX(105%)}
-body[data-sidebar="overlay"].nav-open .sidebar{transform:none}
+body[data-sidebar="overlay"].nav-open .sidebar,html[dir] body[data-sidebar="overlay"].nav-open .sidebar{transform:none}
 body[data-sidebar="overlay"] .hamburger{display:inline-grid}
 body[data-sidebar="overlay"] .nav-close{display:inline-grid}
 
@@ -630,14 +630,21 @@ body[data-hstyle="bar"][data-layout="horizontal"] .topbar .hmenu{display:flex}
    Inspired by elib-web #topnav.docked island (principles, not a copy):
    full-bleed topbar on top, then a centered floating pill bar that holds the
    horizontal menu. New style, independent from the in-topbar bar. */
-.hnbar{display:none;position:sticky;top:calc(var(--topbar-h) + 10px);z-index:45;padding:0 18px;pointer-events:none}
+.hnbar{display:none;position:sticky;top:calc(var(--topbar-h) + 10px);z-index:45;padding:0 18px;pointer-events:none;
+  transition:top .3s ease,padding .3s ease}
 .hnbar-inner{
   pointer-events:auto;max-width:min(96vw,80rem);margin:0 auto;
   display:flex;align-items:center;gap:4px;padding:8px 12px;
   background:var(--glass);backdrop-filter:blur(20px) saturate(1.6);-webkit-backdrop-filter:blur(20px) saturate(1.6);
   border:1px solid var(--border);border-radius:18px;box-shadow:var(--shadow),inset 0 1px 0 rgba(255,255,255,.5);
-  overflow-x:auto;scrollbar-width:thin;
+  overflow:visible;
+  transition:max-width .38s cubic-bezier(.2,.7,.3,1),border-radius .38s ease,border-color .3s ease;
 }
+/* dock auto-merge at page top (view-only body class — hstyle setting untouched):
+   the island stretches full-bleed and fuses with the topbar; scrolling down
+   restores the floating dock. Mirrors the elib-web docked-island morph. */
+body[data-hstyle="dock"][data-layout="horizontal"].dock-merged .hnbar{top:var(--topbar-h);padding:0}
+body[data-hstyle="dock"][data-layout="horizontal"].dock-merged .hnbar-inner{max-width:none;border-radius:0;border-left-width:0;border-right-width:0}
 [data-theme="dark"] .hnbar-inner{box-shadow:var(--shadow),inset 0 1px 0 rgba(255,255,255,.1)}
 body[data-glass="off"] .hnbar-inner{background:var(--surface);backdrop-filter:none;-webkit-backdrop-filter:none;box-shadow:var(--shadow)}
 .hnbar .hmenu{display:flex!important;flex:1 1 auto;min-width:0;margin:0;flex-wrap:nowrap}
@@ -787,6 +794,8 @@ body[data-hstyle="dock"][data-layout="horizontal"] .topbar{border-bottom:1px sol
   color:var(--muted);border:1px solid var(--border);background:color-mix(in srgb,var(--surface) 70%,transparent);border-radius:99px;padding:6px 14px}
 .err-pill .dot{width:7px;height:7px;border-radius:99px;background:linear-gradient(135deg,var(--err-a),var(--err-b));box-shadow:0 0 10px var(--err-a)}
 .err-giant{font-size:clamp(96px,20vw,176px);font-weight:800;letter-spacing:-.055em;line-height:1;margin:10px 0 0;
+  /* Latin digits always in Inter here, independent of locale font stacks */
+  font-family:var(--font-en);
   background:linear-gradient(180deg,var(--text) 30%,color-mix(in srgb,var(--text) 45%,transparent));
   -webkit-background-clip:text;background-clip:text;color:transparent}
 .err-title{font-size:clamp(21px,3.4vw,28px);margin:6px 0 4px}
@@ -823,3 +832,22 @@ body[data-hstyle="dock"][data-layout="horizontal"] .topbar{border-bottom:1px sol
 .hmore-drop .drop{position:static;display:block;border:0;box-shadow:none;padding:0;animation:none}
 .hmore-drop .mega{display:flex;flex-direction:column;min-width:0}
 .hmore-drop .mega img{display:none}
+
+/* ---------- Horizontal search button + popup (horizontal layout only; vertical untouched) ---------- */
+.sbtn{display:none;position:relative;flex:0 0 auto}
+body[data-layout="horizontal"] .sbtn{display:block}
+.sbtn-pop{display:none;position:absolute;top:calc(100% + 10px);inset-inline-start:0;z-index:130;
+  width:min(340px,86vw);background:var(--surface);border:1px solid var(--border);border-radius:16px;
+  box-shadow:var(--shadow),inset 0 1px 0 rgba(255,255,255,.5);padding:10px;
+  animation:pop-in .18s cubic-bezier(.2,.9,.3,1.15)}
+[data-theme="dark"] .sbtn-pop{box-shadow:var(--shadow),inset 0 1px 0 rgba(255,255,255,.1)}
+.sbtn:hover .sbtn-pop,.sbtn.open .sbtn-pop,.sbtn:focus-within .sbtn-pop{display:block}
+/* invisible hover bridge over the 10px gap (same trick as .hmenu .drop):
+   without it the popup shuts mid-travel from button to panel */
+.sbtn-pop::before{content:"";position:absolute;top:-10px;left:0;right:0;height:10px;background:transparent}
+.sbtn-pop .searchbox{min-width:0;width:100%}
+.sbtn-pop .searchbox .search-results{min-width:0;inset-inline:0}
+@media(max-width:600px){
+  .topbar .sbtn-pop .searchbox{min-width:0;width:100%;overflow:visible}
+  .topbar .sbtn-pop .searchbox input{display:block}
+}

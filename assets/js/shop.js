@@ -30,7 +30,7 @@ function save(c){ try{ localStorage.setItem(KEY,JSON.stringify(c)); }catch(e){} 
 function byId(id){ return PRODUCTS.find(p=>p.id===id); }
 function add(id,qty){
   qty=qty||1; const c=load(); c[id]=(c[id]||0)+qty; save(c);
-  try{ const p=byId(id); if(window.toast&&p)toast.success("Added to cart",{description:p.name+" × "+c[id]}); }catch(e){}
+  try{ const p=byId(id); if(window.toast&&p){ const fa=(document.documentElement.lang==="fa"); toast.success(fa?"به سبد اضافه شد":"Added to cart",{description:p.name+" × "+c[id]}); } }catch(e){}
   updateBadges(); return c;
 }
 function remove(id){ const c=load(); delete c[id]; save(c); updateBadges(); return c; }

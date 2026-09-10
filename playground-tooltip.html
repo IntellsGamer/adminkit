@@ -203,12 +203,25 @@
 <button class="icon-btn" data-tip="Edit row" aria-label="Edit"><i class="fa-solid fa-pen"></i></button>
 <button class="icon-btn" data-tip="Delete row" data-pos="bottom" aria-label="Delete"><i class="fa-solid fa-trash"></i></button>
 </div></div>
+<div class="card" style="margin-top:16px"><div class="section-head"><span class="tile t-ghost"><i class="fa-solid fa-window-maximize"></i></span><h3>Rich tooltips — anything inside</h3></div>
+<p class="muted">Need HTML, not just text? Put a <code>.tip-box</code> in a <code>data-tipbox</code> wrapper (same 4 positions, still zero JS — hover or keyboard-focus the trigger).</p>
+<div class="tip-demo">
+<span data-tipbox><button class="btn btn-primary">Profile card</button><span class="tip-box"><span style="display:flex;gap:10px;align-items:center"><span class="avatar">S</span><span><h4>Sara Ahmadi</h4><p>Admin · Tehran</p></span></span><span class="btn-row"><button class="btn btn-ghost btn-sm" onclick="toast('Message sent')">Message</button><button class="btn btn-soft btn-sm" onclick="toast.success('Followed')">Follow</button></span></span></span>
+<span data-tipbox data-pos="bottom"><button class="btn btn-ghost">Release notes</button><span class="tip-box"><h4>v5.2 — Dock merge</h4><p>Dry-run the island morph, mirrored input-group radii, Latin error codes.</p><span class="pill pill-ok"><span class="dot"></span>Stable</span></span></span>
+<span data-tipbox data-pos="right"><button class="icon-btn" aria-label="Help"><i class="fa-solid fa-circle-question"></i></button><span class="tip-box"><h4>Why no JS?</h4><p><code>:hover</code> + <code>:focus-within</code> show the box; it stays open while you hover the box itself, so buttons stay clickable.</p></span></span>
+</div></div>
 <div class="card" style="margin-top:16px"><h3 data-i18n="copypaste">Copy-paste</h3><pre class="code">&lt;button class="btn btn-ghost" data-tip="Save changes"&gt;Save&lt;/button&gt;
 &lt;button class="btn btn-ghost" data-tip="Bottom" data-pos="bottom"&gt;Bottom&lt;/button&gt;
 &lt;button class="btn btn-ghost" data-tip="Left" data-pos="left"&gt;Left&lt;/button&gt;
 &lt;button class="btn btn-ghost" data-tip="Right" data-pos="right"&gt;Right&lt;/button&gt;
-&lt;!-- no JS needed; focus shows it too --&gt;</pre>
-<p class="muted">Positions: default/top, bottom, left, right. Long text stays on one line; keep hints short. No JS file required (<code>tooltip.js</code> is a documented no-op).</p></div></main>
+&lt;!-- no JS needed; focus shows it too --&gt;
+
+&lt;!-- rich: any HTML --&gt;
+&lt;span data-tipbox&gt;
+  &lt;button class="btn btn-primary"&gt;Profile card&lt;/button&gt;
+  &lt;span class="tip-box"&gt;&lt;h4&gt;Sara Ahmadi&lt;/h4&gt;&lt;p&gt;Admin&lt;/p&gt;&lt;/span&gt;
+&lt;/span&gt;</pre>
+<p class="muted">Positions: default/top, bottom, left, right. Plain <code>data-tip</code> stays one line (keep hints short); <code>.tip-box</code> wraps and fits buttons, pills, avatars. No JS file required (<code>tooltip.js</code> is a documented no-op).</p></div></main>
     <footer class="footer">
       <span class="fbrand"><i class="fa-solid fa-layer-group"></i><span data-i18n="appName">AdminKit</span></span>
       <span class="muted" data-i18n="footerTag">Offline-first admin template. No CDN, no build step.</span>

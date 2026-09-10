@@ -35,10 +35,36 @@
     <header class="topbar">
       <a href="homepage.html" class="brand" style="padding:0;text-decoration:none;color:inherit"><span class="brand-mark"><i class="fa-solid fa-layer-group"></i></span><span class="brand-text"><span data-i18n="appName">AdminKit</span><small data-i18n="tagline">Modern admin</small></span></a>
       <nav class="hmenu" aria-label="Horizontal">
-        <div><button class="hlink" onclick="App.go('index.html')"><i class="fa-solid fa-table-columns"></i><span data-i18n="dashboard">Dashboard</span></button></div>
-        <div><button class="hlink" onclick="App.go('products.html')"><i class="fa-solid fa-bag-shopping"></i><span data-i18n="products">Products</span></button></div>
-        <div><button class="hlink" onclick="App.go('gallery.html')"><i class="fa-solid fa-images"></i><span data-i18n="gallery">Gallery</span></button></div>
-        <div><button class="hlink" onclick="App.go('tickets.html')"><i class="fa-solid fa-ticket"></i><span data-i18n="tickets">Tickets</span></button></div>
+        <div><button class="hlink"><i class="fa-solid fa-table-columns"></i><span data-i18n="dashboards">Dashboards</span><i class="fa-solid fa-chevron-down" style="font-size:10px"></i></button>
+          <div class="drop mega">
+            <a href="homepage.html"><img alt="" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='104' height='76'%3E%3Crect width='104' height='76' rx='12' fill='%236366f1'/%3E%3Crect x='12' y='16' width='80' height='6' rx='3' fill='white' opacity='.8'/%3E%3Crect x='12' y='28' width='60' height='6' rx='3' fill='white' opacity='.5'/%3E%3C/svg%3E"><span><b>Homepage</b><br><small class="muted">Locked index</small></span></a>
+            <a href="index.html"><img alt="" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='104' height='76'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0' stop-color='%23f59e0b'/%3E%3Cstop offset='1' stop-color='%23ea580c'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='104' height='76' rx='12' fill='url(%23g)'/%3E%3Crect x='12' y='48' width='60' height='6' rx='3' fill='white' opacity='.8'/%3E%3Crect x='12' y='38' width='40' height='6' rx='3' fill='white' opacity='.5'/%3E%3C/svg%3E"><span><b>Overview</b><br><small class="muted">KPI + charts</small></span></a>
+            <a href="playground-table.html"><img alt="" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='104' height='76'%3E%3Crect width='104' height='76' rx='12' fill='%23059669'/%3E%3Crect x='12' y='16' width='80' height='6' rx='3' fill='white' opacity='.8'/%3E%3Crect x='12' y='28' width='80' height='6' rx='3' fill='white' opacity='.5'/%3E%3Crect x='12' y='40' width='80' height='6' rx='3' fill='white' opacity='.5'/%3E%3Crect x='12' y='52' width='52' height='6' rx='3' fill='white' opacity='.5'/%3E%3C/svg%3E"><span><b>Reports</b><br><small class="muted">Tables + export</small></span></a>
+          </div>
+        </div>
+        <div><button class="hlink"><i class="fa-solid fa-bag-shopping"></i><span data-i18n="shop">Shop</span><i class="fa-solid fa-chevron-down" style="font-size:10px"></i></button>
+          <div class="drop">
+            <a href="products.html"><i class="fa-solid fa-bag-shopping fa-fw"></i><span data-i18n="products">Products</span></a>
+            <a href="cart.html"><i class="fa-solid fa-cart-shopping fa-fw"></i><span data-i18n="cart">Cart</span></a>
+            <a href="gallery.html"><i class="fa-solid fa-images fa-fw"></i><span data-i18n="gallery">Gallery</span></a>
+            <a href="tickets.html"><i class="fa-solid fa-ticket fa-fw"></i><span data-i18n="tickets">Tickets</span></a>
+          </div>
+        </div>
+        <div><button class="hlink"><i class="fa-solid fa-cube"></i><span data-i18n="components">Components</span><i class="fa-solid fa-chevron-down" style="font-size:10px"></i></button>
+          <div class="drop">
+            <a href="playground-buttons.html"><i class="fa-solid fa-circle-dot fa-fw"></i><span data-i18n="buttons">Buttons playground</span></a>
+            <a href="playground-modal.html"><i class="fa-solid fa-window-restore fa-fw"></i><span data-i18n="modal">Modal playground</span></a>
+            <a href="playground-dropdown.html"><i class="fa-solid fa-chevron-down fa-fw"></i><span data-i18n="dropdown">Dropdown playground</span></a>
+            <a href="playground-datepicker.html"><i class="fa-solid fa-calendar-days fa-fw"></i><span data-i18n="datepicker">Date picker playground</span></a>
+            <a href="playground-sonner.html"><i class="fa-solid fa-bell fa-fw"></i><span data-i18n="sonner">Sonner playground</span></a>
+            <a href="playground-table.html"><i class="fa-solid fa-table fa-fw"></i><span data-i18n="table">Table playground</span></a>
+            <a href="playground-tabs.html"><i class="fa-solid fa-folder fa-fw"></i><span data-i18n="tabs">Tabs playground</span></a>
+            <a href="playground-tooltip.html"><i class="fa-solid fa-comment fa-fw"></i><span data-i18n="tooltip">Tooltip playground</span></a>
+            <a href="playground-carousel.html"><i class="fa-solid fa-images fa-fw"></i><span data-i18n="carousel">Carousel playground</span></a>
+            <a href="playground-grid.html"><i class="fa-solid fa-table-cells fa-fw"></i><span data-i18n="gridSys">Grid playground</span></a>
+            <a href="playground-inputgroup.html"><i class="fa-solid fa-i-cursor fa-fw"></i><span data-i18n="inputGroup">Input group playground</span></a>
+          </div>
+        </div>
         <div><button class="hlink" onclick="App.go('login.html')"><i class="fa-solid fa-key"></i><span data-i18n="auth">Auth</span></button></div>
       </nav>
       <div class="topbar-spacer"></div>

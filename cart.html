@@ -197,7 +197,7 @@
 <h1><span data-i18n="cart">Cart</span></h1>
 <p class="muted"><code>Shop.lines()</code> renders here. Quantities persist across visits.</p>
 <div class="grid cols-21">
-<div class="card"><div class="section-head"><span class="tile t-ghost"><i class="fa-solid fa-cart-shopping"></i></span><h3><span data-i18n="cart">Cart</span></h3><span style="flex:1"></span><button class="btn btn-ghost btn-sm" id="cartClear"><i class="fa-solid fa-trash"></i><span data-i18n="remove">Remove</span> all</button></div>
+<div class="card"><div class="section-head"><span class="tile t-ghost"><i class="fa-solid fa-cart-shopping"></i></span><h3><span data-i18n="cart">Cart</span></h3><span style="flex:1"></span><button class="btn btn-ghost btn-sm" id="cartClear"><i class="fa-solid fa-trash"></i><span data-i18n="removeAll">Remove all</span></button></div>
 <div id="cartLines"></div>
 </div>
 <div class="card"><div class="section-head"><span class="tile t-ghost"><i class="fa-solid fa-receipt"></i></span><h3><span data-i18n="subtotal">Subtotal</span></h3></div>
@@ -212,21 +212,24 @@ Shop.subtotal();</pre>
 </div>
 <script>
 (function(){
+var T={remove:'Remove',items:'items',empty:'Your cart is empty.',placed:'Order placed'};
+async function refreshT(){try{var d=await I18N.dict(ThemeStore.get().lang);T={remove:d.remove||T.remove,items:d.cartItems||T.items,empty:d.cartEmpty||T.empty,placed:d.orderPlaced||T.placed};}catch(e){}paint();}
 function paint(){
   var lines=Shop.lines(), box=document.getElementById('cartLines');
   if(!lines.length){box.innerHTML='<p class="muted" data-i18n="cartEmpty">Your cart is empty.</p><div class="btn-row"><a class="btn btn-primary btn-sm" href="products.html">Browse products</a></div>';}
-  else box.innerHTML=lines.map(l=>'<div class="cart-line"><span class="cart-thumb" style="background:'+l.grad+'"><i class="fa-solid '+l.icon+'"></i></span><span style="flex:1;min-width:0"><b>'+l.name+'</b><br><small class="muted">'+l.cat+' · $'+l.price+'</small></span><span class="qty"><button data-dec="'+l.id+'">−</button><b>'+l.qty+'</b><button data-inc="'+l.id+'">+</button></span><b style="min-width:64px;text-align:end">$'+l.total+'</b><button class="icon-btn" data-del="'+l.id+'" aria-label="Remove"><i class="fa-solid fa-xmark"></i></button></div>').join('');
+  else box.innerHTML=lines.map(l=>'<div class="cart-line"><span class="cart-thumb" style="background:'+l.grad+'"><i class="fa-solid '+l.icon+'"></i></span><span style="flex:1;min-width:0"><b>'+l.name+'</b><br><small class="muted">'+l.cat+' · $'+l.price+'</small></span><span class="qty"><button data-dec="'+l.id+'">−</button><b>'+l.qty+'</b><button data-inc="'+l.id+'">+</button></span><b style="min-width:64px;text-align:end">$'+l.total+'</b><button class="icon-btn" data-del="'+l.id+'" aria-label="'+T.remove+'" title="'+T.remove+'"><i class="fa-solid fa-xmark"></i></button></div>').join('');
   document.getElementById('cartTotal').textContent='$'+Shop.subtotal();
-  document.getElementById('cartCount').textContent=Shop.count()+' items';
+  document.getElementById('cartCount').textContent=Shop.count()+' '+T.items;
   box.querySelectorAll('[data-inc]').forEach(b=>b.onclick=()=>{var c=Shop.cart();Shop.setQty(b.dataset.inc,(c[b.dataset.inc]||0)+1);paint();});
   box.querySelectorAll('[data-dec]').forEach(b=>b.onclick=()=>{var c=Shop.cart();Shop.setQty(b.dataset.dec,(c[b.dataset.dec]||0)-1);paint();});
   box.querySelectorAll('[data-del]').forEach(b=>b.onclick=()=>{Shop.remove(b.dataset.del);paint();});
   if(window.Shop)Shop.updateBadges();
 }
 document.getElementById('cartClear').onclick=()=>{Shop.clear();paint();};
-document.getElementById('checkoutBtn').onclick=()=>{var n=Shop.count();if(!n){toast.error('Cart is empty');return;}toast.success('Order placed',{description:n+' items · $'+Shop.subtotal()});Shop.clear();paint();};
+document.getElementById('checkoutBtn').onclick=()=>{var n=Shop.count();if(!n){toast.error(T.empty);return;}toast.success(T.placed,{description:n+' '+T.items+' · $'+Shop.subtotal()});Shop.clear();paint();};
 document.addEventListener('shop:change',paint);
-paint();
+refreshT();
+if(!window.__akLangCart){window.__akLangCart=true;document.addEventListener('app:lang',()=>{try{refreshT();}catch(e){}});}
 })();
 </script></main>
     <footer class="footer">

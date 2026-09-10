@@ -1,7 +1,6 @@
 /* i18n with external JSON dictionaries (outside HTML/JS). EN + FA, RTL aware.
    Digits are NEVER rewritten: they stay plain Latin (U+0030-0039) everywhere
-   and take their locale look from fonts alone — in fa mode the BKoodak face
-   (digit-only unicode-range) renders them Persian-style, in en mode Inter. */
+   and render in Vazirmatn (whose range covers them) at the correct weight. */
 (function(){
   "use strict";
   const cache={};

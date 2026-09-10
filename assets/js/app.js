@@ -1,7 +1,7 @@
 /* App shell wiring: sidebar accordion (full/mini) / waterfall popup (icon),
    overlay drawer, horizontal menus (bar + dock island), settings drawer
    (opposite side of sidebar), hamburger, language switch,
-   command-palette search, scroll edge effect.
+   site search (sidebar box + horizontal magnifier popup), scroll edge effect.
    Turbo lifecycle: init() binds the fresh page DOM; teardown() removes every
    document/window listener so Turbo visits never double-bind. Element-level
    handlers (onclick=) die with the old DOM automatically. */
@@ -53,6 +53,16 @@ function ensureDockBar(){
     // de-duplicate IDs inside the clone (fitHmenu injects its own More per bar)
     clone.querySelectorAll("[id]").forEach(n=>n.removeAttribute("id"));
     clone.removeAttribute("id");
+    // magnifier button also lives in the dock (inline-start of the menu)
+    const sbtn=document.querySelector(".topbar > .sbtn");
+    if(sbtn){
+      const sc=sbtn.cloneNode(true);
+      sc.querySelectorAll("[id]").forEach(n=>n.removeAttribute("id"));
+      sc.classList.remove("open");
+      const oldPanel=sc.querySelector(".search-results"); if(oldPanel)oldPanel.remove();
+      const inp=sc.querySelector("input"); if(inp)inp.value="";
+      inner.prepend(sc);
+    }
     inner.appendChild(clone);
     wrap.appendChild(inner);
     const topbar=document.querySelector(".topbar");
@@ -175,7 +185,7 @@ function syncActive(){
 function initShell(){
   teardown();
   ThemeStore.apply();
-  ensureDockBar();
+  ensureSearchBtn();ensureDockBar();
   const s=ThemeStore.get(); if(window.I18N)I18N.apply(s.lang);
   function bindOnce(el,key,fn){ if(!el)return; el.__ak=el.__ak||{}; if(el.__ak[key])return; el.__ak[key]=true; fn(el); }
   // sidebar accordion: expanding another collapses the rest (full/mini/overlay).
@@ -304,7 +314,7 @@ function initShell(){
   onDoc(document,"app:lang",()=>{ try{setTimeout(fitHmenu,50);}catch(e){} });
   try{
     if(window.__akHmenuObs)window.__akHmenuObs.disconnect();
-    window.__akHmenuObs=new MutationObserver(()=>{ try{fitHmenu();}catch(e){} });
+    window.__akHmenuObs=new MutationObserver(()=>{ try{fitHmenu();}catch(e){} try{syncDockMerge();}catch(e){} });
     window.__akHmenuObs.observe(document.body,{attributes:true,attributeFilter:["data-layout","data-hstyle"]});
   }catch(e){}
   try{ syncActive(); }catch(e){}
@@ -313,8 +323,18 @@ function initShell(){
       el.textContent=String(new Date().getFullYear());
     });
   }catch(e){}
-  function onScroll(){const y=window.scrollY||document.documentElement.scrollTop||0;document.querySelectorAll(".topbar").forEach(t=>t.classList.toggle("scrolled",y>8));}
+  function onScroll(){const y=window.scrollY||document.documentElement.scrollTop||0;document.querySelectorAll(".topbar").forEach(t=>t.classList.toggle("scrolled",y>8));syncDockMerge(y);}
   onDoc(document,"scroll",onScroll,{passive:true});onDoc(window,"scroll",onScroll,{passive:true});onScroll();
+  // dock auto-merge at page top: view-only body class (hstyle setting untouched).
+  // Merged = island stretches full-bleed into the topbar; scrolling down
+  // restores the floating dock.
+  function syncDockMerge(y){
+    try{
+      if(y===undefined)y=window.scrollY||document.documentElement.scrollTop||0;
+      const docked=document.body.dataset.hstyle==="dock"&&document.body.dataset.layout==="horizontal";
+      document.body.classList.toggle("dock-merged",docked&&y<=8);
+    }catch(e){}
+  }
   function syncAtBottom(){
     try{
       const gap=(document.documentElement.scrollHeight||0)-((window.innerHeight||0)+(window.scrollY||document.documentElement.scrollTop||0));
@@ -331,55 +351,89 @@ function initShell(){
   // carousels / tabs boot (their own files also boot; this covers Turbo re-visits)
   try{ if(window.Carousel)Carousel.init(document); }catch(e){}
   try{ if(window.Tabs)Tabs.init(document); }catch(e){}
-  // ---- command-palette search: jump to any page ----
-  const PAGES=[
-    {url:"homepage.html",icon:"fa-house",en:"Homepage",fa:"خانه",keys:"landing index start welcome شروع خانه معرفی"},
-    {url:"index.html",icon:"fa-table-columns",en:"Dashboard",fa:"داشبورد",keys:"home main kpi overview analytics reports خانه اصلی نمودار گزارش"},
-    {url:"index.html#analytics",icon:"fa-chart-line",en:"Analytics",fa:"تحلیل‌ها",keys:"chart traffic views نمودار بازدید"},
-    {url:"products.html",icon:"fa-bag-shopping",en:"Products",fa:"محصولات",keys:"shop store price buy فروشگاه خرید قیمت"},
-    {url:"cart.html",icon:"fa-cart-shopping",en:"Cart",fa:"سبد خرید",keys:"basket checkout cart سبد خرید پرداخت"},
-    {url:"gallery.html",icon:"fa-images",en:"Gallery",fa:"گالری",keys:"photos images lightbox عکس گالری"},
-    {url:"tickets.html",icon:"fa-ticket",en:"Tickets",fa:"تیکت‌ها",keys:"support help desk ticket پشتیبانی تیکت"},
-    {url:"playground-sonner.html",icon:"fa-bell",en:"Sonner toasts",fa:"اعلان سانر",keys:"toast notification alert rich colors position promise اعلان"},
-    {url:"playground-modal.html",icon:"fa-window-restore",en:"Modal dialog",fa:"مودال",keys:"dialog popup confirm پنجره گفتگو تایید"},
-    {url:"playground-table.html",icon:"fa-table",en:"Data table",fa:"جدول داده",keys:"grid csv excel export search sort paging pagination numbers جدول خروجی جستجو صفحه"},
-    {url:"playground-dropdown.html",icon:"fa-chevron-down",en:"Dropdown select",fa:"دراپ‌داون",keys:"select combobox search options انتخاب"},
-    {url:"playground-datepicker.html",icon:"fa-calendar-days",en:"Date picker",fa:"تقویم",keys:"jalali persian calendar gregorian dual months شمسی میلادی تاریخ دو ماهه"},
-    {url:"playground-buttons.html",icon:"fa-circle-dot",en:"Buttons",fa:"دکمه‌ها",keys:"primary danger success دکمه"},
-    {url:"playground-tabs.html",icon:"fa-folder",en:"Tabs",fa:"تب‌ها",keys:"tabs tab panel pills vertical تب"},
-    {url:"playground-tooltip.html",icon:"fa-comment",en:"Tooltips",fa:"تولتیپ",keys:"tooltip hint tip title راهنما"},
-    {url:"playground-carousel.html",icon:"fa-images",en:"Carousel",fa:"کاروسل",keys:"slider slide fade autoplay marquee thumbs drag اسلایدر"},
-    {url:"playground-grid.html",icon:"fa-table-cells",en:"Grid system",fa:"سیستم گرید",keys:"grid col row responsive md sm lg xl ستون ردیف"},
-    {url:"playground-inputgroup.html",icon:"fa-i-cursor",en:"Input groups",fa:"گروه ورودی",keys:"input group addon prefix suffix ورودی"},
-    {url:"login.html",icon:"fa-key",en:"Login / Register",fa:"ورود / ثبت‌نام",keys:"auth sign in sign up email phone password ورود ثبت نام ایمیل رمز تلفن"}
+  // ---- site search (dummy entries, no page-jumping): sidebar box (vertical)
+  // keeps working; horizontal mode gets a magnifier button + popup instead.
+  // Results open in a Modal — wire openEntry() to a real index later.
+  const FINDER=[
+    {icon:"fa-table-columns",en:"Dashboard overview",fa:"نمای کلی داشبورد",den:"KPI tiles, sparklines and capacity bars.",dfa:"کارت‌های شاخص، نمودارها و نوار ظرفیت.",keys:"kpi home main شاخص خانه"},
+    {icon:"fa-chart-line",en:"Analytics charts",fa:"نمودارهای تحلیل",den:"Traffic area chart with live badge.",dfa:"نمودار ناحیه‌ای بازدید با نشان زنده.",keys:"chart traffic views نمودار بازدید"},
+    {icon:"fa-bag-shopping",en:"Products catalog",fa:"کاتالوگ محصولات",den:"Nine demo products with category filter.",dfa:"نه محصول نمایشی با فیلتر دسته.",keys:"shop store price buy فروشگاه خرید قیمت"},
+    {icon:"fa-cart-shopping",en:"Cart checkout",fa:"تسویه سبد",den:"Quantities, subtotal and order toasts.",dfa:"تعداد، جمع و اعلان سفارش.",keys:"basket checkout سبد پرداخت"},
+    {icon:"fa-images",en:"Gallery lightbox",fa:"گالری و لایت‌باکس",den:"Gradient covers with modal preview.",dfa:"کاورهای گرادیانی با پیش‌نمایش مودال.",keys:"photos lightbox عکس گالری"},
+    {icon:"fa-ticket",en:"Support tickets",fa:"تیکت‌های پشتیبانی",den:"Open, pending and closed threads.",dfa:"گفتگوهای باز، در انتظار و بسته.",keys:"support help desk ticket پشتیبانی تیکت"},
+    {icon:"fa-calendar-days",en:"Jalali date picker",fa:"تقویم شمسی",den:"Single or dual-month Jalali + Gregorian.",dfa:"تک‌ماهه یا دوماهه شمسی و میلادی.",keys:"jalali calendar date شمسی تاریخ تقویم"},
+    {icon:"fa-table",en:"Data table export",fa:"خروجی جدول",den:"Numbered paging with CSV and Excel.",dfa:"صفحه‌بندی شماره‌دار با خروجی CSV و اکسل.",keys:"grid csv excel export paging جدول خروجی"},
+    {icon:"fa-bell",en:"Sonner toasts",fa:"اعلان‌های سانر",den:"Stacking, swipe and promise toasts.",dfa:"استک، سوایپ و اعلان پرامیسی.",keys:"toast notification alert اعلان"},
+    {icon:"fa-window-restore",en:"Modal dialogs",fa:"پنجره‌های مودال",den:"Sizes, sticky footer and confirm.",dfa:"اندازه‌ها، فوتر چسبان و تأیید.",keys:"dialog popup confirm مودال پنجره"},
+    {icon:"fa-circle-dot",en:"Buttons set",fa:"ست دکمه‌ها",den:"Quiet Vercel-style variants and sizes.",dfa:"حالت‌ها و اندازه‌های آرام.",keys:"primary danger success دکمه"},
+    {icon:"fa-folder",en:"Tabs and layout",fa:"تب‌ها و چیدمان",den:"Underline, pills and vertical tabs.",dfa:"تب‌های خطی، قرصی و عمودی.",keys:"tabs grid panel تب گرید"}
   ];
-  document.querySelectorAll(".searchbox").forEach(box=>{
+  function finderLang(){ try{return ThemeStore.get().lang==="fa"?"fa":"en";}catch(e){return "en";} }
+  function openEntry(p){
+    if(!p)return;
+    try{ Modal.open({title:p.label,desc:(finderLang()==="fa"?"ورودی نمایشی":"Demo entry"),body:'<p class="muted">'+p.desc+"</p>"}); }catch(e){}
+  }
+  function bindFinder(box){
     const input=box.querySelector("input"); if(!input||box.querySelector(".search-results"))return;
     const panel=document.createElement("div"); panel.className="search-results"; panel.hidden=true; box.appendChild(panel);
     let items=[],hl=0;
     function close(){panel.hidden=true;items=[];hl=0;}
     function draw(){
       if(!items.length){panel.innerHTML='<div class="search-empty muted">No matches</div>';panel.hidden=false;return;}
-      panel.innerHTML=items.map((p,i)=>'<button type="button" class="search-hit'+(i===hl?" hl":"")+'" data-u="'+p.url+'"><i class="fa-solid '+p.icon+' fa-fw"></i><span>'+p.label+'</span><small>'+p.kind+'</small></button>').join("");
+      panel.innerHTML=items.map((p,i)=>'<button type="button" class="search-hit'+(i===hl?" hl":"")+'"><i class="fa-solid '+p.icon+' fa-fw"></i><span>'+p.label+'</span><small>'+p.kind+'</small></button>').join("");
       panel.hidden=false;
-      panel.querySelectorAll(".search-hit").forEach((b,i)=>{b.onmousedown=(e)=>{e.preventDefault();go(b.dataset.u);};b.onmouseenter=()=>{hl=i;draw();};});
+      panel.querySelectorAll(".search-hit").forEach((b,i)=>{b.onmousedown=(e)=>{e.preventDefault();openEntry(items[i]);close();};b.onmouseenter=()=>{hl=i;draw();};});
     }
     input.addEventListener("input",()=>{
       const q=input.value.trim().toLowerCase();
       if(!q){close();return;}
-      const fa=(ThemeStore.get().lang==="fa");
-      items=PAGES.filter(p=>(p.en+" "+p.fa+" "+p.keys).toLowerCase().includes(q)).slice(0,7)
-        .map(p=>({url:p.url,icon:p.icon,label:fa?p.fa:p.en,kind:fa?"صفحه":"page"}));
+      const fa=(finderLang()==="fa");
+      items=FINDER.filter(f=>(f.en+" "+f.fa+" "+f.den+" "+f.dfa+" "+f.keys).toLowerCase().includes(q)).slice(0,7)
+        .map(f=>({icon:f.icon,label:fa?f.fa:f.en,desc:fa?f.dfa:f.den,kind:fa?"نمایشی":"demo"}));
       hl=0;draw();
     });
     input.addEventListener("keydown",(e)=>{
       if(panel.hidden)return;
       if(e.key==="ArrowDown"){e.preventDefault();hl=Math.min(items.length-1,hl+1);draw();}
       else if(e.key==="ArrowUp"){e.preventDefault();hl=Math.max(0,hl-1);draw();}
-      else if(e.key==="Enter"){e.preventDefault();if(items[hl])go(items[hl].url);}
+      else if(e.key==="Enter"){e.preventDefault();if(items[hl]){openEntry(items[hl]);close();}}
       else if(e.key==="Escape"){close();input.blur();}
     });
     onDoc(document,"click",(e)=>{if(!box.contains(e.target))close();});
+  }
+  // magnifier button for horizontal mode only (vertical untouched): sits
+  // inline-start of the topbar hmenu (left of Dashboards in LTR, right in
+  // RTL); hover or click pops the same finder search.
+  function bindSearchBtn(wrap){
+    if(!wrap||wrap.__akSbtn)return; wrap.__akSbtn=true;
+    const btn=wrap.querySelector(":scope > button"), pop=wrap.querySelector(":scope > .sbtn-pop");
+    if(!btn||!pop)return;
+    btn.addEventListener("click",e=>{
+      e.stopPropagation();
+      const was=wrap.classList.contains("open");
+      document.querySelectorAll(".sbtn.open").forEach(o=>{o.classList.remove("open");const b=o.querySelector(":scope > button");if(b)b.setAttribute("aria-expanded","false");});
+      document.querySelectorAll(".tmenu.open").forEach(o=>o.classList.remove("open"));
+      wrap.classList.toggle("open",!was);
+      btn.setAttribute("aria-expanded",String(!was));
+      if(!was)setTimeout(()=>{try{pop.querySelector("input").focus();}catch(_){}},60);
+    });
+  }
+  function ensureSearchBtn(){
+    try{
+      if(document.querySelector(".topbar > .sbtn"))return;
+      const bar=document.querySelector(".topbar .hmenu"); if(!bar)return;
+      const wrap=document.createElement("div"); wrap.className="sbtn";
+      wrap.innerHTML='<button type="button" class="icon-btn" aria-label="Search" aria-expanded="false"><i class="fa-solid fa-magnifying-glass"></i></button><div class="sbtn-pop"><label class="searchbox"><i class="fa-solid fa-magnifying-glass"></i><input data-i18n-ph="searchPh" placeholder="Search…"></label></div>';
+      bar.before(wrap);
+      bindSearchBtn(wrap);
+      const popBox=wrap.querySelector(".searchbox"); if(popBox)bindFinder(popBox);
+    }catch(e){}
+  }
+  ensureSearchBtn();
+  document.querySelectorAll(".sbtn").forEach(w=>{ try{bindSearchBtn(w);}catch(e){} });
+  document.querySelectorAll(".searchbox").forEach(box=>{ try{bindFinder(box);}catch(e){} });
+  onDoc(document,"click",e=>{
+    if(!e.target.closest(".sbtn"))document.querySelectorAll(".sbtn.open").forEach(o=>{o.classList.remove("open");const b=o.querySelector(":scope > button");if(b)b.setAttribute("aria-expanded","false");});
   });
   // demo progress bars + reveal on load
   document.querySelectorAll("[data-bar]").forEach(el=>{setTimeout(()=>el.style.width=el.dataset.bar+"%",300);});

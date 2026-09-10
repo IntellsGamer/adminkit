@@ -271,5 +271,8 @@
   "backHome": "Back to homepage",
   "openDash": "Open dashboard",
   "dualMonth": "Two months",
-  "singleMonth": "One month"
+  "singleMonth": "One month",
+  "removeAll": "Remove all",
+  "cartItems": "items",
+  "orderPlaced": "Order placed"
 }

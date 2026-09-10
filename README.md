@@ -73,8 +73,9 @@ idle/lock overlays. Change the theme once — it follows you across pages via
 
 **Top bar (always visible, identical on every page except `homepage.html`):** hamburger (mobile + overlay mode) ·
 horizontal menus (horizontal layout only; extra entries auto-collapse into a
-`More ⌄` overflow entry) · search at the top of the sidebar — topbar in
-horizontal mode (command-palette page jumper, ↓↑ + Enter) · cart shortcut
+`More ⌄` overflow entry) · search at the top of the sidebar (vertical mode;
+dummy site entries in a Modal, ↓↑ + Enter) · magnifier button inline-start of
+the menu in horizontal mode only (hover or click pops the same search) · cart shortcut
 (badge `data-cart-count`, hides at 0) ·
 theme dropdown (System default / Light / Dark + primary color + 6 swatches +
 layout + sidebar mode + horizontal style + glass switch) · language dropdown (English / فارسی) ·
@@ -258,12 +259,11 @@ document.addEventListener('app:lang', () => rebuildWithNewStrings());
 modules rebuild in the new language.
 
 **Persian digits:** digits are never rewritten — they stay plain Latin (`0-9`)
-in the DOM everywhere (values, exports, sorting and search untouched). Their
-*look* follows the locale through fonts alone: in `fa` mode the vendored
-B Koodak face (digit-only `unicode-range`, Persian-style drawings shared
-across Latin/Arabic-Indic/Persian codepoints) renders every digit Persian;
-in `en` mode the same characters render in Inter. Persian text stays
-Vazirmatn via its own range, so each script always gets its correct font.
+in the DOM everywhere (values, exports, sorting and search untouched). They
+render in Vazirmatn (whose `unicode-range` covers `U+0030–0039`) at the correct
+weight in both languages; Persian text stays Vazirmatn via its Arabic range,
+Latin text falls through to Inter. (Retired: the B Koodak digit face was
+removed; its Persian-style digit shapes are gone with it.)
 
 ## 8. Sonner toasts (exact vanilla port of `emilkowalski/sonner`)
 
@@ -476,7 +476,16 @@ default underline, `.tabs-pills`, `.tabs-vertical` wrapper. Live lab:
 <button data-tip="Left" data-pos="left">Left</button> <!-- top|bottom|left|right -->
 ```
 
-Zero JS (focus shows it too). Live lab: `playground-tooltip.html`.
+Zero JS (focus shows it too). Rich variant for arbitrary HTML (still CSS-only):
+
+```html
+<span data-tipbox>
+  <button class="btn btn-primary">Profile card</button>
+  <span class="tip-box"><h4>Sara</h4><p>Admin</p></span>
+</span>
+```
+
+Live lab: `playground-tooltip.html`.
 
 ## 13d. Carousel (`Carousel` — 5 types, mouse drag)
 
@@ -569,8 +578,7 @@ Idle.setWarnSecs(30);   // warning window seconds (default 60)
 | Asset | Location | Notes |
 |---|---|---|
 | Inter 400–800 (latin) | `assets/fonts/inter-*.woff2` | EN UI font |
-| Vazirmatn 400–900 (arabic subset = Persian) | `assets/fonts/vazirmatn-*.woff2` | auto-used when `lang=fa` |
-| B Koodak Bold, subset to digits only (~2 KB) | `assets/fonts/bkoodak-700.woff2` | FA digits render Persian via `unicode-range` (`U+0030–0039,U+0660–0669,U+06F0–06F9`) |
+| Vazirmatn 400–900 (arabic subset = Persian + Latin digits) | `assets/fonts/vazirmatn-*.woff2` | auto-used when `lang=fa`; range covers `U+0030–0039` so digits match text weight |
 | Font Awesome 6.5.2 css | `assets/vendor/fontawesome/all.min.css` | unmodified |
 | FA webfonts (solid/regular/brands/v4compat) | `assets/vendor/webfonts/` | relative `../webfonts/` intact |
 | Jalali math (jalaali-js UMD) | `assets/js/jalaali-vendor.js` | byte-identical vendor |
