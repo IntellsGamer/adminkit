@@ -218,7 +218,9 @@ Rules:
 - Mobile (≤560px) collapses `.mega` to 1 column automatically.
 - Overflow is free: if your entries exceed the bar, `fitHmenu()` moves the
   trailing ones into `More ⌄` — no extra markup needed (the `#hMore` node is
-  injected by JS).
+  injected by JS). The More panel itself is a responsive mega grid (3→2→1
+  columns, headers + statically-open drops, anchored to the bar end), so
+  clipped mega cards stay contained.
 
 ## 7. i18n + RTL
 

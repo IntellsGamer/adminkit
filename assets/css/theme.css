@@ -247,6 +247,16 @@ body[data-glass="off"] .topbar,body[data-glass="off"] .sidebar,body[data-glass="
 .sidebar .searchbox .search-results{inset-inline-start:0;inset-inline-end:0;min-width:0}
 body[data-layout="vertical"] .topbar .searchbox{display:none}
 body[data-layout="vertical"] .top-sep{display:none}
+/* vertical + collapsed rail (mini/icon/overlay hides the rail's own box):
+   the topbar carries search instead — desktop only, mobile keeps drawer search */
+@media(min-width:861px){
+  body[data-layout="vertical"][data-sidebar="mini"] .topbar .searchbox,
+  body[data-layout="vertical"][data-sidebar="icon"] .topbar .searchbox,
+  body[data-layout="vertical"][data-sidebar="overlay"] .topbar .searchbox{display:flex}
+  body[data-layout="vertical"][data-sidebar="mini"] .top-sep,
+  body[data-layout="vertical"][data-sidebar="icon"] .top-sep,
+  body[data-layout="vertical"][data-sidebar="overlay"] .top-sep{display:block}
+}
 body[data-sidebar="mini"] .sidebar .searchbox{display:none}
 .color-dot{width:22px;height:22px;border-radius:50%;border:2px solid var(--border);padding:0;cursor:pointer;background:none}
 .color-dot::-webkit-color-swatch-wrapper{padding:0}
@@ -505,10 +515,29 @@ html[dir="rtl"] .avatar-btn{padding:0 4px 0 10px}
 .lang-flag{font-weight:800;font-size:12px}
 /* horizontal "More" overflow: a v-chevron entry that collects clipped items */
 #hMore .hlink .vicon{font-size:10px;opacity:.7}
-#hMoreDrop{min-width:260px}
-#hMoreDrop .drop{position:static;display:block;border:0;box-shadow:none;padding:0;animation:none}
+#hMore > .drop{inset-inline-end:0;inset-inline-start:auto}
+#hMoreDrop > div{min-width:0}
+#hMoreDrop > div > button.hlink{width:100%;justify-content:flex-start;font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);cursor:default;background:transparent}
+#hMoreDrop > div > button.hlink:hover{background:transparent;color:var(--muted)}
+#hMoreDrop > div > button.hlink .fa-chevron-down{display:none}
+#hMoreDrop > div > button.hlink[onclick]{cursor:pointer;color:var(--text);text-transform:none;letter-spacing:0;font-size:13.5px}
+#hMoreDrop > div > button.hlink[onclick]:hover{background:var(--primary-soft);color:var(--primary-600)}
+#hMoreDrop .drop{position:static;display:block;border:0;box-shadow:none;padding:0;animation:none;min-width:0}
 #hMoreDrop .mega{display:flex;flex-direction:column;min-width:0}
-#hMoreDrop .mega img{display:none}
+#hMoreDrop .mega img{width:40px;height:30px;flex:0 0 40px}
+.hmenu > #hMore:hover > #hMoreDrop,
+.hmenu > #hMore:focus-within > #hMoreDrop,
+.hmenu > #hMore.open > #hMoreDrop{display:grid;min-width:min(700px,94vw);max-width:94vw;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px;padding:10px}
+@media(max-width:700px){
+  .hmenu > #hMore:hover > #hMoreDrop,
+  .hmenu > #hMore:focus-within > #hMoreDrop,
+  .hmenu > #hMore.open > #hMoreDrop{grid-template-columns:repeat(2,minmax(0,1fr))}
+}
+@media(max-width:480px){
+  .hmenu > #hMore:hover > #hMoreDrop,
+  .hmenu > #hMore:focus-within > #hMoreDrop,
+  .hmenu > #hMore.open > #hMoreDrop{grid-template-columns:1fr}
+}
 
 /* ---------- Footer (all pages) ---------- */
 .footer{
@@ -837,10 +866,35 @@ body[data-hstyle="dock"][data-layout="horizontal"] .topbar{border-bottom:1px sol
 
 /* hmore class alias (multi-bar safe; same visuals as legacy #hMore) */
 .hmore .hlink .vicon{font-size:10px;opacity:.7}
-.hmore-drop{min-width:260px}
-.hmore-drop .drop{position:static;display:block;border:0;box-shadow:none;padding:0;animation:none}
+/* More… overflow is a MEGA panel, not a plain list: clipped entries land in
+   a 3-column grid (headers + statically-open drops), so mega cards and long
+   menus stay contained instead of flying away. Anchored to the bar end. */
+.hmore > .drop,
+.hmore > #hMoreDrop{inset-inline-end:0;inset-inline-start:auto}
+.hmore-drop > div{min-width:0}
+.hmore-drop > div > button.hlink{width:100%;justify-content:flex-start;font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);cursor:default;background:transparent}
+.hmore-drop > div > button.hlink:hover{background:transparent;color:var(--muted)}
+.hmore-drop > div > button.hlink .fa-chevron-down{display:none}
+.hmore-drop > div > button.hlink[onclick]{cursor:pointer;color:var(--text);text-transform:none;letter-spacing:0;font-size:13.5px}
+.hmore-drop > div > button.hlink[onclick]:hover{background:var(--primary-soft);color:var(--primary-600)}
+.hmore-drop .drop{position:static;display:block;border:0;box-shadow:none;padding:0;animation:none;min-width:0}
 .hmore-drop .mega{display:flex;flex-direction:column;min-width:0}
-.hmore-drop .mega img{display:none}
+.hmore-drop .mega img{width:40px;height:30px;flex:0 0 40px}
+/* open-state specificity beats the base :hover display:block, so the panel
+   is a real grid (3 cols → 2 → 1) */
+.hmenu > .hmore:hover > .drop.hmore-drop,
+.hmenu > .hmore:focus-within > .drop.hmore-drop,
+.hmenu > .hmore.open > .drop.hmore-drop{display:grid;min-width:min(700px,94vw);max-width:94vw;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px;padding:10px}
+@media(max-width:700px){
+  .hmenu > .hmore:hover > .drop.hmore-drop,
+  .hmenu > .hmore:focus-within > .drop.hmore-drop,
+  .hmenu > .hmore.open > .drop.hmore-drop{grid-template-columns:repeat(2,minmax(0,1fr))}
+}
+@media(max-width:480px){
+  .hmenu > .hmore:hover > .drop.hmore-drop,
+  .hmenu > .hmore:focus-within > .drop.hmore-drop,
+  .hmenu > .hmore.open > .drop.hmore-drop{grid-template-columns:1fr}
+}
 
 /* ---------- Horizontal search button + popup (horizontal layout only; vertical untouched) ---------- */
 .sbtn{display:none;position:relative;flex:0 0 auto}
