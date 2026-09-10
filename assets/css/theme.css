@@ -758,7 +758,50 @@ body[data-hstyle="dock"][data-layout="horizontal"] .topbar{border-bottom:1px sol
 .st-pending{background:var(--primary-soft);border-color:color-mix(in srgb,var(--primary) 45%,transparent);color:var(--primary-600)}
 .st-closed{background:rgba(18,165,111,.12);border-color:rgba(18,165,111,.4);color:var(--success)}
 
-/* ---------- Error pages: Vercel style ---------- */
+/* ---------- Error pages: Vercel-minimal (centered type, grid + glow, no heavy card) ---------- */
+.err{min-height:100vh;display:flex;flex-direction:column;background:var(--bg);position:relative;overflow:clip}
+.err::before{content:"";position:fixed;inset:0;pointer-events:none;opacity:var(--orb-op);
+  background:
+    radial-gradient(700px 380px at 50% -8%, var(--err-glow, var(--primary-soft)), transparent 62%),
+    radial-gradient(640px 420px at 8% 108%, rgba(14,165,233,.08), transparent 60%);}
+.err::after{content:"";position:fixed;inset:0;pointer-events:none;opacity:.5;
+  background-image:linear-gradient(color-mix(in srgb,var(--muted) 10%,transparent) 1px,transparent 1px),linear-gradient(90deg,color-mix(in srgb,var(--muted) 10%,transparent) 1px,transparent 1px);
+  background-size:44px 44px;
+  mask-image:radial-gradient(70% 55% at 50% 38%,#000 20%,transparent 100%);
+  -webkit-mask-image:radial-gradient(70% 55% at 50% 38%,#000 20%,transparent 100%)}
+.err[data-err="401"]{--err-a:#38bdf8;--err-b:#0369a1;--err-glow:rgba(14,165,233,.14)}
+.err[data-err="403"]{--err-a:#fb7185;--err-b:#be123c;--err-glow:rgba(229,72,77,.13)}
+.err[data-err="404"]{--err-a:#fbbf24;--err-b:#ea580c;--err-glow:var(--primary-soft)}
+.err[data-err="500"]{--err-a:#fb7185;--err-b:#9f1239;--err-glow:rgba(229,72,77,.13)}
+.err-nav{width:min(880px,94vw);margin:0 auto;display:flex;align-items:center;gap:10px;padding:20px 4px;position:relative;z-index:1}
+.err-brand{display:inline-flex;align-items:center;gap:10px;font-weight:800;color:var(--text);text-decoration:none}
+.err-nav .spacer{flex:1}
+.err-chip{font:inherit;font-size:12px;font-weight:700;color:var(--muted);background:transparent;border:1px solid var(--border);border-radius:9px;padding:7px 11px;cursor:pointer;transition:border-color .15s,color .15s}
+.err-chip:hover{color:var(--text);border-color:color-mix(in srgb,var(--muted) 45%,transparent)}
+.err-chip.on{color:var(--text);border-color:color-mix(in srgb,var(--text) 35%,transparent);background:color-mix(in srgb,var(--text) 7%,transparent)}
+.err-main{flex:1;display:grid;place-items:center;padding:24px 18px 10px;position:relative;z-index:1}
+.err-inner{width:min(620px,94vw);text-align:center;animation:pop-in .3s cubic-bezier(.2,.9,.3,1.15)}
+.err-mark{width:72px;height:72px;border-radius:22px;display:grid;place-items:center;margin:0 auto 18px;font-size:28px;color:#fff;
+  background:linear-gradient(135deg,var(--err-a),var(--err-b));box-shadow:0 18px 40px -14px var(--err-glow),var(--inset-hi)}
+.err-pill{display:inline-flex;align-items:center;gap:7px;font-size:11.5px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;
+  color:var(--muted);border:1px solid var(--border);background:color-mix(in srgb,var(--surface) 70%,transparent);border-radius:99px;padding:6px 14px}
+.err-pill .dot{width:7px;height:7px;border-radius:99px;background:linear-gradient(135deg,var(--err-a),var(--err-b));box-shadow:0 0 10px var(--err-a)}
+.err-giant{font-size:clamp(96px,20vw,176px);font-weight:800;letter-spacing:-.055em;line-height:1;margin:10px 0 0;
+  background:linear-gradient(180deg,var(--text) 30%,color-mix(in srgb,var(--text) 45%,transparent));
+  -webkit-background-clip:text;background-clip:text;color:transparent}
+.err-title{font-size:clamp(21px,3.4vw,28px);margin:6px 0 4px}
+.err-desc{color:var(--muted);margin:0 auto;max-width:46ch}
+.err-path{display:inline-flex;align-items:center;gap:8px;margin-top:14px;max-width:100%;
+  font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:12.5px;color:var(--muted);
+  border:1px dashed var(--border);border-radius:10px;padding:7px 12px;background:color-mix(in srgb,var(--surface) 70%,transparent)}
+.err-path span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:min(420px,70vw)}
+.err-actions{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-top:22px}
+.err-foot{width:min(880px,94vw);margin:0 auto;padding:22px 4px 30px;display:flex;align-items:center;gap:10px;flex-wrap:wrap;
+  color:var(--muted);font-size:12.5px;position:relative;z-index:1}
+.err-foot nav{display:flex;gap:2px;margin-inline-start:auto}
+.err-foot nav a{color:var(--muted);font-weight:600;padding:6px 10px;border-radius:8px;text-decoration:none}
+.err-foot nav a:hover{color:var(--text);background:color-mix(in srgb,var(--text) 6%,transparent)}
+/* legacy classes kept working (old markup still renders) */
 .err-wrap{min-height:100vh;display:grid;place-items:center;padding:32px;background:var(--bg)}
 .err-card{width:min(560px,94vw);text-align:center;background:var(--surface);border:1px solid var(--border);border-radius:26px;box-shadow:var(--shadow);padding:44px 34px;position:relative;overflow:hidden}
 .err-card::before{content:"";position:absolute;inset:0;pointer-events:none;background:radial-gradient(500px 240px at 50% 0%,var(--primary-soft),transparent 65%)}
