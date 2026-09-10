@@ -14,7 +14,7 @@ function toExcelHTML(cols,rows){ let h='<table><thead><tr>'+cols.map(c=>"<th>"+e
   rows.forEach(r=>{h+="<tr>"+cols.map(c=>"<td>"+esc(r[c.key])+"</td>").join("")+"</tr>";}); return '<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel"><head><meta charset="UTF-8"></head><body>'+h+"</tbody></table></body></html>"; }
 class DataGrid{
   constructor(el,opts){
-    this.el=el; this.o=Object.assign({columns:[],rows:[],pageSize:8,search:true,paging:true,exports:true,colToggle:true,info:true},opts||{});
+    this.el=el; this.o=Object.assign({columns:[],rows:[],pageSize:8,search:true,paging:true,exports:true,colToggle:true,info:true,pagerWindow:5},opts||{});
     this.o.strings=Object.assign({search:"Search…",columns:"Columns",showing:"Showing",from:"from",page:"Page",perPage:"/ page",noRows:"No rows"},(opts&&opts.strings)||{});
     this.q=""; this.sortKey=""; this.sortDir=1; this.page=1; this.hidden=new Set(); this.colsOpen=false;
     this._docClick=(e)=>{ if(this.colsOpen&&this.el.isConnected&&!this.el.contains(e.target)){ this.colsOpen=false; const p=this.el.querySelector('[data-g="colpanel"]'); if(p)p.hidden=true; } };
@@ -61,6 +61,22 @@ class DataGrid{
       this.renderBody();
     });
   }
+  pageList(pages){
+    // Windowed page numbers: < 1 2 3 4 > style with ellipsis for large sets.
+    // Returns array like [1,"…",4,5,6,"…",12]. Window size from pagerWindow (default 5).
+    const cur=this.page, win=Math.max(3,this.o.pagerWindow||5);
+    if(pages<=win+2){
+      const out=[]; for(let i=1;i<=pages;i++)out.push(i); return out;
+    }
+    const out=[1];
+    let lo=Math.max(2,cur-Math.floor(win/2)), hi=Math.min(pages-1,lo+win-1);
+    lo=Math.max(2,hi-win+1);
+    if(lo>2)out.push("…");
+    for(let i=lo;i<=hi;i++)out.push(i);
+    if(hi<pages-1)out.push("…");
+    out.push(pages);
+    return out;
+  }
   renderBody(){
     const box=this.el.querySelector(".tbl-grid");
     const cols=this.visibleCols(), rows=this.filtered();
@@ -73,13 +89,23 @@ class DataGrid{
     if(this.o.paging||this.o.info){
       h+='<div class="tbl-pager">';
       if(this.o.info)h+='<span class="muted">'+esc(this.o.strings.showing)+' '+(total?(start+1):0)+"–"+Math.min(start+ps,total)+" "+esc(this.o.strings.from)+" "+total+"</span>";
-      if(this.o.paging){h+='<span style="flex:1"></span><button type="button" class="btn btn-ghost btn-sm" data-g="prev"><i class="fa-solid fa-chevron-left"></i></button><span>'+esc(this.o.strings.page)+' '+this.page+" / "+pages+'</span><button type="button" class="btn btn-ghost btn-sm" data-g="next"><i class="fa-solid fa-chevron-right"></i></button><select data-g="ps" aria-label="Rows per page">'+[5,8,15,25,50].map(n=>'<option value="'+n+'"'+(ps===n?" selected":"")+">"+n+" "+esc(this.o.strings.perPage)+"</option>").join("")+"</select>";}
+      if(this.o.paging){
+        h+='<span style="flex:1"></span><nav class="pg" aria-label="Pagination">';
+        h+='<button type="button" class="btn btn-ghost btn-sm pg-btn" data-g="prev" aria-label="Previous page"'+(this.page<=1?" disabled":"")+'><i class="fa-solid fa-chevron-left"></i></button>';
+        this.pageList(pages).forEach(p=>{
+          if(p==="…")h+='<span class="pg-dots" aria-hidden="true">…</span>';
+          else h+='<button type="button" class="btn btn-sm pg-btn'+(p===this.page?" pg-cur":" btn-ghost")+'" data-g="pg" data-p="'+p+'" aria-label="Page '+p+'"'+(p===this.page?' aria-current="page"':"")+'>'+p+"</button>";
+        });
+        h+='<button type="button" class="btn btn-ghost btn-sm pg-btn" data-g="next" aria-label="Next page"'+(this.page>=pages?" disabled":"")+'><i class="fa-solid fa-chevron-right"></i></button>';
+        h+='</nav><select data-g="ps" aria-label="Rows per page">'+[5,8,15,25,50].map(n=>'<option value="'+n+'"'+(ps===n?" selected":"")+">"+n+" "+esc(this.o.strings.perPage)+"</option>").join("")+"</select>";
+      }
       h+="</div>";
     }
     box.innerHTML=h;
     box.querySelectorAll('[data-g="sort"]').forEach(th=>th.addEventListener("click",()=>{const k=th.dataset.k; if(this.sortKey===k)this.sortDir*=-1; else{this.sortKey=k;this.sortDir=1;} this.renderBody();}));
     const prev=box.querySelector('[data-g="prev"]'); if(prev)prev.onclick=()=>{if(this.page>1){this.page--;this.renderBody();}};
-    const next=box.querySelector('[data-g="next"]'); if(next)next.onclick=()=>{this.page++;this.renderBody();};
+    const next=box.querySelector('[data-g="next"]'); if(next)next.onclick=()=>{if(this.page<pages){this.page++;this.renderBody();}};
+    box.querySelectorAll('[data-g="pg"]').forEach(b=>b.addEventListener("click",()=>{const p=+b.dataset.p; if(p&&p!==this.page){this.page=p;this.renderBody();}}));
     const psSel=box.querySelector('[data-g="ps"]'); if(psSel){ psSel.onchange=()=>{this.o.pageSize=+psSel.value;this.page=1;this.renderBody();};
       // custom dropdown (no search: 5 options). Rebuilt with the pager on every
       // render, so upgrade fresh each time; stale instances self-clean.

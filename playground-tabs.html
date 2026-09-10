@@ -1,4 +1,8 @@
-<!doctype html><html lang="en" dir="ltr" data-theme="light"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<!doctype html>
+<html lang="en" dir="ltr" data-theme="light">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
 <script src="assets/vendor/turbo/turbo.es2017-umd.min.js?v=5" defer></script>
 <script src="assets/js/theme.js?v=5"></script>
 <script src="assets/js/i18n.js?v=5"></script>
@@ -15,9 +19,16 @@
 <script src="assets/js/tickets.js?v=5"></script>
 <script src="assets/js/idle.js?v=5"></script>
 <script src="assets/js/app.js?v=5"></script>
-<title>Table playground — AdminKit</title><link rel="stylesheet" href="assets/vendor/fontawesome/all.min.css?v=5"><link rel="stylesheet" href="assets/css/sonner.css?v=5"><link rel="stylesheet" href="assets/css/theme.css?v=5"><link rel="stylesheet" href="assets/css/components.css?v=5"></head>
-<body data-layout="vertical" data-sidebar="full" data-glass="on"><div class="app">
-<aside class="sidebar" id="sidebar">
+<title>Tabs playground — AdminKit</title>
+<link rel="stylesheet" href="assets/vendor/fontawesome/all.min.css?v=5">
+<link rel="stylesheet" href="assets/css/sonner.css?v=5">
+<link rel="stylesheet" href="assets/css/theme.css?v=5">
+<link rel="stylesheet" href="assets/css/components.css?v=5">
+</head>
+<body data-layout="vertical" data-sidebar="full" data-glass="on">
+<div class="app">
+  <!-- ============ SIDEBAR ============ -->
+  <aside class="sidebar" id="sidebar">
     <div class="brand"><span class="brand-mark"><i class="fa-solid fa-layer-group"></i></span><span class="brand-text"><span data-i18n="appName">AdminKit</span><small data-i18n="tagline">Modern admin</small></span><button class="icon-btn nav-close" data-act="nav-close" aria-label="Close menu"><i class="fa-solid fa-xmark"></i></button></div>
     <label class="searchbox"><i class="fa-solid fa-magnifying-glass"></i><input data-i18n-ph="searchPh" placeholder="Search…"></label>
     <nav class="nav">
@@ -71,7 +82,10 @@
       </div>
     </nav>
   </aside>
-<div class="main"><header class="topbar">
+
+  <!-- ============ MAIN ============ -->
+  <div class="main">
+    <header class="topbar">
       <button class="icon-btn hamburger" data-act="nav" aria-label="Menu"><i class="fa-solid fa-bars"></i></button>
       <nav class="hmenu" aria-label="Horizontal">
         <div><button class="hlink"><i class="fa-solid fa-table-columns"></i><span data-i18n="dashboards">Dashboards</span><i class="fa-solid fa-chevron-down" style="font-size:10px"></i></button>
@@ -159,7 +173,8 @@
       </div>
       <button class="icon-btn" data-act="settings" aria-label="Settings"><i class="fa-solid fa-gear"></i></button>
     </header>
-<main class="content"><div class="pagenav">
+
+    <main class="content"><div class="pagenav">
         <a href="homepage.html"><i class="fa-solid fa-house"></i><span data-i18n="homepage">Homepage</span></a>
         <a href="index.html"><i class="fa-solid fa-table-columns"></i><span data-i18n="dashboard">Dashboard</span></a>
         <a href="products.html"><i class="fa-solid fa-bag-shopping"></i><span data-i18n="products">Products</span></a>
@@ -179,25 +194,39 @@
         <a href="playground-inputgroup.html"><i class="fa-solid fa-i-cursor"></i><span data-i18n="inputGroup">Input group</span></a>
         <a href="login.html"><i class="fa-solid fa-key"></i><span data-i18n="login">Auth</span></a>
       </div>
-<h1 data-i18n="pgTableH">Table — DataTables-like, lightweight</h1><p class="muted" data-i18n="pgTableP">Search, sort, paging, export, column popover. Plain table + JSON rows.</p>
-<p class="muted" data-i18n="pgTableNew">Numbered pagination (&lt; 1 2 3 4 &gt;): chevrons + windowed numbers + ellipsis. Set pagerWindow to change the window.</p>
-<div class="card"><div id="grid"></div></div>
-<div class="grid cols-2" style="margin-top:16px"><div class="card"><h3 data-i18n="moduleToggles">Module toggles</h3><div class="btn-row"><button class="btn btn-ghost btn-sm" id="tglSearch">Search: on</button><button class="btn btn-ghost btn-sm" id="tglExports">Exports: on</button><button class="btn btn-ghost btn-sm" id="tglCols">Columns: on</button></div><p class="muted" data-i18n="rebuildP">Rebuilds the grid with modules hidden.</p></div>
-<div class="card"><h3 data-i18n="copypaste">Copy-paste</h3><pre class="code">&lt;div id="grid"&gt;&lt;/div&gt;
-&lt;script src="assets/js/table.js"&gt;&lt;/script&gt;
-&lt;script&gt;new DataGrid(document.getElementById('grid'), {
-  columns: [{key:'name',title:'Name'},{key:'email',title:'Email'}],
-  rows: [{name:'Sara',email:'s@x.io'}],
-  pageSize: 8, search: true, paging: true, pagerWindow: 5, // < 1 2 3 4 > window
-  exports: true, colToggle: true, info: true });&lt;/script&gt;</pre></div></div>
-</main>
+<h1 data-i18n="pgTabsH">Tabs — simple accessible tabs</h1><p class="muted" data-i18n="pgTabsP">Horizontal, pills and vertical variants.</p>
+<div class="card"><div class="section-head"><span class="tile t-ghost"><i class="fa-solid fa-folder"></i></span><h3>Underline tabs</h3></div>
+<div class="tabs" data-tabs="demo1"><button class="tab-btn" data-tab="a" aria-selected="true"><i class="fa-solid fa-house"></i>Overview</button><button class="tab-btn" data-tab="b" aria-selected="false"><i class="fa-solid fa-chart-line"></i>Analytics</button><button class="tab-btn" data-tab="c" aria-selected="false"><i class="fa-solid fa-gear"></i>Settings</button></div>
+<div class="tab-panel" data-panel="demo1:a"><p><b>Overview</b> — KPI summary lives here.</p></div>
+<div class="tab-panel" data-panel="demo1:b" hidden><p><b>Analytics</b> — charts live here.</p></div>
+<div class="tab-panel" data-panel="demo1:c" hidden><p><b>Settings</b> — toggles live here.</p></div>
+</div>
+<div class="grid cols-2" style="margin-top:16px">
+<div class="card"><h3>Pills</h3><div class="tabs tabs-pills" data-tabs="demo2"><button class="tab-btn" data-tab="a" aria-selected="true">Day</button><button class="tab-btn" data-tab="b" aria-selected="false">Week</button><button class="tab-btn" data-tab="c" aria-selected="false">Month</button></div>
+<div class="tab-panel" data-panel="demo2:a"><p class="muted">Day range.</p></div><div class="tab-panel" data-panel="demo2:b" hidden><p class="muted">Week range.</p></div><div class="tab-panel" data-panel="demo2:c" hidden><p class="muted">Month range.</p></div></div>
+<div class="card"><h3>Vertical</h3><div class="tabs-vertical"><div class="tabs" data-tabs="demo3"><button class="tab-btn" data-tab="a" aria-selected="true">Profile</button><button class="tab-btn" data-tab="b" aria-selected="false">Billing</button><button class="tab-btn" data-tab="c" aria-selected="false">Security</button></div><div style="flex:1"><div class="tab-panel" data-panel="demo3:a"><p>Profile fields.</p></div><div class="tab-panel" data-panel="demo3:b" hidden><p>Billing fields.</p></div><div class="tab-panel" data-panel="demo3:c" hidden><p>Security fields.</p></div></div></div></div>
+</div>
+<div class="card" style="margin-top:16px"><h3 data-i18n="copypaste">Copy-paste</h3><pre class="code">&lt;div class="tabs" data-tabs="g1"&gt;
+  &lt;button class="tab-btn" data-tab="a" aria-selected="true"&gt;One&lt;/button&gt;
+  &lt;button class="tab-btn" data-tab="b"&gt;Two&lt;/button&gt;
+&lt;/div&gt;
+&lt;div class="tab-panel" data-panel="g1:a"&gt;…&lt;/div&gt;
+&lt;div class="tab-panel" data-panel="g1:b" hidden&gt;…&lt;/div&gt;
+&lt;script src="assets/js/tabs.js"&gt;&lt;/script&gt;
+&lt;script&gt;Tabs.select('g1','b'); // programmatic&lt;/script&gt;</pre>
+<p class="muted">Keyboard: ArrowLeft/Right (RTL aware), Home/End. <code>Tabs.init()</code> re-runs on Turbo visits.</p></div></main>
     <footer class="footer">
       <span class="fbrand"><i class="fa-solid fa-layer-group"></i><span data-i18n="appName">AdminKit</span></span>
       <span class="muted" data-i18n="footerTag">Offline-first admin template. No CDN, no build step.</span>
       <nav><a href="index.html"><span data-i18n="dashboard">Dashboard</span></a><a href="playground-table.html"><span data-i18n="reports">Reports</span></a><a href="login.html"><span data-i18n="login">Login / Register</span></a></nav>
       <span class="muted fyear">© <span data-year>2026</span></span>
-    </footer></div></div>
-<div class="scrim" id="scrim"></div><aside class="drawer" id="settingsDrawer" aria-label="Settings">
+    </footer>
+  </div>
+</div>
+
+<!-- ============ SETTINGS DRAWER (opposite side of sidebar) ============ -->
+<div class="scrim" id="scrim"></div>
+<aside class="drawer" id="settingsDrawer" aria-label="Settings">
   <div style="display:flex;align-items:center;justify-content:space-between"><h3 style="margin:0"><i class="fa-solid fa-sliders"></i> <span data-i18n="settings">Theme settings</span></h3><button class="icon-btn" data-act="settings-close"><i class="fa-solid fa-xmark"></i></button></div>
   <div class="set-group"><span class="eyebrow" data-i18n="appearance">Appearance</span>
     <div class="set-row"><span data-i18n="theme">Theme</span><select id="setTheme"><option value="system" data-i18n="system">System default</option><option value="light" data-i18n="light">Light</option><option value="dark" data-i18n="dark">Dark</option></select></div>
@@ -228,26 +257,19 @@
   </div>
   <p class="muted" style="font-size:12.5px">System theme is followed automatically and only applied when you haven't overridden it (or when set to System default). All settings persist in localStorage.</p>
 </aside>
-<div class="idle-wrap" id="idleWrap"><div class="idle-card"><span class="tile"><i class="fa-solid fa-bell"></i></span><h3 data-i18n="idleTitle">Still there?</h3><div class="progress"><i id="idleBar"></i></div><p class="muted" id="idleTxt"></p><button class="btn btn-primary" id="idleStay"><i class="fa-solid fa-check"></i><span data-i18n="stay">Stay</span></button> <button class="btn btn-ghost" id="idleLeave"><i class="fa-solid fa-lock"></i><span data-i18n="leave">Lock</span></button></div></div>
-<div class="lock-wrap" id="lockWrap"><div class="lock-card"><span class="tile t-red"><i class="fa-solid fa-lock"></i></span><h3 data-i18n="lockTitle">Locked</h3><p class="muted" data-i18n="lockDesc">Locked for inactivity.</p><button class="btn btn-primary btn-lg" id="lockBtn"><i class="fa-solid fa-arrow-right-to-bracket"></i><span data-i18n="unlock">Back to workflow</span></button></div></div>
 
-<script>
-var rowsRaw=[['Sara Ahmadi','sara@example.com','Tehran',0,1240],['Ali Rezaei','ali@example.com','Mashhad',1,860],['Mina Karimi','mina@example.com','Isfahan',2,430],['Omid Hosseini','omid@example.com','Shiraz',1,210],['Neda Mohammadi','neda@example.com','Tabriz',1,975],['Reza Gholami','reza@example.com','Karaj',3,1500],['Laleh Moradi','laleh@example.com','Qom',1,320],['Kaveh Naderi','kaveh@example.com','Yazd',2,540],['Diba Farahani','diba@example.com','Rasht',1,610],['Arman Salimi','arman@example.com','Ahvaz',1,780],['Yasaman Taha','yas@example.com','Kerman',0,1320],['Babak Azimi','babak@example.com','Hamadan',1,290]];
-var roleKeys=['roleAdmin','roleUser','roleEditor','roleManager'];
-var flags={search:true,exports:true,colToggle:true};
-var grid=null,curDict=null;
-async function dict(){try{curDict=await I18N.dict(ThemeStore.get().lang);}catch(e){curDict=null;}return curDict;}
-function paintToggles(){const d=curDict,on=d?d.tOn:'on',off=d?d.tOff:'off';
-document.getElementById('tglSearch').textContent=(d?d.modSearch:'Search')+': '+(flags.search?on:off);
-document.getElementById('tglExports').textContent=(d?d.modExports:'Exports')+': '+(flags.exports?on:off);
-document.getElementById('tglCols').textContent=(d?d.modCols:'Columns')+': '+(flags.colToggle?on:off);}
-async function build(){if(grid)grid.destroy();const d=await dict();const colT=(k,fb)=>(d&&d[k])||fb;
-const cols=[{key:'id',title:'ID'},{key:'name',title:colT('colName','Name')},{key:'email',title:colT('colEmail','Email')},{key:'city',title:colT('colCity','City')},{key:'role',title:colT('colRole','Role')},{key:'score',title:colT('colScore','Score')}];
-const rows=rowsRaw.map((r,i)=>({id:i+1,name:r[0],email:r[1],city:r[2],role:d?d[roleKeys[r[3]]]:['Admin','User','Editor','Manager'][r[3]],score:r[4]}));
-const o={columns:cols,rows,pageSize:8,paging:true,info:true,...flags};
-if(d)o.strings={search:d.tblSearch,columns:d.tblColumns,showing:d.tblShowing,from:d.tblFrom,page:d.tblPage,perPage:d.tblPerPage,noRows:d.tblNoRows};
-grid=new DataGrid(document.getElementById('grid'),o);paintToggles();}
-build();
-[['tglSearch','search'],['tglExports','exports'],['tglCols','colToggle']].forEach(([id,k])=>{document.getElementById(id).onclick=()=>{flags[k]=!flags[k];build();};});
-if(!window.__akLangTable){window.__akLangTable=true;document.addEventListener('app:lang',()=>{try{build();}catch(e){}});}
-</script></body></html>
+<!-- idle warning + lock -->
+<div class="idle-wrap" id="idleWrap"><div class="idle-card">
+  <span class="tile"><i class="fa-solid fa-bell"></i></span>
+  <h3 data-i18n="idleTitle">Are you still there?</h3><p class="muted" data-i18n="idleDesc">No interaction detected. You will be locked soon.</p>
+  <div class="progress"><i id="idleBar" style="width:0%"></i></div>
+  <p class="muted" id="idleTxt">60s</p>
+  <div class="btn-row" style="justify-content:center"><button class="btn btn-primary" id="idleStay"><i class="fa-solid fa-check"></i><span data-i18n="stay">Stay — I'm here</span></button><button class="btn btn-ghost" id="idleLeave"><i class="fa-solid fa-lock"></i><span data-i18n="leave">Leave / lock now</span></button></div>
+</div></div>
+<div class="lock-wrap" id="lockWrap"><div class="lock-card">
+  <span class="tile t-red"><i class="fa-solid fa-lock"></i></span>
+  <h3 data-i18n="lockTitle">Locked</h3><p class="muted" data-i18n="lockDesc">Locked for inactivity.</p>
+  <button class="btn btn-primary btn-lg" id="lockBtn"><i class="fa-solid fa-arrow-right-to-bracket"></i><span data-i18n="unlock">Back to workflow</span></button>
+</div></div>
+</body>
+</html>

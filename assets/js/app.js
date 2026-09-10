@@ -1,5 +1,6 @@
-/* App shell wiring: sidebar accordion (full) / waterfall popup (mini), horizontal
-   menus, settings drawer (opposite side of sidebar), hamburger, language switch,
+/* App shell wiring: sidebar accordion (full/mini) / waterfall popup (icon),
+   overlay drawer, horizontal menus (bar + dock island), settings drawer
+   (opposite side of sidebar), hamburger, language switch,
    command-palette search, scroll edge effect.
    Turbo lifecycle: init() binds the fresh page DOM; teardown() removes every
    document/window listener so Turbo visits never double-bind. Element-level
@@ -36,17 +37,44 @@ function teardown(){while(docCleanups.length){try{docCleanups.pop()();}catch(e){
     +'</filter></defs>';
   document.body.prepend(svg);
 })();
+// Ensure a separated dock bar exists: pages ship <div class="hnbar"> physically,
+// but older/custom pages without one get it auto-cloned from the topbar menu
+// so hstyle=dock works everywhere with zero per-page edits.
+function ensureDockBar(){
+  try{
+    if(document.querySelector(".hnbar"))return;
+    const src=document.querySelector(".topbar .hmenu");
+    if(!src)return;
+    const wrap=document.createElement("div");
+    wrap.className="hnbar"; wrap.setAttribute("aria-label","Horizontal dock");
+    const inner=document.createElement("div");
+    inner.className="hnbar-inner";
+    const clone=src.cloneNode(true);
+    // de-duplicate IDs inside the clone (fitHmenu injects its own More per bar)
+    clone.querySelectorAll("[id]").forEach(n=>n.removeAttribute("id"));
+    clone.removeAttribute("id");
+    inner.appendChild(clone);
+    wrap.appendChild(inner);
+    const topbar=document.querySelector(".topbar");
+    if(topbar&&topbar.parentNode)topbar.parentNode.insertBefore(wrap,topbar.nextSibling);
+  }catch(e){}
+}
 // Horizontal "More": when .hmenu items overflow (too many items or narrow
 // screen), extra top-level entries move into a trailing v-chevron "More" drop.
 // Idempotent: restores everything first, then clips until it fits.
+// Supports TWO bars: .topbar .hmenu (hstyle=bar) and .hnbar .hmenu (hstyle=dock).
 function fitHmenu(){
-  document.querySelectorAll(".hmenu").forEach(bar=>{
-    let more=bar.querySelector(":scope > #hMore");
-    let drop=bar.querySelector(":scope > #hMore > #hMoreDrop");
+  ensureDockBar();
+  document.querySelectorAll(".hmenu").forEach((bar,bi)=>{
+    const inDock=!!bar.closest(".hnbar");
+    const inTop=!!bar.closest(".topbar");
+    let more=bar.querySelector(":scope > .hmore, :scope > #hMore");
+    let drop=more?more.querySelector(":scope > .drop"):null;
     if(!more){
-      more=document.createElement("div"); more.id="hMore";
-      more.innerHTML='<button class="hlink" aria-expanded="false" aria-haspopup="true"><i class="fa-solid fa-ellipsis"></i><span data-i18n="more">More</span><i class="fa-solid fa-chevron-down vicon"></i></button><div class="drop" id="hMoreDrop"></div>';
-      drop=more.querySelector("#hMoreDrop");
+      more=document.createElement("div");
+      more.className="hmore"; more.id="hMore"+(bi||"");
+      more.innerHTML='<button class="hlink" aria-expanded="false" aria-haspopup="true"><i class="fa-solid fa-ellipsis"></i><span data-i18n="more">More</span><i class="fa-solid fa-chevron-down vicon"></i></button><div class="drop hmore-drop"></div>';
+      drop=more.querySelector(".drop");
       bar.appendChild(more);
       const btn=more.querySelector(":scope > button.hlink");
       btn.addEventListener("click",e=>{
@@ -59,16 +87,16 @@ function fitHmenu(){
       });
       if(window.I18N){ try{ I18N.dict(ThemeStore.get().lang).then(d=>{ const s=more.querySelector('[data-i18n="more"]'); if(s&&d.more)s.textContent=d.more; }); }catch(e){} }
     }
+    if(!drop)drop=more.querySelector(":scope > .drop");
     // restore: move everything back out of More
     while(drop.firstChild){ bar.insertBefore(drop.firstChild,more); }
     more.classList.remove("open"); more.style.display="none";
     if(document.body.dataset.layout!=="horizontal")return;
+    const hs=(document.body.dataset.hstyle||"bar");
+    // only fit the ACTIVE bar: topbar menu for hstyle=bar, dock menu for hstyle=dock
+    if(inTop&&hs==="dock")return;
+    if(inDock&&hs!=="dock")return;
     if(bar.clientWidth<=0)return;
-    // clip trailing items (never the More entry itself) until it fits.
-    // NOTE: .hmenu is overflow:visible so dropdowns can escape (overflow:hidden
-    // clipped .drop invisible — buttons looked dead with no console errors).
-    // scrollWidth only exceeds clientWidth when overflow clips, so measure by
-    // summing visible child widths instead.
     function barOverflows(){
       const cs=getComputedStyle(bar);
       const gap=parseFloat(cs.columnGap||cs.gap||"4")||0;
@@ -81,7 +109,7 @@ function fitHmenu(){
     }
     let guard=0;
     while(guard++<24 && barOverflows()){
-      const kids=[...bar.children].filter(el=>el.id!=="hMore");
+      const kids=[...bar.children].filter(el=>!el.classList.contains("hmore")&&el.id!=="hMore"&&!String(el.id||"").startsWith("hMore"));
       if(kids.length<=1)break;
       const victim=kids[kids.length-1];
       drop.insertBefore(victim,drop.firstChild);
@@ -124,29 +152,36 @@ function resyncSelects(){
 function syncActive(){
   let file="index.html";
   try{ file=(location.pathname.split("/").pop()||"index.html").split("?")[0].split("#")[0]||"index.html"; }catch(e){}
-  document.querySelectorAll(".sidebar .nav-sub a.nav-link, .pagenav a").forEach(a=>{
+  document.querySelectorAll(".sidebar .nav-sub a.nav-link, .pagenav a, .hnbar a, .hmenu a").forEach(a=>{
+    const href=(a.getAttribute("href")||"").split("#")[0].split("?")[0];
+    if(href&&href===file)a.classList.add("active"); else if(a.classList&&a.classList.contains("pagenav"))a.classList.remove("active");
+  });
+  document.querySelectorAll(".pagenav a").forEach(a=>{
     const href=(a.getAttribute("href")||"").split("#")[0].split("?")[0];
     if(href===file)a.classList.add("active"); else a.classList.remove("active");
   });
   // dashboard parent opens when on index; playgrounds parent opens on playground-*
   const onPlay=file.indexOf("playground-")===0;
+  const onShop=(file==="products.html"||file==="cart.html"||file==="gallery.html");
+  const onTickets=(file.indexOf("ticket")===0);
   document.querySelectorAll(".sidebar .nav-item").forEach(item=>{
     const txt=(item.textContent||"");
     if(/Playground|زمین/.test(txt))item.classList.toggle("open",onPlay||item.querySelector(".nav-sub a.active")!==null);
     if(/Dashboard|داشبورد/.test(txt)&&file==="index.html")item.classList.add("open");
+    if(/Shop|فروشگاه/.test(txt))item.classList.toggle("open",onShop||item.querySelector(".nav-sub a.active")!==null);
+    if(/Ticket|تیکت|پشتیبانی/.test(txt))item.classList.toggle("open",onTickets||item.querySelector(".nav-sub a.active")!==null);
   });
 }
 function initShell(){
   teardown();
   ThemeStore.apply();
+  ensureDockBar();
   const s=ThemeStore.get(); if(window.I18N)I18N.apply(s.lang);
-  // Element bindings must be idempotent: both DOMContentLoaded AND turbo:load
-  // fire on initial load, so initShell runs twice per page. Document/window
-  // listeners are removed by teardown(); element listeners are guarded below.
   function bindOnce(el,key,fn){ if(!el)return; el.__ak=el.__ak||{}; if(el.__ak[key])return; el.__ak[key]=true; fn(el); }
-  // sidebar accordion: expanding another collapses the rest (full mode)
+  // sidebar accordion: expanding another collapses the rest (full/mini/overlay).
+  // icon mode uses a waterfall popup positioned next to the clicked row.
   function placeMini(item){
-    if(document.body.dataset.sidebar!=="mini")return;
+    if(document.body.dataset.sidebar!=="icon")return;
     const link=item.querySelector(":scope > .nav-link"), sub=item.querySelector(":scope > .nav-sub");
     if(!link||!sub)return;
     const r=link.getBoundingClientRect();
@@ -155,7 +190,8 @@ function initShell(){
   }
   function repositionMini(){ if(window.innerWidth>860)document.querySelectorAll(".sidebar .nav-item.open").forEach(placeMini); }
   let rsT=null;
-  onDoc(window,"scroll",()=>{ if(rsT)return; rsT=requestAnimationFrame(()=>{rsT=null;repositionMini();onScroll();}); },{passive:true,capture:true});
+  function onScrollEarly(){const y=window.scrollY||document.documentElement.scrollTop||0;document.querySelectorAll(".topbar").forEach(t=>t.classList.toggle("scrolled",y>8));}
+  onDoc(window,"scroll",()=>{ if(rsT)return; rsT=requestAnimationFrame(()=>{rsT=null;repositionMini();onScrollEarly();}); },{passive:true,capture:true});
   onDoc(window,"resize",repositionMini);
   document.querySelectorAll(".sidebar .nav-item").forEach(item=>{
     const link=item.querySelector(":scope > .nav-link");
@@ -164,24 +200,26 @@ function initShell(){
     bindOnce(link,"nav",()=>link.addEventListener("click",e=>{
       e.preventDefault();
       const was=item.classList.contains("open");
-      // collapse rest (both modes)
       item.parentElement.querySelectorAll(":scope > .nav-item.open").forEach(o=>{if(o!==item)o.classList.remove("open");});
       item.classList.toggle("open",!was);
-      // mini waterfall: position popup next to the clicked item (viewport-anchored;
-      // the mini rail is solid so fixed positioning resolves against the viewport)
+      // icon waterfall: position popup next to the clicked item (viewport-anchored)
       if(!was)placeMini(item);
     }));
   });
-  // horizontal top menu is hover/focus-only: nothing pins on click. Clicking
-  // a parent behaves exactly like hovering it — move the pointer away (or tab
-  // away) and it closes. Touch taps still preview via :hover; only #hMore
-  // (the overflow entry) keeps a click toggle, for small screens without hover.
+  // mini icon-only: hover expands the rail (CSS :hover does it); pin open while
+  // a submenu is open via keyboard focus, unpin when focus leaves.
+  try{
+    const sb=document.getElementById("sidebar");
+    if(sb&&!sb.__akMini){
+      sb.__akMini=true;
+      sb.addEventListener("mouseenter",()=>{ if(document.body.dataset.sidebar==="mini")sb.classList.add("pinned"); });
+      sb.addEventListener("mouseleave",()=>{ sb.classList.remove("pinned"); });
+      sb.addEventListener("focusin",()=>{ if(document.body.dataset.sidebar==="mini")sb.classList.add("pinned"); });
+      sb.addEventListener("focusout",()=>{ setTimeout(()=>{ if(!sb.contains(document.activeElement))sb.classList.remove("pinned"); },50); });
+    }
+  }catch(e){}
+  // horizontal top menu is hover/focus-only: nothing pins on click.
   onDoc(document,"click",e=>{if(!e.target.closest(".hmenu"))document.querySelectorAll(".hmenu > div.open").forEach(o=>o.classList.remove("open"));});
-  // pointer clicks focus the button, and that focus alone would keep the menu
-  // open via :focus-within after the pointer leaves. Drop pointer focus so a
-  // click behaves exactly like a hover; keyboard activation (Enter/Space,
-  // which fires click with detail 0) keeps focus so keyboard users can still
-  // tab into the open menu.
   onDoc(document,"click",e=>{
     try{
       if(e.detail>0&&e.target&&e.target.closest){
@@ -190,11 +228,6 @@ function initShell(){
       }
     }catch(_){}
   });
-  // hover/focus exclusivity: entering another top-level entry closes the
-  // #hMore overflow toggle if it was pinned open, so two dropdowns never show
-  // at once. Delegated on the bar (mouseover/focusin bubble), so entries moved
-  // into #hMore by fitHmenu are covered too. Main entries need no .open at
-  // all — CSS :hover/:focus-within shows them and leaving hides them.
   document.querySelectorAll(".hmenu").forEach(bar=>{
     bindOnce(bar,"hexcl",()=>{
       const closeOthers=e=>{
@@ -211,17 +244,15 @@ function initShell(){
       bar.addEventListener("focusin",closeOthers);
     });
   });
-  // close mini popup on outside click
+  // close icon popup on outside click
   onDoc(document,"click",e=>{
-    if(document.body.dataset.sidebar!=="mini")return;
+    if(document.body.dataset.sidebar!=="icon")return;
     if(!e.target.closest(".sidebar .nav-item"))document.querySelectorAll(".sidebar .nav-item.open").forEach(o=>o.classList.remove("open"));
   });
-  // hamburger: mobile sidebar overlay. The shared scrim covers the content
-  // whenever the sidebar OR the settings drawer is open; overlay click and
-  // the sidebar X button both collapse it (hamburger restores it).
+  // hamburger: mobile + overlay sidebar. The shared scrim covers the content
+  // whenever the sidebar OR the settings drawer is open.
   document.querySelectorAll("[data-act='nav']").forEach(b=>bindOnce(b,"nav",()=>b.addEventListener("click",()=>{document.body.classList.toggle("nav-open");syncScrim();})));
   document.querySelectorAll("[data-act='nav-close']").forEach(b=>bindOnce(b,"navx",()=>b.addEventListener("click",()=>{document.body.classList.remove("nav-open");syncScrim();})));
-  // settings drawer (opposite of sidebar side)
   const drawer=document.getElementById("settingsDrawer"), scrim=document.getElementById("scrim");
   function syncScrim(){const sc=document.getElementById("scrim"),dr=document.getElementById("settingsDrawer");if(!sc)return;sc.classList.toggle("show",document.body.classList.contains("nav-open")||(dr&&dr.classList.contains("open")));}
   function openSettings(){ThemeStore.apply();document.querySelectorAll(".tmenu.open").forEach(o=>o.classList.remove("open"));if(drawer)drawer.classList.add("open");syncScrim();}
@@ -229,13 +260,12 @@ function initShell(){
   document.querySelectorAll("[data-act='settings']").forEach(b=>bindOnce(b,"set",()=>b.addEventListener("click",openSettings)));
   document.querySelectorAll("[data-act='settings-close']").forEach(b=>bindOnce(b,"setx",()=>b.addEventListener("click",closeSettings)));
   if(scrim)bindOnce(scrim,"scrim",()=>scrim.addEventListener("click",()=>{closeSettings();document.body.classList.remove("nav-open");syncScrim();}));
-  // first load -> open up settings (per spec: pull menu opens on first load)
   try{if(!localStorage.getItem("adminkit.seen")){localStorage.setItem("adminkit.seen","1");setTimeout(openSettings,600);}}catch(e){}
-  // controls (drawer keeps canonical IDs; topbar dropdown mirrors them)
   const $=id=>document.getElementById(id);
   if($("setTheme"))$("setTheme").onchange=e=>ThemeStore.set({theme:e.target.value});
   if($("setLayout"))$("setLayout").onchange=e=>ThemeStore.set({layout:e.target.value});
   if($("setSidebar"))$("setSidebar").onchange=e=>ThemeStore.set({sidebar:e.target.value});
+  if($("setHstyle"))$("setHstyle").onchange=e=>ThemeStore.set({hstyle:e.target.value});
   if($("setGlass"))$("setGlass").onchange=e=>ThemeStore.set({glass:e.target.checked});
   if($("setLang"))$("setLang").onchange=e=>setLang(e.target.value);
   if($("setDir"))$("setDir").onchange=e=>{const v=e.target.value;ThemeStore.set(v==="auto"?{dirAuto:true}:{dirAuto:false,dir:v});};
@@ -246,21 +276,16 @@ function initShell(){
   document.querySelectorAll("[data-theme-pick]").forEach(b=>b.onclick=()=>ThemeStore.set({theme:b.dataset.themePick}));
   document.querySelectorAll("[data-layout-pick]").forEach(b=>b.onclick=()=>ThemeStore.set({layout:b.dataset.layoutPick}));
   document.querySelectorAll("[data-sidebar-pick]").forEach(b=>b.onclick=()=>ThemeStore.set({sidebar:b.dataset.sidebarPick}));
+  document.querySelectorAll("[data-hstyle-pick]").forEach(b=>b.onclick=()=>ThemeStore.set({hstyle:b.dataset.hstylePick}));
   document.querySelectorAll("[data-footer-pick]").forEach(b=>b.onclick=()=>ThemeStore.set({footerSticky:b.dataset.footerPick==="sticky"}));
-  // legacy topbar buttons (kept working if a page still has them)
   if($("themeToggle"))$("themeToggle").onclick=()=>{const cur=ThemeStore.effectiveTheme();ThemeStore.set({theme:cur==="dark"?"light":"dark"});};
   if($("layoutToggle"))$("layoutToggle").onclick=()=>{const cur=ThemeStore.get().layout;ThemeStore.set({layout:cur==="vertical"?"horizontal":"vertical"});};
   if($("topPrimary"))$("topPrimary").oninput=e=>ThemeStore.set({primary:e.target.value});
   if($("tbPrimary"))$("tbPrimary").oninput=e=>ThemeStore.set({primary:e.target.value});
   if($("tbGlass"))$("tbGlass").onchange=e=>ThemeStore.set({glass:e.target.checked});
   document.querySelectorAll("[data-lang]").forEach(b=>b.onclick=()=>setLang(b.dataset.lang));
-  // ---- custom dropdowns: upgrade every static native <select> to NiceSelect.
-  // No search by default (short lists don't need it); data-search="true" opts
-  // in. pick() dispatches a real change event, so the .onchange wiring above
-  // keeps working untouched. Labels re-sync after language swaps.
   try{ upgradeSelects(); }catch(e){}
   onDoc(document,"app:lang",()=>{ try{ resyncSelects(); }catch(e){} });
-  // ---- topbar dropdowns (theme / lang / notif / profile): one open at a time
   document.querySelectorAll("[data-tmenu]").forEach(btn=>{
     bindOnce(btn,"tmenu",()=>btn.addEventListener("click",e=>{
       e.stopPropagation();
@@ -274,34 +299,22 @@ function initShell(){
     if(!e.target.closest(".tmenu"))document.querySelectorAll(".tmenu.open").forEach(o=>o.classList.remove("open"));
   });
   const markBtn=$("notifMark"); if(markBtn)bindOnce(markBtn,"notif",()=>markBtn.addEventListener("click",()=>{const b=$("notifBadge");if(b)b.style.display="none";}));
-  // ---- horizontal overflow: clip into a "More ⌄" entry when too wide ----
   try{ fitHmenu(); }catch(e){}
   onDoc(window,"resize",()=>{ try{fitHmenu();}catch(e){} });
   onDoc(document,"app:lang",()=>{ try{setTimeout(fitHmenu,50);}catch(e){} });
-  // refit after layout switches (vertical<->horizontal changes .hmenu visibility)
   try{
     if(window.__akHmenuObs)window.__akHmenuObs.disconnect();
     window.__akHmenuObs=new MutationObserver(()=>{ try{fitHmenu();}catch(e){} });
-    window.__akHmenuObs.observe(document.body,{attributes:true,attributeFilter:["data-layout"]});
+    window.__akHmenuObs.observe(document.body,{attributes:true,attributeFilter:["data-layout","data-hstyle"]});
   }catch(e){}
-  // ---- active link sync: same shell on every page, current page highlights itself
   try{ syncActive(); }catch(e){}
-  // ---- footer year (plain Latin digits; fa styling comes from fonts)
   try{
     document.querySelectorAll("[data-year]").forEach(el=>{
       el.textContent=String(new Date().getFullYear());
     });
   }catch(e){}
-  // scroll edge effect: content dissolving beneath lifts the glass bar
   function onScroll(){const y=window.scrollY||document.documentElement.scrollTop||0;document.querySelectorAll(".topbar").forEach(t=>t.classList.toggle("scrolled",y>8));}
   onDoc(document,"scroll",onScroll,{passive:true});onDoc(window,"scroll",onScroll,{passive:true});onScroll();
-  // footer landing: in sticky mode the bar sheds its glass shell and sits
-  // like a normal footer once you reach the very bottom of the page (and
-  // floats again when you scroll up). Pure style — body class only, the
-  // footerSticky setting itself is never changed or persisted. Wide
-  // hysteresis (dock within 2px, undock past 40px): the morph changes the
-  // footer height by ~28px mid-transition, and the band swallows that delta
-  // so borderline positions can't flap.
   function syncAtBottom(){
     try{
       const gap=(document.documentElement.scrollHeight||0)-((window.innerHeight||0)+(window.scrollY||document.documentElement.scrollTop||0));
@@ -312,16 +325,32 @@ function initShell(){
   onDoc(window,"scroll",syncAtBottom,{passive:true});
   onDoc(window,"resize",syncAtBottom);
   syncAtBottom();
+  // cart badges stay fresh across pages
+  try{ if(window.Shop&&Shop.updateBadges)Shop.updateBadges(); }catch(e){}
+  onDoc(document,"shop:change",()=>{ try{ if(window.Shop)Shop.updateBadges(); }catch(e){} });
+  // carousels / tabs boot (their own files also boot; this covers Turbo re-visits)
+  try{ if(window.Carousel)Carousel.init(document); }catch(e){}
+  try{ if(window.Tabs)Tabs.init(document); }catch(e){}
   // ---- command-palette search: jump to any page ----
   const PAGES=[
+    {url:"homepage.html",icon:"fa-house",en:"Homepage",fa:"خانه",keys:"landing index start welcome شروع خانه معرفی"},
     {url:"index.html",icon:"fa-table-columns",en:"Dashboard",fa:"داشبورد",keys:"home main kpi overview analytics reports خانه اصلی نمودار گزارش"},
     {url:"index.html#analytics",icon:"fa-chart-line",en:"Analytics",fa:"تحلیل‌ها",keys:"chart traffic views نمودار بازدید"},
+    {url:"products.html",icon:"fa-bag-shopping",en:"Products",fa:"محصولات",keys:"shop store price buy فروشگاه خرید قیمت"},
+    {url:"cart.html",icon:"fa-cart-shopping",en:"Cart",fa:"سبد خرید",keys:"basket checkout cart سبد خرید پرداخت"},
+    {url:"gallery.html",icon:"fa-images",en:"Gallery",fa:"گالری",keys:"photos images lightbox عکس گالری"},
+    {url:"tickets.html",icon:"fa-ticket",en:"Tickets",fa:"تیکت‌ها",keys:"support help desk ticket پشتیبانی تیکت"},
     {url:"playground-sonner.html",icon:"fa-bell",en:"Sonner toasts",fa:"اعلان سانر",keys:"toast notification alert rich colors position promise اعلان"},
     {url:"playground-modal.html",icon:"fa-window-restore",en:"Modal dialog",fa:"مودال",keys:"dialog popup confirm پنجره گفتگو تایید"},
-    {url:"playground-table.html",icon:"fa-table",en:"Data table",fa:"جدول داده",keys:"grid csv excel export search sort paging جدول خروجی جستجو"},
+    {url:"playground-table.html",icon:"fa-table",en:"Data table",fa:"جدول داده",keys:"grid csv excel export search sort paging pagination numbers جدول خروجی جستجو صفحه"},
     {url:"playground-dropdown.html",icon:"fa-chevron-down",en:"Dropdown select",fa:"دراپ‌داون",keys:"select combobox search options انتخاب"},
-    {url:"playground-datepicker.html",icon:"fa-calendar-days",en:"Date picker",fa:"تقویم",keys:"jalali persian calendar gregorian شمسی میلادی تاریخ"},
+    {url:"playground-datepicker.html",icon:"fa-calendar-days",en:"Date picker",fa:"تقویم",keys:"jalali persian calendar gregorian dual months شمسی میلادی تاریخ دو ماهه"},
     {url:"playground-buttons.html",icon:"fa-circle-dot",en:"Buttons",fa:"دکمه‌ها",keys:"primary danger success دکمه"},
+    {url:"playground-tabs.html",icon:"fa-folder",en:"Tabs",fa:"تب‌ها",keys:"tabs tab panel pills vertical تب"},
+    {url:"playground-tooltip.html",icon:"fa-comment",en:"Tooltips",fa:"تولتیپ",keys:"tooltip hint tip title راهنما"},
+    {url:"playground-carousel.html",icon:"fa-images",en:"Carousel",fa:"کاروسل",keys:"slider slide fade autoplay marquee thumbs drag اسلایدر"},
+    {url:"playground-grid.html",icon:"fa-table-cells",en:"Grid system",fa:"سیستم گرید",keys:"grid col row responsive md sm lg xl ستون ردیف"},
+    {url:"playground-inputgroup.html",icon:"fa-i-cursor",en:"Input groups",fa:"گروه ورودی",keys:"input group addon prefix suffix ورودی"},
     {url:"login.html",icon:"fa-key",en:"Login / Register",fa:"ورود / ثبت‌نام",keys:"auth sign in sign up email phone password ورود ثبت نام ایمیل رمز تلفن"}
   ];
   document.querySelectorAll(".searchbox").forEach(box=>{
@@ -355,7 +384,6 @@ function initShell(){
   // demo progress bars + reveal on load
   document.querySelectorAll("[data-bar]").forEach(el=>{setTimeout(()=>el.style.width=el.dataset.bar+"%",300);});
   setTimeout(()=>document.querySelectorAll(".reveal").forEach(el=>el.classList.add("in")),60);
-  // Escape closes drawer + mobile sidebar + any open menu
   onDoc(document,"keydown",e=>{if(e.key==="Escape"){closeSettings();document.body.classList.remove("nav-open");syncScrim();document.querySelectorAll(".hmenu > div.open").forEach(o=>o.classList.remove("open"));document.querySelectorAll(".tmenu.open").forEach(o=>o.classList.remove("open"));}});
 }
 document.addEventListener("DOMContentLoaded",initShell);

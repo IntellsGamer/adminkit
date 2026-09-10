@@ -1,16 +1,21 @@
 <!doctype html><html lang="en" dir="ltr" data-theme="light"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<script src="assets/vendor/turbo/turbo.es2017-umd.min.js?v=4" defer></script>
-<script src="assets/js/theme.js?v=4"></script>
-<script src="assets/js/i18n.js?v=4"></script>
-<script src="assets/js/sonner.js?v=4"></script>
-<script src="assets/js/modal.js?v=4"></script>
-<script src="assets/js/table.js?v=4"></script>
-<script src="assets/js/dropdown.js?v=4"></script>
-<script src="assets/js/jalaali-vendor.js?v=4"></script>
-<script src="assets/js/datepicker.js?v=4"></script>
-<script src="assets/js/idle.js?v=4"></script>
-<script src="assets/js/app.js?v=4"></script>
-<title>Date picker playground — AdminKit</title><link rel="stylesheet" href="assets/vendor/fontawesome/all.min.css?v=4"><link rel="stylesheet" href="assets/css/sonner.css?v=4"><link rel="stylesheet" href="assets/css/theme.css?v=4"><link rel="stylesheet" href="assets/css/components.css?v=4"></head>
+<script src="assets/vendor/turbo/turbo.es2017-umd.min.js?v=5" defer></script>
+<script src="assets/js/theme.js?v=5"></script>
+<script src="assets/js/i18n.js?v=5"></script>
+<script src="assets/js/sonner.js?v=5"></script>
+<script src="assets/js/modal.js?v=5"></script>
+<script src="assets/js/table.js?v=5"></script>
+<script src="assets/js/dropdown.js?v=5"></script>
+<script src="assets/js/jalaali-vendor.js?v=5"></script>
+<script src="assets/js/datepicker.js?v=5"></script>
+<script src="assets/js/tabs.js?v=5"></script>
+<script src="assets/js/tooltip.js?v=5"></script>
+<script src="assets/js/carousel.js?v=5"></script>
+<script src="assets/js/shop.js?v=5"></script>
+<script src="assets/js/tickets.js?v=5"></script>
+<script src="assets/js/idle.js?v=5"></script>
+<script src="assets/js/app.js?v=5"></script>
+<title>Date picker playground — AdminKit</title><link rel="stylesheet" href="assets/vendor/fontawesome/all.min.css?v=5"><link rel="stylesheet" href="assets/css/sonner.css?v=5"><link rel="stylesheet" href="assets/css/theme.css?v=5"><link rel="stylesheet" href="assets/css/components.css?v=5"></head>
 <body data-layout="vertical" data-sidebar="full" data-glass="on"><div class="app">
 <aside class="sidebar" id="sidebar">
     <div class="brand"><span class="brand-mark"><i class="fa-solid fa-layer-group"></i></span><span class="brand-text"><span data-i18n="appName">AdminKit</span><small data-i18n="tagline">Modern admin</small></span><button class="icon-btn nav-close" data-act="nav-close" aria-label="Close menu"><i class="fa-solid fa-xmark"></i></button></div>
@@ -20,9 +25,25 @@
       <div class="nav-item">
         <button class="nav-link"><i class="fa-solid fa-table-columns fa-fw"></i><span class="nav-text" data-i18n="dashboard">Dashboard</span><i class="fa-solid fa-chevron-down chev"></i></button>
         <div class="nav-sub">
+          <a class="nav-link" href="homepage.html"><i class="fa-solid fa-house fa-fw"></i><span class="nav-text" data-i18n="homepage">Homepage</span></a>
           <a class="nav-link" href="index.html#overview"><i class="fa-solid fa-chart-line fa-fw"></i><span class="nav-text" data-i18n="overview">Overview</span></a>
           <a class="nav-link" href="index.html#analytics"><i class="fa-solid fa-chart-pie fa-fw"></i><span class="nav-text" data-i18n="analytics">Analytics</span></a>
           <a class="nav-link" href="playground-table.html"><i class="fa-solid fa-file-lines fa-fw"></i><span class="nav-text" data-i18n="reports">Reports</span></a>
+        </div>
+      </div>
+      <div class="nav-item">
+        <button class="nav-link"><i class="fa-solid fa-bag-shopping fa-fw"></i><span class="nav-text" data-i18n="shop">Shop</span><i class="fa-solid fa-chevron-down chev"></i></button>
+        <div class="nav-sub">
+          <a class="nav-link" href="products.html"><i class="fa-solid fa-bag-shopping fa-fw"></i><span class="nav-text" data-i18n="products">Products</span></a>
+          <a class="nav-link" href="cart.html"><i class="fa-solid fa-cart-shopping fa-fw"></i><span class="nav-text" data-i18n="cart">Cart</span></a>
+          <a class="nav-link" href="gallery.html"><i class="fa-solid fa-images fa-fw"></i><span class="nav-text" data-i18n="gallery">Gallery</span></a>
+        </div>
+      </div>
+      <div class="nav-item">
+        <button class="nav-link"><i class="fa-solid fa-ticket fa-fw"></i><span class="nav-text" data-i18n="support">Support</span><i class="fa-solid fa-chevron-down chev"></i></button>
+        <div class="nav-sub">
+          <a class="nav-link" href="tickets.html"><i class="fa-solid fa-ticket fa-fw"></i><span class="nav-text" data-i18n="tickets">Tickets</span></a>
+          <a class="nav-link" href="tickets.html#new"><i class="fa-solid fa-plus fa-fw"></i><span class="nav-text" data-i18n="ticketNew">New ticket</span></a>
         </div>
       </div>
       <div class="nav-item">
@@ -34,6 +55,11 @@
           <a class="nav-link" href="playground-dropdown.html"><i class="fa-solid fa-chevron-down fa-fw"></i><span class="nav-text" data-i18n="dropdown">Dropdown playground</span></a>
           <a class="nav-link" href="playground-datepicker.html"><i class="fa-solid fa-calendar-days fa-fw"></i><span class="nav-text" data-i18n="datepicker">Date picker playground</span></a>
           <a class="nav-link" href="playground-buttons.html"><i class="fa-solid fa-circle-dot fa-fw"></i><span class="nav-text" data-i18n="buttons">Buttons playground</span></a>
+          <a class="nav-link" href="playground-tabs.html"><i class="fa-solid fa-folder fa-fw"></i><span class="nav-text" data-i18n="tabs">Tabs playground</span></a>
+          <a class="nav-link" href="playground-tooltip.html"><i class="fa-solid fa-comment fa-fw"></i><span class="nav-text" data-i18n="tooltip">Tooltip playground</span></a>
+          <a class="nav-link" href="playground-carousel.html"><i class="fa-solid fa-images fa-fw"></i><span class="nav-text" data-i18n="carousel">Carousel playground</span></a>
+          <a class="nav-link" href="playground-grid.html"><i class="fa-solid fa-table-cells fa-fw"></i><span class="nav-text" data-i18n="gridSys">Grid playground</span></a>
+          <a class="nav-link" href="playground-inputgroup.html"><i class="fa-solid fa-i-cursor fa-fw"></i><span class="nav-text" data-i18n="inputGroup">Input group playground</span></a>
         </div>
       </div>
       <div class="nav-item">
@@ -50,9 +76,17 @@
       <nav class="hmenu" aria-label="Horizontal">
         <div><button class="hlink"><i class="fa-solid fa-table-columns"></i><span data-i18n="dashboards">Dashboards</span><i class="fa-solid fa-chevron-down" style="font-size:10px"></i></button>
           <div class="drop mega">
+            <a href="homepage.html"><img alt="" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='104' height='76'%3E%3Crect width='104' height='76' rx='12' fill='%236366f1'/%3E%3Crect x='12' y='16' width='80' height='6' rx='3' fill='white' opacity='.8'/%3E%3Crect x='12' y='28' width='60' height='6' rx='3' fill='white' opacity='.5'/%3E%3C/svg%3E"><span><b>Homepage</b><br><small class="muted">Locked index</small></span></a>
             <a href="index.html"><img alt="" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='104' height='76'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0' stop-color='%23f59e0b'/%3E%3Cstop offset='1' stop-color='%23ea580c'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='104' height='76' rx='12' fill='url(%23g)'/%3E%3Crect x='12' y='48' width='60' height='6' rx='3' fill='white' opacity='.8'/%3E%3Crect x='12' y='38' width='40' height='6' rx='3' fill='white' opacity='.5'/%3E%3C/svg%3E"><span><b>Overview</b><br><small class="muted">KPI + charts</small></span></a>
             <a href="playground-table.html"><img alt="" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='104' height='76'%3E%3Crect width='104' height='76' rx='12' fill='%23059669'/%3E%3Crect x='12' y='16' width='80' height='6' rx='3' fill='white' opacity='.8'/%3E%3Crect x='12' y='28' width='80' height='6' rx='3' fill='white' opacity='.5'/%3E%3Crect x='12' y='40' width='80' height='6' rx='3' fill='white' opacity='.5'/%3E%3Crect x='12' y='52' width='52' height='6' rx='3' fill='white' opacity='.5'/%3E%3C/svg%3E"><span><b>Reports</b><br><small class="muted">Tables + export</small></span></a>
-            <a href="playground-sonner.html"><img alt="" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='104' height='76'%3E%3Crect width='104' height='76' rx='12' fill='%230369a1'/%3E%3Crect x='32' y='14' width='40' height='30' rx='9' fill='white' opacity='.9'/%3E%3Crect x='12' y='52' width='80' height='6' rx='3' fill='white' opacity='.5'/%3E%3C/svg%3E"><span><b>Alerts</b><br><small class="muted">Sonner toasts</small></span></a>
+          </div>
+        </div>
+        <div><button class="hlink"><i class="fa-solid fa-bag-shopping"></i><span data-i18n="shop">Shop</span><i class="fa-solid fa-chevron-down" style="font-size:10px"></i></button>
+          <div class="drop">
+            <a href="products.html"><i class="fa-solid fa-bag-shopping fa-fw"></i><span data-i18n="products">Products</span></a>
+            <a href="cart.html"><i class="fa-solid fa-cart-shopping fa-fw"></i><span data-i18n="cart">Cart</span></a>
+            <a href="gallery.html"><i class="fa-solid fa-images fa-fw"></i><span data-i18n="gallery">Gallery</span></a>
+            <a href="tickets.html"><i class="fa-solid fa-ticket fa-fw"></i><span data-i18n="tickets">Tickets</span></a>
           </div>
         </div>
         <div><button class="hlink"><i class="fa-solid fa-cube"></i><span data-i18n="components">Components</span><i class="fa-solid fa-chevron-down" style="font-size:10px"></i></button>
@@ -63,6 +97,11 @@
             <a href="playground-datepicker.html"><i class="fa-solid fa-calendar-days fa-fw"></i><span data-i18n="datepicker">Date picker playground</span></a>
             <a href="playground-sonner.html"><i class="fa-solid fa-bell fa-fw"></i><span data-i18n="sonner">Sonner playground</span></a>
             <a href="playground-table.html"><i class="fa-solid fa-table fa-fw"></i><span data-i18n="table">Table playground</span></a>
+            <a href="playground-tabs.html"><i class="fa-solid fa-folder fa-fw"></i><span data-i18n="tabs">Tabs playground</span></a>
+            <a href="playground-tooltip.html"><i class="fa-solid fa-comment fa-fw"></i><span data-i18n="tooltip">Tooltip playground</span></a>
+            <a href="playground-carousel.html"><i class="fa-solid fa-images fa-fw"></i><span data-i18n="carousel">Carousel playground</span></a>
+            <a href="playground-grid.html"><i class="fa-solid fa-table-cells fa-fw"></i><span data-i18n="gridSys">Grid playground</span></a>
+            <a href="playground-inputgroup.html"><i class="fa-solid fa-i-cursor fa-fw"></i><span data-i18n="inputGroup">Input group playground</span></a>
           </div>
         </div>
         <div><button class="hlink" onclick="App.go('login.html')"><i class="fa-solid fa-key"></i><span data-i18n="auth">Auth</span></button></div>
@@ -82,7 +121,8 @@
           <div class="tmenu-row"><span data-i18n="swatches">Swatches</span><span class="swatches"><button type="button" class="swatch" data-color="#f59e0b" style="background:#f59e0b" aria-label="amber"></button><button type="button" class="swatch" data-color="#6366f1" style="background:#6366f1" aria-label="indigo"></button><button type="button" class="swatch" data-color="#0ea5e9" style="background:#0ea5e9" aria-label="sky"></button><button type="button" class="swatch" data-color="#12a56f" style="background:#12a56f" aria-label="green"></button><button type="button" class="swatch" data-color="#e5484d" style="background:#e5484d" aria-label="red"></button><button type="button" class="swatch" data-color="#8b5cf6" style="background:#8b5cf6" aria-label="violet"></button></span></div>
           <div class="tmenu-sep"></div>
           <div class="tmenu-row"><span data-i18n="layout">Menu layout</span><span class="seg"><button type="button" data-layout-pick="vertical"><span data-i18n="vertical">Vertical sidebar</span></button><button type="button" data-layout-pick="horizontal"><span data-i18n="horizontal">Horizontal top menu</span></button></span></div>
-          <div class="tmenu-row"><span data-i18n="sidebar">Sidebar mode</span><span class="seg"><button type="button" data-sidebar-pick="full"><span data-i18n="full">Full</span></button><button type="button" data-sidebar-pick="mini"><span data-i18n="mini">Mini (icons)</span></button></span></div>
+          <div class="tmenu-row"><span data-i18n="hstyle">Horizontal style</span><span class="seg"><button type="button" data-hstyle-pick="bar"><span data-i18n="hbar">Bar</span></button><button type="button" data-hstyle-pick="dock"><span data-i18n="hdock">Dock</span></button></span></div>
+          <div class="tmenu-row"><span data-i18n="sidebar">Sidebar mode</span><span class="seg"><button type="button" data-sidebar-pick="full"><span data-i18n="full">Full</span></button><button type="button" data-sidebar-pick="icon"><span data-i18n="icon">Icon</span></button><button type="button" data-sidebar-pick="mini"><span data-i18n="mini">Mini</span></button><button type="button" data-sidebar-pick="overlay"><span data-i18n="overlay">Overlay</span></button></span></div>
           <div class="tmenu-row"><span data-i18n="footer">Footer</span><span class="seg"><button type="button" data-footer-pick="sticky"><span data-i18n="sticky">Sticky</span></button><button type="button" data-footer-pick="static"><span data-i18n="static">Static</span></button></span></div>
           <div class="tmenu-row"><span data-i18n="glass">Liquid glass</span><label class="switch"><input type="checkbox" id="tbGlass" checked><i></i></label></div>
         </div>
@@ -95,6 +135,7 @@
           <button type="button" class="tmi" data-lang="fa"><i class="fa-solid fa-globe fa-fw"></i><span>فارسی</span><i class="fa-solid fa-check tick"></i></button>
         </div>
       </div>
+      <a class="icon-btn" href="cart.html" aria-label="Cart" title="Cart" style="position:relative;text-decoration:none"><i class="fa-solid fa-cart-shopping"></i><span class="badge" data-cart-count style="display:none">0</span></a>
       <div class="tmenu">
         <button class="icon-btn" data-tmenu aria-label="Notifications" title="Notifications"><i class="fa-solid fa-bell"></i><span class="badge" id="notifBadge" data-num>3</span></button>
         <div class="tmenu-drop wide" role="menu">
@@ -118,16 +159,39 @@
       </div>
       <button class="icon-btn" data-act="settings" aria-label="Settings"><i class="fa-solid fa-gear"></i></button>
     </header>
-<main class="content"><div class="pagenav"><a href="index.html"><i class="fa-solid fa-table-columns"></i><span data-i18n="dashboard">Dashboard</span></a><a href="playground-sonner.html"><i class="fa-solid fa-bell"></i><span data-i18n="sonner">Sonner</span></a><a href="playground-modal.html"><i class="fa-solid fa-window-restore"></i><span data-i18n="modal">Modal</span></a><a href="playground-table.html"><i class="fa-solid fa-table"></i><span data-i18n="table">Table</span></a><a href="playground-dropdown.html"><i class="fa-solid fa-chevron-down"></i><span data-i18n="dropdown">Dropdown</span></a><a class="active" href="playground-datepicker.html"><i class="fa-solid fa-calendar-days"></i><span data-i18n="datepicker">Date picker</span></a><a href="playground-buttons.html"><i class="fa-solid fa-circle-dot"></i><span data-i18n="buttons">Buttons</span></a><a href="login.html"><i class="fa-solid fa-key"></i><span data-i18n="login">Auth</span></a></div>
+<main class="content"><div class="pagenav">
+        <a href="homepage.html"><i class="fa-solid fa-house"></i><span data-i18n="homepage">Homepage</span></a>
+        <a href="index.html"><i class="fa-solid fa-table-columns"></i><span data-i18n="dashboard">Dashboard</span></a>
+        <a href="products.html"><i class="fa-solid fa-bag-shopping"></i><span data-i18n="products">Products</span></a>
+        <a href="cart.html"><i class="fa-solid fa-cart-shopping"></i><span data-i18n="cart">Cart</span></a>
+        <a href="gallery.html"><i class="fa-solid fa-images"></i><span data-i18n="gallery">Gallery</span></a>
+        <a href="tickets.html"><i class="fa-solid fa-ticket"></i><span data-i18n="tickets">Tickets</span></a>
+        <a href="playground-sonner.html"><i class="fa-solid fa-bell"></i><span data-i18n="sonner">Sonner</span></a>
+        <a href="playground-modal.html"><i class="fa-solid fa-window-restore"></i><span data-i18n="modal">Modal</span></a>
+        <a href="playground-table.html"><i class="fa-solid fa-table"></i><span data-i18n="table">Table</span></a>
+        <a href="playground-dropdown.html"><i class="fa-solid fa-chevron-down"></i><span data-i18n="dropdown">Dropdown</span></a>
+        <a href="playground-datepicker.html"><i class="fa-solid fa-calendar-days"></i><span data-i18n="datepicker">Date picker</span></a>
+        <a href="playground-buttons.html"><i class="fa-solid fa-circle-dot"></i><span data-i18n="buttons">Buttons</span></a>
+        <a href="playground-tabs.html"><i class="fa-solid fa-folder"></i><span data-i18n="tabs">Tabs</span></a>
+        <a href="playground-tooltip.html"><i class="fa-solid fa-comment"></i><span data-i18n="tooltip">Tooltip</span></a>
+        <a href="playground-carousel.html"><i class="fa-solid fa-images"></i><span data-i18n="carousel">Carousel</span></a>
+        <a href="playground-grid.html"><i class="fa-solid fa-table-cells"></i><span data-i18n="gridSys">Grid</span></a>
+        <a href="playground-inputgroup.html"><i class="fa-solid fa-i-cursor"></i><span data-i18n="inputGroup">Input group</span></a>
+        <a href="login.html"><i class="fa-solid fa-key"></i><span data-i18n="login">Auth</span></a>
+      </div>
 <h1 data-i18n="pgDpH">Persian + Gregorian date picker</h1><p class="muted">Jalali math is the exact <code>jalaali-js</code> algorithm vendored offline at <code>assets/js/jalaali-vendor.js</code> (<code>toJalaali/toGregorian/jalaaliMonthLength</code>). Popup: month/year jump, min/max, formats, presets.</p><p class="muted" data-i18n="pgDpP">Exact jalaali-js math, vendored offline.</p>
-<div class="grid cols-2"><div class="card"><div class="section-head"><span class="tile t-ghost"><i class="fa-solid fa-calendar-days"></i></span><h3 data-i18n="tryIt">Try it</h3></div><div class="field"><label data-i18n="dpFaL">Jalali date (fa)</label><input id="dpFa" placeholder="1404/…"></div><div class="field"><label data-i18n="dpEnL">Gregorian (en)</label><input id="dpEn" placeholder="YYYY-MM-DD"></div><div class="field"><label data-i18n="dpMinL">Constrained (2024 only, no presets)</label><input id="dpMin" placeholder="Pick within 2024"></div><div class="btn-row"><button class="btn btn-ghost btn-sm" id="btnFa">FA locale</button><button class="btn btn-ghost btn-sm" id="btnEn">EN locale</button></div><p class="muted">Value: <b id="dpOut">—</b></p></div>
+<p class="muted" data-i18n="pgDpNew">months: 1 shows one month, months: 2 shows two side-by-side. Use setMonths(n) at runtime.</p>
+<div class="grid cols-2"><div class="card"><div class="section-head"><span class="tile t-ghost"><i class="fa-solid fa-calendar-days"></i></span><h3 data-i18n="tryIt">Try it</h3></div><div class="field"><label data-i18n="dpFaL">Jalali date (fa)</label><input id="dpFa" placeholder="1404/…"></div><div class="field"><label data-i18n="dpEnL">Gregorian (en)</label><input id="dpEn" placeholder="YYYY-MM-DD"></div><div class="field"><label data-i18n="dpMinL">Constrained (2024 only, no presets)</label><input id="dpMin" placeholder="Pick within 2024"></div>
+<div class="field"><label><span data-i18n="dualMonth">Two months</span> (months: 2)</label><input id="dpDual" placeholder="Dual month"></div>
+<div class="btn-row"><button class="btn btn-ghost btn-sm" id="btnFa">FA locale</button><button class="btn btn-ghost btn-sm" id="btnEn">EN locale</button><button class="btn btn-ghost btn-sm" id="btn1M"><span data-i18n="singleMonth">One month</span></button><button class="btn btn-ghost btn-sm" id="btn2M"><span data-i18n="dualMonth">Two months</span></button></div><p class="muted">Value: <b id="dpOut">—</b></p></div>
 <div class="card"><h3 data-i18n="copypaste">Copy-paste</h3><pre class="code">&lt;input id="birth"&gt;
 &lt;script src="assets/js/jalaali-vendor.js"&gt;&lt;/script&gt;
 &lt;script src="assets/js/datepicker.js"&gt;&lt;/script&gt;
 &lt;script&gt;new DatePicker(document.getElementById('birth'), {
   locale: 'fa',            // 'fa' | 'en'
   format: 'jYYYY/jMM/jDD', // or 'YYYY-MM-DD'
-  presets: true, min: new Date(2020,0,1), max: null,
+  presets: true, months: 2, // 1 | 2 side-by-side
+  min: new Date(2020,0,1), max: null,
   onChange: d =&gt; console.log(d) });&lt;/script&gt;</pre></div></div>
 </main>
     <footer class="footer">
@@ -154,7 +218,8 @@
   </div>
   <div class="set-group"><span class="eyebrow" data-i18n="layoutGroup">Layout</span>
     <div class="set-row"><span data-i18n="layout">Menu layout</span><select id="setLayout"><option value="vertical" data-i18n="vertical">Vertical sidebar</option><option value="horizontal" data-i18n="horizontal">Horizontal top menu</option></select></div>
-    <div class="set-row"><span data-i18n="sidebar">Sidebar mode</span><select id="setSidebar"><option value="full" data-i18n="full">Full</option><option value="mini" data-i18n="mini">Mini (icons)</option></select></div>
+    <div class="set-row"><span data-i18n="hstyle">Horizontal style</span><select id="setHstyle"><option value="bar" data-i18n="hbar">Bar (in topbar)</option><option value="dock" data-i18n="hdock">Dock (separated)</option></select></div>
+    <div class="set-row"><span data-i18n="sidebar">Sidebar mode</span><select id="setSidebar"><option value="full" data-i18n="full">Full</option><option value="icon" data-i18n="icon">Icon</option><option value="mini" data-i18n="mini">Mini (hover)</option><option value="overlay" data-i18n="overlay">Overlay</option></select></div>
     <div class="set-row"><span data-i18n="footer">Footer</span><select id="setFooter"><option value="sticky" data-i18n="sticky">Sticky</option><option value="static" data-i18n="static">Static</option></select></div>
   </div>
   <div class="set-group"><span class="eyebrow" data-i18n="localeGroup">Locale</span>
@@ -174,9 +239,12 @@ var out=document.getElementById('dpOut');
 var dpA=new DatePicker(document.getElementById('dpFa'),{locale:'fa',onChange:d=>out.textContent=d?d.toString():'—'});
 var dpB=new DatePicker(document.getElementById('dpEn'),{locale:'en',format:'YYYY-MM-DD',onChange:d=>out.textContent=d?d.toString():'—'});
 var dpC=new DatePicker(document.getElementById('dpMin'),{locale:'en',format:'YYYY-MM-DD',presets:false,min:new Date(2024,0,1),max:new Date(2024,11,31),onChange:d=>out.textContent=d?d.toString():'—'});
-async function paintDp(){try{const d=await I18N.dict(ThemeStore.get().lang);[dpA,dpB,dpC].forEach(p=>p.setStrings({today:d.dpToday,clear:d.dpClear,now:d.dpNow,searchPh:d.ddSearchPh,noResults:d.ddNoResults}));}catch(e){}}
+var dpD=new DatePicker(document.getElementById('dpDual'),{locale:'en',format:'YYYY-MM-DD',months:2,onChange:d=>out.textContent=d?d.toString():'—'});
+async function paintDp(){try{const d=await I18N.dict(ThemeStore.get().lang);[dpA,dpB,dpC,dpD].forEach(p=>p.setStrings({today:d.dpToday,clear:d.dpClear,now:d.dpNow,searchPh:d.ddSearchPh,noResults:d.ddNoResults}));}catch(e){}}
 paintDp();
 if(!window.__akLangDp){window.__akLangDp=true;document.addEventListener('app:lang',()=>{try{paintDp();}catch(e){}});}
 document.getElementById('btnFa').onclick=()=>App.setLang('fa');
 document.getElementById('btnEn').onclick=()=>App.setLang('en');
+document.getElementById('btn1M').onclick=()=>{dpD.setMonths(1);toast('Single month')};
+document.getElementById('btn2M').onclick=()=>{dpD.setMonths(2);toast('Dual months')};
 </script></body></html>

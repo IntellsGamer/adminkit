@@ -3,7 +3,9 @@
    (toJalaali/toGregorian/isLeapJalaaliYear/jalaaliMonthLength). UI is a modern
    react-multi-date-picker-like popup: month/year nav, presets, min/max,
    format tokens (YYYY/MM/DD, jYYYY/jM/jD), clear/today, keyboard. Offline.
-   Usage: new DatePicker(input,{locale:'fa'|'en',format:'jYYYY/jMM/jDD',...}) */
+   Usage: new DatePicker(input,{locale:'fa'|'en',format:'jYYYY/jMM/jDD',months:1|2,...})
+   months: 1 = single month (default, compact), 2 = two months side-by-side.
+   setMonths(n) switches at runtime. */
 (function(g){
 "use strict";
 const FA_MONTHS=["فروردین","اردیبهشت","خرداد","تیر","مرداد","شهریور","مهر","آبان","آذر","دی","بهمن","اسفند"];
@@ -18,9 +20,14 @@ function toJ(d){ const j=J(); if(j&&j.toJalaali)return j.toJalaali(d.getFullYear
 function toG(jy,jm,jd){ const j=J(); if(j&&j.toGregorian){const r=j.toGregorian(jy,jm,jd);return new Date(r.gy,r.gm-1,r.gd);} return new Date(); }
 function jLen(jy,jm){ const j=J(); if(j&&j.jalaaliMonthLength)return j.jalaaliMonthLength(jy,jm); return jm<=6?31:jm<=11?30:29; }
 function pad(n){return String(n).padStart(2,"0");}
+function shiftView(view,locale,d){
+  if(locale==="fa"){ const j=toJ(view); let m=j.jm+d,y=j.jy; if(m<1){m=12;y--;} if(m>12){m=1;y++;} return toG(y,m,1); }
+  return new Date(view.getFullYear(),view.getMonth()+d,1);
+}
 class DatePicker{
   constructor(input,opts){
-    this.input=input; this.o=Object.assign({locale:"fa",format:"",min:null,max:null,presets:true,onChange:null,todayLabel:null,clearLabel:null,nowLabel:null,searchPh:null,noResults:null},opts||{});
+    this.input=input; this.o=Object.assign({locale:"fa",format:"",months:1,min:null,max:null,presets:true,onChange:null,todayLabel:null,clearLabel:null,nowLabel:null,searchPh:null,noResults:null},opts||{});
+    this.o.months=(this.o.months===2)?2:1;
     if(!this.o.format)this.o.format=this.o.locale==="fa"?"jYYYY/jMM/jDD":"YYYY-MM-DD";
     const fa0=this.o.locale==="fa";
     if(!this.o.todayLabel)this.o.todayLabel=fa0?"امروز":"Today";
@@ -39,48 +46,61 @@ class DatePicker{
     return this.o.format.replace("jYYYY",jy.jy).replace("jMM",pad(jy.jm)).replace("jM",jy.jm).replace("jDD",pad(jy.jd)).replace("jD",jy.jd)
       .replace("YYYY",d.getFullYear()).replace("MM",pad(d.getMonth()+1)).replace("DD",pad(d.getDate()));
   }
-  show(){ this.draw(); this.pop.style.display="block"; const r=this.input.getBoundingClientRect();
-    this.pop.style.position="fixed"; this.pop.style.top=Math.min(innerHeight-360,r.bottom+6)+"px";
+  setMonths(n){ this.o.months=(n===2)?2:1; this.draw(); return this; }
+  show(){ this.draw(); this.pop.style.display="block"; this.pop.classList.toggle("dp-dual",this.o.months===2); const r=this.input.getBoundingClientRect();
+    this.pop.style.position="fixed"; this.pop.style.top=Math.min(innerHeight-380,r.bottom+6)+"px";
     const rtl=document.documentElement.dir==="rtl"; this.pop.style[rtl?"right":"left"]=Math.max(8,(rtl?innerWidth-r.right:r.left))+"px"; }
   hide(){ this.pop.style.display="none"; }
-  draw(){
+  monthHTML(viewDate){
     const fa=this.o.locale==="fa";
     let title="",cells="",jump="";
     if(fa){
-      const j=toJ(this.view);
+      const j=toJ(viewDate);
       title=FA_MONTHS[j.jm-1]+" "+j.jy;
-      jump='<span class="dp-jump"><select data-n="jm">'+FA_MONTHS.map((m,i)=>'<option value="'+(i+1)+'"'+(i+1===j.jm?" selected":"")+">"+m+"</option>").join("")+'</select><select data-n="jy">'
+      jump='<span class="dp-jump"><select data-n="jm" data-view="'+viewDate.getTime()+'">'+FA_MONTHS.map((m,i)=>'<option value="'+(i+1)+'"'+(i+1===j.jm?" selected":"")+">"+m+"</option>").join("")+'</select><select data-n="jy" data-view="'+viewDate.getTime()+'">'
         +Array.from({length:61},(_,k)=>j.jy-30+k).map(y=>'<option value="'+y+'"'+(y===j.jy?" selected":"")+">"+y+"</option>").join("")+"</select></span>";
       const firstG=toG(j.jy,j.jm,1);
       let start=(firstG.getDay()+1)%7; // Sat-first for Jalali
       cells=FA_DOW.map(d=>'<div class="dp-dow">'+d+"</div>").join("");
       for(let i=0;i<start;i++)cells+="<span></span>";
       const n=jLen(j.jy,j.jm);
-      for(let d=1;d<=n;d++){ const g2=toG(j.jy,j.jm,d); cells+=this.dayBtn(g2,d,fa); }
-      this._nav={jy:j.jy,jm:j.jm};
+      for(let d=1;d<=n;d++){ const g2=toG(j.jy,j.jm,d); cells+=this.dayBtn(g2,d); }
+      if(!this._nav)this._nav={jy:j.jy,jm:j.jm};
     }else{
-      const Y=this.view.getFullYear(),M=this.view.getMonth();
+      const Y=viewDate.getFullYear(),M=viewDate.getMonth();
       title=EN_MONTHS[M]+" "+Y;
-      jump='<span class="dp-jump"><select data-n="em">'+EN_MONTHS.map((m,i)=>'<option value="'+i+'"'+(i===M?" selected":"")+">"+m.slice(0,3)+"</option>").join("")+'</select><select data-n="ey">'
+      jump='<span class="dp-jump"><select data-n="em" data-view="'+viewDate.getTime()+'">'+EN_MONTHS.map((m,i)=>'<option value="'+i+'"'+(i===M?" selected":"")+">"+m.slice(0,3)+"</option>").join("")+'</select><select data-n="ey" data-view="'+viewDate.getTime()+'">'
         +Array.from({length:61},(_,k)=>Y-30+k).map(y=>'<option value="'+y+'"'+(y===Y?" selected":"")+">"+y+"</option>").join("")+"</select></span>";
       const first=new Date(Y,M,1);
       cells=EN_DOW.map(d=>'<div class="dp-dow">'+d+"</div>").join("");
       for(let i=0;i<first.getDay();i++)cells+="<span></span>";
       const n=new Date(Y,M+1,0).getDate();
-      for(let d=1;d<=n;d++)cells+=this.dayBtn(new Date(Y,M,d),d,fa);
+      for(let d=1;d<=n;d++)cells+=this.dayBtn(new Date(Y,M,d),d);
     }
-    this.pop.innerHTML='<div class="dp-head"><button class="icon-btn" data-n="p" aria-label="Previous"><i class="fa-solid fa-chevron-left"></i></button>'+jump+'<button class="icon-btn" data-n="n" aria-label="Next"><i class="fa-solid fa-chevron-right"></i></button></div>'
+    return '<div class="dp-mon"><div class="dp-head"><button class="icon-btn" data-n="p" aria-label="Previous"><i class="fa-solid fa-chevron-left"></i></button>'+jump+'<button class="icon-btn" data-n="n" aria-label="Next"><i class="fa-solid fa-chevron-right"></i></button></div>'
       +'<div class="muted" style="font-size:12px;font-weight:700;margin-bottom:6px">'+title+'</div>'
-      +'<div class="dp-grid">'+cells+'</div>'
+      +'<div class="dp-grid">'+cells+'</div></div>';
+  }
+  draw(){
+    const dual=this.o.months===2;
+    const v2=dual?shiftView(this.view,this.o.locale,1):null;
+    if(this.o.locale==="fa"){ const j=toJ(this.view); this._nav={jy:j.jy,jm:j.jm}; }
+    this.pop.classList.toggle("dp-dual",dual);
+    this.pop.innerHTML='<div class="dp-mons">'+this.monthHTML(this.view)+(dual?this.monthHTML(v2):"")+'</div>'
       +'<div class="btn-row" style="margin-top:10px"><button class="btn btn-ghost btn-sm" data-n="today"><i class="fa-solid fa-calendar-day"></i> '+this.o.todayLabel+'</button><button class="btn btn-ghost btn-sm" data-n="clear">'+this.o.clearLabel+'</button>'
       +(this.o.presets?'<button class="btn btn-soft btn-sm" data-n="now">'+this.o.nowLabel+'</button>':"")+"</div>";
     this.pop.querySelectorAll(".dp-day").forEach(b=>b.onclick=()=>{this.sel=new Date(+b.dataset.t);this.input.value=this.fmt(this.sel);this.view=new Date(this.sel);this.o.onChange&&this.o.onChange(this.sel);this.hide();});
-    this.pop.querySelector('[data-n="p"]').onclick=()=>this.nav(-1);
-    this.pop.querySelector('[data-n="n"]').onclick=()=>this.nav(1);
-    const jm=this.pop.querySelector('[data-n="jm"]'),jy=this.pop.querySelector('[data-n="jy"]');
-    if(jm&&jy){const go=()=>{this.view=toG(+jy.value,+jm.value,1);this.draw();};jm.onchange=go;jy.onchange=go;}
-    const em=this.pop.querySelector('[data-n="em"]'),ey=this.pop.querySelector('[data-n="ey"]');
-    if(em&&ey){const go=()=>{this.view=new Date(+ey.value,+em.value,1);this.draw();};em.onchange=go;ey.onchange=go;}
+    this.pop.querySelectorAll('[data-n="p"]').forEach(b=>b.onclick=()=>this.nav(-1));
+    this.pop.querySelectorAll('[data-n="n"]').forEach(b=>b.onclick=()=>this.nav(1));
+    const self=this;
+    this.pop.querySelectorAll('[data-n="jm"]').forEach(jm=>{
+      const jy=self.pop.querySelector('[data-n="jy"][data-view="'+jm.getAttribute("data-view")+'"]');
+      if(jm&&jy){const go=()=>{self.view=toG(+jy.value,+jm.value,1);self.draw();};jm.onchange=go;jy.onchange=go;}
+    });
+    this.pop.querySelectorAll('[data-n="em"]').forEach(em=>{
+      const ey=self.pop.querySelector('[data-n="ey"][data-view="'+em.getAttribute("data-view")+'"]');
+      if(em&&ey){const go=()=>{const base=new Date(+ey.value,+em.value,1); self.view=base; self.draw();};em.onchange=go;ey.onchange=go;}
+    });
     // month/year jumps use the shared custom dropdown (months: no search,
     // years: 61 options so search stays on). Rebuilt with the popup on every
     // draw; stale instances self-clean once detached.
@@ -93,7 +113,10 @@ class DatePicker{
       const r=s.nextElementSibling;
       if(r&&r.classList&&r.classList.contains("dd"))r.classList.add("dd-compact");
     }catch(e){} };
-    upSel(jm,false); upSel(jy,true); upSel(em,false); upSel(ey,true);
+    this.pop.querySelectorAll('[data-n="jm"]').forEach(s=>upSel(s,false));
+    this.pop.querySelectorAll('[data-n="jy"]').forEach(s=>upSel(s,true));
+    this.pop.querySelectorAll('[data-n="em"]').forEach(s=>upSel(s,false));
+    this.pop.querySelectorAll('[data-n="ey"]').forEach(s=>upSel(s,true));
     this.pop.querySelector('[data-n="today"]').onclick=()=>{this.sel=new Date();this.view=new Date();this.input.value=this.fmt(this.sel);this.o.onChange&&this.o.onChange(this.sel);this.draw();};
     this.pop.querySelector('[data-n="clear"]').onclick=()=>{this.sel=null;this.input.value="";this.o.onChange&&this.o.onChange(null);this.hide();};
     const now=this.pop.querySelector('[data-n="now"]'); if(now)now.onclick=()=>{this.sel=new Date();this.view=new Date();this.input.value=this.fmt(this.sel);this.o.onChange&&this.o.onChange(this.sel);this.hide();};
@@ -105,7 +128,7 @@ class DatePicker{
     return '<button class="dp-day'+(sel?" sel":"")+(today?" today":"")+'" data-t="'+date.getTime()+'"'+(dis?" disabled":"")+">"+num+"</button>";
   }
   nav(d){
-    if(this.o.locale==="fa"){ const n=this._nav; let m=n.jm+d,y=n.jy; if(m<1){m=12;y--;} if(m>12){m=1;y++;} this.view=toG(y,m,1); }
+    if(this.o.locale==="fa"){ const n=this._nav||toJ(this.view); let m=n.jm+d,y=n.jy; if(m<1){m=12;y--;} if(m>12){m=1;y++;} this.view=toG(y,m,1); }
     else this.view=new Date(this.view.getFullYear(),this.view.getMonth()+d,1);
     this.draw();
   }

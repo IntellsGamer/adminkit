@@ -1,4 +1,8 @@
-<!doctype html><html lang="en" dir="ltr" data-theme="light"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<!doctype html>
+<html lang="en" dir="ltr" data-theme="light">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
 <script src="assets/vendor/turbo/turbo.es2017-umd.min.js?v=5" defer></script>
 <script src="assets/js/theme.js?v=5"></script>
 <script src="assets/js/i18n.js?v=5"></script>
@@ -15,9 +19,16 @@
 <script src="assets/js/tickets.js?v=5"></script>
 <script src="assets/js/idle.js?v=5"></script>
 <script src="assets/js/app.js?v=5"></script>
-<title>Table playground — AdminKit</title><link rel="stylesheet" href="assets/vendor/fontawesome/all.min.css?v=5"><link rel="stylesheet" href="assets/css/sonner.css?v=5"><link rel="stylesheet" href="assets/css/theme.css?v=5"><link rel="stylesheet" href="assets/css/components.css?v=5"></head>
-<body data-layout="vertical" data-sidebar="full" data-glass="on"><div class="app">
-<aside class="sidebar" id="sidebar">
+<title>Gallery — AdminKit</title>
+<link rel="stylesheet" href="assets/vendor/fontawesome/all.min.css?v=5">
+<link rel="stylesheet" href="assets/css/sonner.css?v=5">
+<link rel="stylesheet" href="assets/css/theme.css?v=5">
+<link rel="stylesheet" href="assets/css/components.css?v=5">
+</head>
+<body data-layout="vertical" data-sidebar="full" data-glass="on">
+<div class="app">
+  <!-- ============ SIDEBAR ============ -->
+  <aside class="sidebar" id="sidebar">
     <div class="brand"><span class="brand-mark"><i class="fa-solid fa-layer-group"></i></span><span class="brand-text"><span data-i18n="appName">AdminKit</span><small data-i18n="tagline">Modern admin</small></span><button class="icon-btn nav-close" data-act="nav-close" aria-label="Close menu"><i class="fa-solid fa-xmark"></i></button></div>
     <label class="searchbox"><i class="fa-solid fa-magnifying-glass"></i><input data-i18n-ph="searchPh" placeholder="Search…"></label>
     <nav class="nav">
@@ -71,7 +82,10 @@
       </div>
     </nav>
   </aside>
-<div class="main"><header class="topbar">
+
+  <!-- ============ MAIN ============ -->
+  <div class="main">
+    <header class="topbar">
       <button class="icon-btn hamburger" data-act="nav" aria-label="Menu"><i class="fa-solid fa-bars"></i></button>
       <nav class="hmenu" aria-label="Horizontal">
         <div><button class="hlink"><i class="fa-solid fa-table-columns"></i><span data-i18n="dashboards">Dashboards</span><i class="fa-solid fa-chevron-down" style="font-size:10px"></i></button>
@@ -159,45 +173,76 @@
       </div>
       <button class="icon-btn" data-act="settings" aria-label="Settings"><i class="fa-solid fa-gear"></i></button>
     </header>
-<main class="content"><div class="pagenav">
-        <a href="homepage.html"><i class="fa-solid fa-house"></i><span data-i18n="homepage">Homepage</span></a>
-        <a href="index.html"><i class="fa-solid fa-table-columns"></i><span data-i18n="dashboard">Dashboard</span></a>
-        <a href="products.html"><i class="fa-solid fa-bag-shopping"></i><span data-i18n="products">Products</span></a>
-        <a href="cart.html"><i class="fa-solid fa-cart-shopping"></i><span data-i18n="cart">Cart</span></a>
-        <a href="gallery.html"><i class="fa-solid fa-images"></i><span data-i18n="gallery">Gallery</span></a>
-        <a href="tickets.html"><i class="fa-solid fa-ticket"></i><span data-i18n="tickets">Tickets</span></a>
-        <a href="playground-sonner.html"><i class="fa-solid fa-bell"></i><span data-i18n="sonner">Sonner</span></a>
-        <a href="playground-modal.html"><i class="fa-solid fa-window-restore"></i><span data-i18n="modal">Modal</span></a>
-        <a href="playground-table.html"><i class="fa-solid fa-table"></i><span data-i18n="table">Table</span></a>
-        <a href="playground-dropdown.html"><i class="fa-solid fa-chevron-down"></i><span data-i18n="dropdown">Dropdown</span></a>
-        <a href="playground-datepicker.html"><i class="fa-solid fa-calendar-days"></i><span data-i18n="datepicker">Date picker</span></a>
-        <a href="playground-buttons.html"><i class="fa-solid fa-circle-dot"></i><span data-i18n="buttons">Buttons</span></a>
-        <a href="playground-tabs.html"><i class="fa-solid fa-folder"></i><span data-i18n="tabs">Tabs</span></a>
-        <a href="playground-tooltip.html"><i class="fa-solid fa-comment"></i><span data-i18n="tooltip">Tooltip</span></a>
-        <a href="playground-carousel.html"><i class="fa-solid fa-images"></i><span data-i18n="carousel">Carousel</span></a>
-        <a href="playground-grid.html"><i class="fa-solid fa-table-cells"></i><span data-i18n="gridSys">Grid</span></a>
-        <a href="playground-inputgroup.html"><i class="fa-solid fa-i-cursor"></i><span data-i18n="inputGroup">Input group</span></a>
-        <a href="login.html"><i class="fa-solid fa-key"></i><span data-i18n="login">Auth</span></a>
-      </div>
-<h1 data-i18n="pgTableH">Table — DataTables-like, lightweight</h1><p class="muted" data-i18n="pgTableP">Search, sort, paging, export, column popover. Plain table + JSON rows.</p>
-<p class="muted" data-i18n="pgTableNew">Numbered pagination (&lt; 1 2 3 4 &gt;): chevrons + windowed numbers + ellipsis. Set pagerWindow to change the window.</p>
-<div class="card"><div id="grid"></div></div>
-<div class="grid cols-2" style="margin-top:16px"><div class="card"><h3 data-i18n="moduleToggles">Module toggles</h3><div class="btn-row"><button class="btn btn-ghost btn-sm" id="tglSearch">Search: on</button><button class="btn btn-ghost btn-sm" id="tglExports">Exports: on</button><button class="btn btn-ghost btn-sm" id="tglCols">Columns: on</button></div><p class="muted" data-i18n="rebuildP">Rebuilds the grid with modules hidden.</p></div>
-<div class="card"><h3 data-i18n="copypaste">Copy-paste</h3><pre class="code">&lt;div id="grid"&gt;&lt;/div&gt;
-&lt;script src="assets/js/table.js"&gt;&lt;/script&gt;
-&lt;script&gt;new DataGrid(document.getElementById('grid'), {
-  columns: [{key:'name',title:'Name'},{key:'email',title:'Email'}],
-  rows: [{name:'Sara',email:'s@x.io'}],
-  pageSize: 8, search: true, paging: true, pagerWindow: 5, // < 1 2 3 4 > window
-  exports: true, colToggle: true, info: true });&lt;/script&gt;</pre></div></div>
-</main>
+
+    <main class="content">
+<h1 style="position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)"><span data-i18n="gallery">Gallery</span></h1>
+<div class="gal-hero reveal in">
+<span class="eyebrow"><i class="fa-solid fa-images"></i> <span data-i18n="gallery">Gallery</span></span>
+<h1 style="margin:8px 0 4px;font-size:clamp(28px,4vw,40px)">Stories in color, offline by design</h1>
+<p class="muted" style="max-width:620px">A homepage-style showcase — big editorial cards, hover zoom, instant lightbox. Swap each gradient for your own photo; the overlay keeps text readable in light and graphite dark.</p>
+<div class="gal-pills" id="galFilters" role="group" aria-label="Filter">
+<button class="btn btn-primary btn-sm" data-f="" aria-pressed="true">All</button>
+<button class="btn btn-ghost btn-sm" data-f="Nature" aria-pressed="false">Nature</button>
+<button class="btn btn-ghost btn-sm" data-f="City" aria-pressed="false">City</button>
+<button class="btn btn-ghost btn-sm" data-f="Abstract" aria-pressed="false">Abstract</button>
+</div>
+<div class="btn-row" style="margin-top:14px"><span class="pill pill-ok"><span class="dot"></span>9 works</span><span class="pill pill-neutral"><i class="fa-solid fa-expand"></i>Click any card</span><span class="pill pill-neutral"><i class="fa-solid fa-wifi"></i>No network</span></div>
+</div>
+<div class="gal-grid" id="galGrid"></div>
+<div class="card" style="margin-top:16px"><h3 data-i18n="copypaste">Copy-paste</h3><pre class="code">&lt;div class="gal-grid"&gt;
+  &lt;div class="gal-item gal-feature"&gt;
+    &lt;div class="gal-art" style="background:linear-gradient(135deg,#f59e0b,#ea580c)"&gt;
+      &lt;i class="fa-solid fa-mountain-sun"&gt;&lt;/i&gt;
+    &lt;/div&gt;
+    &lt;div class="gal-meta"&gt;&lt;span&gt;&lt;b&gt;Dune&lt;/b&gt;&lt;small&gt;Nature&lt;/small&gt;&lt;/span&gt;&lt;span class="gal-open"&gt;+&lt;/span&gt;&lt;/div&gt;
+  &lt;/div&gt;
+&lt;/div&gt;
+&lt;script&gt;Modal.open({title:'Dune', body:'&lt;img …&gt;'})&lt;/script&gt;</pre></div>
+<script>
+(function(){
+var items=[
+ {t:'Dune glow',c:'Nature',i:'fa-mountain-sun',g:'linear-gradient(135deg,#f59e0b,#7c2d12)'},
+ {t:'Harbor night',c:'City',i:'fa-city',g:'linear-gradient(135deg,#38bdf8,#1e3a8a)'},
+ {t:'Prism',c:'Abstract',i:'fa-shapes',g:'linear-gradient(135deg,#8b5cf6,#312e81)'},
+ {t:'Moss',c:'Nature',i:'fa-leaf',g:'linear-gradient(135deg,#34d399,#064e3b)'},
+ {t:'Neon rain',c:'City',i:'fa-cloud-rain',g:'linear-gradient(135deg,#ec4899,#581c87)'},
+ {t:'Solar',c:'Abstract',i:'fa-sun',g:'linear-gradient(135deg,#f97316,#7f1d1d)'},
+ {t:'Tide',c:'Nature',i:'fa-water',g:'linear-gradient(135deg,#0ea5e9,#0c4a6e)'},
+ {t:'Metro',c:'City',i:'fa-train-subway',g:'linear-gradient(135deg,#7c3aed,#1e1b4b)'},
+ {t:'Bloom',c:'Abstract',i:'fa-wand-magic-sparkles',g:'linear-gradient(135deg,#fb7185,#881337)'}
+];
+var grid=document.getElementById('galGrid'),f='';
+function paint(){
+  var list=items.filter(x=>!f||x.c===f);
+  grid.innerHTML=list.map((x,k)=>'<div class="gal-item'+(k===0&&!f?' gal-feature':'')+'" data-k="'+x.t+'" tabindex="0" role="button" aria-label="'+x.t+'"><div class="gal-art" style="background:'+x.g+'"><i class="fa-solid '+x.i+'"></i></div><div class="gal-meta"><span><b>'+x.t+'</b><small>'+x.c+'</small></span><span class="gal-open"><i class="fa-solid fa-expand"></i></span></div></div>').join('');
+  grid.querySelectorAll('.gal-item').forEach(el=>{
+    el.onclick=()=>{
+      var x=items.find(v=>v.t===el.dataset.k);
+      Modal.open({title:x.t,desc:x.c + ' · offline cover',body:'<div class="gal-art" style="background:'+x.g+';height:300px;border-radius:14px;display:grid;place-items:center;font-size:72px;color:#fff"><i class="fa-solid '+x.i+'"></i></div><p class="muted" style="margin-top:10px">Swap this gradient for <code>&lt;img src="…"&gt;</code> — the overlay and radius stay the same.</p>',size:'md'});
+    };
+    el.onkeydown=e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();el.click();}};
+  });
+}
+document.getElementById('galFilters').querySelectorAll('button').forEach(b=>b.onclick=()=>{
+  f=b.dataset.f;
+  document.getElementById('galFilters').querySelectorAll('button').forEach(x=>{x.className='btn btn-ghost btn-sm';x.setAttribute('aria-pressed','false');});
+  b.className='btn btn-primary btn-sm';b.setAttribute('aria-pressed','true');paint();
+});
+paint();
+})();
+</script></main>
     <footer class="footer">
       <span class="fbrand"><i class="fa-solid fa-layer-group"></i><span data-i18n="appName">AdminKit</span></span>
       <span class="muted" data-i18n="footerTag">Offline-first admin template. No CDN, no build step.</span>
       <nav><a href="index.html"><span data-i18n="dashboard">Dashboard</span></a><a href="playground-table.html"><span data-i18n="reports">Reports</span></a><a href="login.html"><span data-i18n="login">Login / Register</span></a></nav>
       <span class="muted fyear">© <span data-year>2026</span></span>
-    </footer></div></div>
-<div class="scrim" id="scrim"></div><aside class="drawer" id="settingsDrawer" aria-label="Settings">
+    </footer>
+  </div>
+</div>
+
+<!-- ============ SETTINGS DRAWER (opposite side of sidebar) ============ -->
+<div class="scrim" id="scrim"></div>
+<aside class="drawer" id="settingsDrawer" aria-label="Settings">
   <div style="display:flex;align-items:center;justify-content:space-between"><h3 style="margin:0"><i class="fa-solid fa-sliders"></i> <span data-i18n="settings">Theme settings</span></h3><button class="icon-btn" data-act="settings-close"><i class="fa-solid fa-xmark"></i></button></div>
   <div class="set-group"><span class="eyebrow" data-i18n="appearance">Appearance</span>
     <div class="set-row"><span data-i18n="theme">Theme</span><select id="setTheme"><option value="system" data-i18n="system">System default</option><option value="light" data-i18n="light">Light</option><option value="dark" data-i18n="dark">Dark</option></select></div>
@@ -228,26 +273,19 @@
   </div>
   <p class="muted" style="font-size:12.5px">System theme is followed automatically and only applied when you haven't overridden it (or when set to System default). All settings persist in localStorage.</p>
 </aside>
-<div class="idle-wrap" id="idleWrap"><div class="idle-card"><span class="tile"><i class="fa-solid fa-bell"></i></span><h3 data-i18n="idleTitle">Still there?</h3><div class="progress"><i id="idleBar"></i></div><p class="muted" id="idleTxt"></p><button class="btn btn-primary" id="idleStay"><i class="fa-solid fa-check"></i><span data-i18n="stay">Stay</span></button> <button class="btn btn-ghost" id="idleLeave"><i class="fa-solid fa-lock"></i><span data-i18n="leave">Lock</span></button></div></div>
-<div class="lock-wrap" id="lockWrap"><div class="lock-card"><span class="tile t-red"><i class="fa-solid fa-lock"></i></span><h3 data-i18n="lockTitle">Locked</h3><p class="muted" data-i18n="lockDesc">Locked for inactivity.</p><button class="btn btn-primary btn-lg" id="lockBtn"><i class="fa-solid fa-arrow-right-to-bracket"></i><span data-i18n="unlock">Back to workflow</span></button></div></div>
 
-<script>
-var rowsRaw=[['Sara Ahmadi','sara@example.com','Tehran',0,1240],['Ali Rezaei','ali@example.com','Mashhad',1,860],['Mina Karimi','mina@example.com','Isfahan',2,430],['Omid Hosseini','omid@example.com','Shiraz',1,210],['Neda Mohammadi','neda@example.com','Tabriz',1,975],['Reza Gholami','reza@example.com','Karaj',3,1500],['Laleh Moradi','laleh@example.com','Qom',1,320],['Kaveh Naderi','kaveh@example.com','Yazd',2,540],['Diba Farahani','diba@example.com','Rasht',1,610],['Arman Salimi','arman@example.com','Ahvaz',1,780],['Yasaman Taha','yas@example.com','Kerman',0,1320],['Babak Azimi','babak@example.com','Hamadan',1,290]];
-var roleKeys=['roleAdmin','roleUser','roleEditor','roleManager'];
-var flags={search:true,exports:true,colToggle:true};
-var grid=null,curDict=null;
-async function dict(){try{curDict=await I18N.dict(ThemeStore.get().lang);}catch(e){curDict=null;}return curDict;}
-function paintToggles(){const d=curDict,on=d?d.tOn:'on',off=d?d.tOff:'off';
-document.getElementById('tglSearch').textContent=(d?d.modSearch:'Search')+': '+(flags.search?on:off);
-document.getElementById('tglExports').textContent=(d?d.modExports:'Exports')+': '+(flags.exports?on:off);
-document.getElementById('tglCols').textContent=(d?d.modCols:'Columns')+': '+(flags.colToggle?on:off);}
-async function build(){if(grid)grid.destroy();const d=await dict();const colT=(k,fb)=>(d&&d[k])||fb;
-const cols=[{key:'id',title:'ID'},{key:'name',title:colT('colName','Name')},{key:'email',title:colT('colEmail','Email')},{key:'city',title:colT('colCity','City')},{key:'role',title:colT('colRole','Role')},{key:'score',title:colT('colScore','Score')}];
-const rows=rowsRaw.map((r,i)=>({id:i+1,name:r[0],email:r[1],city:r[2],role:d?d[roleKeys[r[3]]]:['Admin','User','Editor','Manager'][r[3]],score:r[4]}));
-const o={columns:cols,rows,pageSize:8,paging:true,info:true,...flags};
-if(d)o.strings={search:d.tblSearch,columns:d.tblColumns,showing:d.tblShowing,from:d.tblFrom,page:d.tblPage,perPage:d.tblPerPage,noRows:d.tblNoRows};
-grid=new DataGrid(document.getElementById('grid'),o);paintToggles();}
-build();
-[['tglSearch','search'],['tglExports','exports'],['tglCols','colToggle']].forEach(([id,k])=>{document.getElementById(id).onclick=()=>{flags[k]=!flags[k];build();};});
-if(!window.__akLangTable){window.__akLangTable=true;document.addEventListener('app:lang',()=>{try{build();}catch(e){}});}
-</script></body></html>
+<!-- idle warning + lock -->
+<div class="idle-wrap" id="idleWrap"><div class="idle-card">
+  <span class="tile"><i class="fa-solid fa-bell"></i></span>
+  <h3 data-i18n="idleTitle">Are you still there?</h3><p class="muted" data-i18n="idleDesc">No interaction detected. You will be locked soon.</p>
+  <div class="progress"><i id="idleBar" style="width:0%"></i></div>
+  <p class="muted" id="idleTxt">60s</p>
+  <div class="btn-row" style="justify-content:center"><button class="btn btn-primary" id="idleStay"><i class="fa-solid fa-check"></i><span data-i18n="stay">Stay — I'm here</span></button><button class="btn btn-ghost" id="idleLeave"><i class="fa-solid fa-lock"></i><span data-i18n="leave">Leave / lock now</span></button></div>
+</div></div>
+<div class="lock-wrap" id="lockWrap"><div class="lock-card">
+  <span class="tile t-red"><i class="fa-solid fa-lock"></i></span>
+  <h3 data-i18n="lockTitle">Locked</h3><p class="muted" data-i18n="lockDesc">Locked for inactivity.</p>
+  <button class="btn btn-primary btn-lg" id="lockBtn"><i class="fa-solid fa-arrow-right-to-bracket"></i><span data-i18n="unlock">Back to workflow</span></button>
+</div></div>
+</body>
+</html>

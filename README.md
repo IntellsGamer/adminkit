@@ -45,14 +45,25 @@ Nginx, IIS, VB.NET `wwwroot`, …). No server code needed.
 
 | File | What | Use it for |
 |---|---|---|
+| `homepage.html` | Locked-horizontal index: hero, what-is-this, feature cards, all-pages links. `data-lock-layout="horizontal"`, topbar has theme + language only | Landing / index (NOT the dashboard) |
 | `index.html` | Dashboard: hero, KPI tiles + sparklines + delta pills, activity, idle card | Home page |
+| `products.html` | Shop grid from `Shop.PRODUCTS`, search + category + sort, add-to-cart | Shop demo |
+| `cart.html` | Cart lines, qty steppers, subtotal, checkout → toast + clear | Cart demo |
+| `gallery.html` | Gradient-cover grid + `Modal` lightbox, category filter | Gallery demo |
+| `tickets.html` | Ticket list (search + status filter), new-ticket form, thread modal with reply + status | Support desk demo |
+| `401.html` / `403.html` / `404.html` / `500.html` | Vercel-style error cards: big code, icon, home + dashboard buttons | Error pages |
 | `login.html` | Split-screen login/register: icon inputs, password eye-toggle, country dial-code select, offline validation | Auth page |
 | `playground-sonner.html` | Toast lab: all types, rich gallery, recipes, event log, live Toaster rebuild | Learn/test `toast` |
 | `playground-modal.html` | Modal lab: sizes, sticky footer, confirm, template triggers | Learn/test `Modal` |
-| `playground-table.html` | Grid lab: search/sort/page/export/columns + module toggles | Learn/test `DataGrid` |
+| `playground-table.html` | Grid lab: search/sort/numbered paging/export/columns + module toggles | Learn/test `DataGrid` |
 | `playground-dropdown.html` | Searchable select lab | Learn/test `NiceSelect` |
-| `playground-datepicker.html` | Jalali + Gregorian picker lab | Learn/test `DatePicker` |
+| `playground-datepicker.html` | Jalali + Gregorian picker lab, 1-or-2-month mode | Learn/test `DatePicker` |
 | `playground-buttons.html` | Full button set + icon buttons | Copy button classes |
+| `playground-tabs.html` | Underline / pills / vertical tabs lab | Learn/test `Tabs` |
+| `playground-tooltip.html` | `data-tip` 4-position lab (CSS-only) | Learn/test tooltips |
+| `playground-carousel.html` | 5 carousels: slide / fade / autoplay / thumbs / marquee, mouse drag | Learn/test `Carousel` |
+| `playground-grid.html` | 12-col `col-*` → `col-xl-*` lab with live rows | Learn/test grid |
+| `playground-inputgroup.html` | Prefix / suffix / button addons + sm/lg lab | Copy input groups |
 
 Every page shares the same shell: sidebar, top bar, settings drawer,
 idle/lock overlays. Change the theme once — it follows you across pages via
@@ -60,14 +71,18 @@ idle/lock overlays. Change the theme once — it follows you across pages via
 
 ## 4. Theme settings (UI)
 
-**Top bar (always visible, identical on every page):** hamburger (mobile) ·
+**Top bar (always visible, identical on every page except `homepage.html`):** hamburger (mobile + overlay mode) ·
 horizontal menus (horizontal layout only; extra entries auto-collapse into a
 `More ⌄` overflow entry) · search at the top of the sidebar — topbar in
-horizontal mode (command-palette page jumper, ↓↑ + Enter) ·
+horizontal mode (command-palette page jumper, ↓↑ + Enter) · cart shortcut
+(badge `data-cart-count`, hides at 0) ·
 theme dropdown (System default / Light / Dark + primary color + 6 swatches +
-layout + sidebar mode + glass switch) · language dropdown (English / فارسی) ·
+layout + sidebar mode + horizontal style + glass switch) · language dropdown (English / فارسی) ·
 notifications dropdown (badge + mark-all-read) · profile dropdown (profile /
 settings / logout) · gear (opens settings drawer).
+
+`homepage.html` is the exception: horizontal-locked index with theme +
+language dropdowns only (no search, notifications, profile, gear, drawer).
 
 The old one-off top-bar buttons (`#layoutToggle`, `#topPrimary`,
 `#themeToggle`, `EN`/`فا`) are gone — every theme control now lives in the
@@ -83,7 +98,8 @@ but new pages should copy the unified `<header class="topbar">` shell.
 | Theme | System / Light / Dark | System follows the OS live |
 | Primary color | color input + 6 swatches | Default amber `#f59e0b`; recolors accents, tiles, progress, focus rings |
 | Menu layout | Vertical / Horizontal | Horizontal hides sidebar, shows top mega-menu |
-| Sidebar mode | Full / Mini | Mini = icons + tiny labels; submenus pop **outside** as waterfall cards |
+| Horizontal style | Bar / Dock | Bar = menu inside topbar (default). Dock = separated floating island below topbar (elib-web docked style, new). Only one bar is fitted/shown at a time |
+| Sidebar mode | Full / Icon / Mini / Overlay | Icon = icons + tiny labels, submenus pop **outside** as waterfall cards (renamed from Mini; old `mini` storage auto-migrates to `icon`). Mini = icon-only rail, hover/focus expands to full, leaves collapses. Overlay = hidden rail sliding over content via hamburger + scrim |
 | Footer | Sticky / Static | Sticky keeps the footer always visible at the viewport bottom (default: Sticky); at the very bottom it docks back into a plain footer — style only, never persisted |
 | Liquid glass | on / off | Kill-switch for all nav-layer glass |
 | Language | English / فارسی | Switches dictionary + direction |
@@ -93,9 +109,9 @@ but new pages should copy the unified `<header class="topbar">` shell.
 ## 5. Dark / light logic (read this once)
 
 ```js
-ThemeStore.get()            // {theme, primary, layout, sidebar, glass, lang, dir, dirAuto, idleMinutes, toasterPosition}
+ThemeStore.get()            // {theme, primary, layout, sidebar, hstyle, glass, lang, dir, dirAuto, idleMinutes, toasterPosition}
 ThemeStore.set({theme:'dark'})
-ThemeStore.set({primary:'#0ea5e9', layout:'horizontal'})
+ThemeStore.set({primary:'#0ea5e9', layout:'horizontal', hstyle:'dock', sidebar:'mini'})
 ThemeStore.effectiveTheme() // 'light' | 'dark' (resolves 'system' via OS)
 ```
 
@@ -108,14 +124,29 @@ ThemeStore.effectiveTheme() // 'light' | 'dark' (resolves 'system' via OS)
 
 - **Vertical:** sticky glass sidebar. Parent items accordion **inside** the
   sidebar; opening one closes the rest.
-- **Mini:** icons + tiny text. Opening a parent shows its children in a
+- **Icon (renamed from Mini):** icons + tiny text. Opening a parent shows its children in a
   **floating card outside** the sidebar, anchored to the clicked row.
+- **Mini (new, icon-only):** 64px rail with icons only; hovering/focusing the rail
+  expands it to full width (`pinned` class for touch/keyboard), leaving collapses it.
+  Accordion works while expanded.
+- **Overlay (new):** rail hidden off-canvas; hamburger slides it over content with the
+  shared scrim (overlay click / X / Esc closes). Hamburger is force-visible in this mode.
 - **Horizontal:** sidebar hides; top bar shows dropdown menus incl. a
   **mega-menu with images** (offline inline-SVG covers — swap `src` for yours).
   Menus are hover/focus-only: nothing pins on click, moving away closes them.
   When entries overflow the bar width, extras move into a trailing `More ⌄`
   entry automatically (`fitHmenu()` in `app.js`; re-runs on resize, layout
   switch and language change — see §6b).
+- **Horizontal styles (two):** `bar` keeps the menu inside the topbar (default);
+  `dock` shows a separated floating island bar (`.hnbar > .hnbar-inner > .hmenu`)
+  below the topbar in the elib-web docked-island style. `app.js:ensureDockBar()`
+  auto-clones the topbar menu so `dock` works on pages without physical `.hnbar`
+  markup; `fitHmenu()` only measures the active bar. Toggle via drawer
+  `#setHstyle` or `data-hstyle-pick="bar|dock"`.
+- **Homepage lock:** `<body data-lock-layout="horizontal">` (only `homepage.html`)
+  forces `layout=horizontal`, ignores `ThemeStore.set({layout})` away from it,
+  disables layout controls, and that page ships theme + language dropdowns only.
+  The homepage is an index describing AdminKit — not the dashboard.
 - **Mobile (≤860px):** hamburger toggles the sidebar as an overlay drawer with a grey overlay; overlay click, the X button, or Esc closes it.
 - Active states are quiet (neutral gray block), Vercel-style — parents are
   never "active", only the current leaf page is bold. The shared shell is
@@ -345,6 +376,7 @@ const grid = new DataGrid(document.getElementById('grid'), {
   columns: [{key:'name',title:'Name'},{key:'email',title:'Email'}],
   rows: [{name:'Sara',email:'s@x.io'}],
   pageSize: 8, search: true, paging: true,
+  pagerWindow: 5,     // numbered window size: < 1 … 4 5 6 … 12 >
   exports: true,    // CSV + Excel (.xls) + Copy buttons
   colToggle: true,  // "Columns (n/m)" popover with switches
   info: true,       // "Showing 1–8 from 12"
@@ -352,6 +384,9 @@ const grid = new DataGrid(document.getElementById('grid'), {
 grid.destroy(); // unbinds document listeners
 ```
 
+- Pager is `< prev | 1 2 3 4 | next >`: chevrons + windowed numbers + `…` ellipsis
+  (7+ pages). Current page is a filled pill (`aria-current="page"`), chevrons
+  disable at the ends. RTL mirrors automatically.
 - Toolbar builds **once** (typing never loses focus); only rows repaint.
 - Column popover never rebuilds on toggle — no flicker, stays open.
 - Exports respect current search/sort/visible columns.
@@ -390,16 +425,19 @@ lists are plain option arrays — edit freely.
 new DatePicker(document.getElementById('birth'), {
   locale: 'fa',                 // 'fa' | 'en'
   format: 'jYYYY/jMM/jDD',      // j-tokens = Jalali, plain = Gregorian
+  months: 2,                    // 1 = single month (default) | 2 = two side-by-side
   min: new Date(2020,0,1), max: null,
   presets: true,                // Today / Now buttons
   onChange: d => console.log(d) // Date | null
 });
+picker.setMonths(2);            // switch at runtime (re-draws)
 picker.setLocale('en');
 picker.setStrings({ today:d.dpToday, clear:d.dpClear, now:d.dpNow });
 ```
 
 Popup has month/year jump selects, Today/Clear, min/max disabling, RTL-aware
-placement. Conversion calls the vendored `jalaali.toJalaali/toGregorian/
+placement. `months:2` renders two months side-by-side (`.dp-dual`, stacks on
+mobile); arrows step one month. Conversion calls the vendored `jalaali.toJalaali/toGregorian/
 jalaaliMonthLength` (Intl fallback only if the vendor file is missing).
 
 ## 13. Buttons (Vercel-quiet)
@@ -409,6 +447,89 @@ jalaaliMonthLength` (Intl fallback only if the vendor file is missing).
 (dark-on-light, light-on-dark) like Geist; the rest are flat and subtle.
 Icon-only: reuse `icon-btn` + any `fa-*` icon. Full set demoed in
 `playground-buttons.html`.
+
+## 13b. Tabs (`Tabs` — underline / pills / vertical)
+
+```html
+<script src="assets/js/tabs.js"></script>
+<div class="tabs" data-tabs="g1">
+  <button class="tab-btn" data-tab="a" aria-selected="true">One</button>
+  <button class="tab-btn" data-tab="b">Two</button>
+</div>
+<div class="tab-panel" data-panel="g1:a">…</div>
+<div class="tab-panel" data-panel="g1:b" hidden>…</div>
+```
+
+```js
+Tabs.select('g1','b'); // programmatic
+```
+
+ArrowLeft/Right (RTL aware) + Home/End move, click selects. Variants:
+default underline, `.tabs-pills`, `.tabs-vertical` wrapper. Live lab:
+`playground-tabs.html`.
+
+## 13c. Tooltip (CSS-only `data-tip`)
+
+```html
+<button class="btn btn-ghost" data-tip="Save changes">Save</button>
+<button data-tip="Left" data-pos="left">Left</button> <!-- top|bottom|left|right -->
+```
+
+Zero JS (focus shows it too). Live lab: `playground-tooltip.html`.
+
+## 13d. Carousel (`Carousel` — 5 types, mouse drag)
+
+```html
+<script src="assets/js/carousel.js"></script>
+<div class="car" data-car="slide"><!-- slide|fade|auto|thumbs|marquee -->
+  <div class="car-track"><div class="car-slide">…</div><div class="car-slide">…</div></div>
+</div>
+```
+
+Slide (arrows + dots + drag), fade (crossfade), auto (`data-interval`, progress
+bar, hover pauses), thumbs (thumbnail strip), marquee (infinite loop, hover
+pauses). 40px drag threshold, RTL aware, `prefers-reduced-motion` safe.
+Live lab: `playground-carousel.html`.
+
+## 13e. Grid (12-col, `col-*` → `col-xl-*`)
+
+```html
+<div class="row">
+  <div class="col-12 col-md-6 col-xl-4">…</div>
+  <div class="col-12 col-md-6 col-xl-4">…</div>
+</div>
+```
+
+Breakpoints `sm≥576 md≥768 lg≥992 xl≥1200`; base `col-*` is mobile-first,
+un-prefixed columns stack full-width below 576. Keep `.grid.cols-2/.cols-21/.kpi`
+for simple cases; use `.row/.col-*` for sm→xl control. Live lab + docs:
+`playground-grid.html`.
+
+## 13f. Input group (addons + buttons)
+
+```html
+<div class="igroup">
+  <span class="ig-add"><i class="fa-solid fa-magnifying-glass"></i></span>
+  <input placeholder="Search…">
+  <button class="btn btn-primary">Go</button>
+</div>
+```
+
+`.ig-add` = text/icon addon, plain `.btn` = button addon, sizes
+`.igroup-sm/.igroup-lg`, RTL mirrors. Live lab: `playground-inputgroup.html`.
+
+## 13g. Shop (`Shop`) + Tickets (`Tickets`) + Errors
+
+```js
+Shop.add('p1'); Shop.setQty('p1',3); Shop.remove('p1'); Shop.clear();
+Shop.lines(); Shop.subtotal(); Shop.count(); // badge: [data-cart-count]
+document.addEventListener('shop:change', ()=>Shop.updateBadges());
+Tickets.create({title,desc,prio}); Tickets.reply(id,text); Tickets.setStatus(id,'closed');
+```
+
+Cart persists (`adminkit.cart.v1`), tickets persist (`adminkit.tickets.v1`),
+both offline. Errors `401/403/404/500.html` are standalone Vercel-style cards
+(big code, icon, homepage + dashboard buttons, i18n title/desc).
 
 ## 14. Auth page (`login.html`)
 
@@ -490,9 +611,10 @@ App.go('playground-table.html'); // Turbo.visit() when present, full load otherw
 
 Rules for future code (this is where naive ports break):
 
-- **One identical `<head>` everywhere:** all 10 library scripts live in
+- **One identical `<head>` everywhere:** all 15 library scripts live in
   `<head>` in the same order on every page (`theme → i18n → sonner → modal →
-  table → dropdown → jalaali → datepicker → idle → app`). Turbo merges
+  table → dropdown → jalaali → datepicker → tabs → tooltip → carousel → shop →
+  tickets → idle → app`). Turbo merges
   identical heads (no re-execution, no async race); only per-page **inline**
   body scripts re-run per visit, with every global already defined. Never add
   a page-specific library to just one page — append it to the shared order.
@@ -522,26 +644,36 @@ Rules for future code (this is where naive ports break):
 
 ```
 adminkit/
+├── homepage.html               locked-horizontal index (theme + lang only)
 ├── index.html                  dashboard
+├── products.html · cart.html   shop demo (Shop store)
+├── gallery.html                gallery + Modal lightbox
+├── tickets.html                support desk (Tickets store)
+├── 401/403/404/500.html        Vercel-style error cards
 ├── login.html                  auth
-├── playground-*.html           6 module labs (sonner/modal/table/…)
-├── assets/css/theme.css        design system (light + graphite dark)
+├── playground-*.html           11 module labs (sonner/modal/table/dropdown/datepicker/buttons/tabs/tooltip/carousel/grid/inputgroup)
+├── assets/css/theme.css        design system (light + graphite dark) + sidebar modes + dock + grid + pager + shop/gallery/tickets/errors/home
 ├── assets/css/sonner.css       VERBATIM upstream sonner styles
-├── assets/css/components.css   modal/table/dropdown/datepicker/buttons/auth
+├── assets/css/components.css   modal/table/dropdown/datepicker/buttons/auth + tabs/tooltip/carousel/input-group
 ├── assets/js/theme.js          settings store (ThemeStore)
 ├── assets/js/i18n.js           dictionary loader (I18N)
 ├── assets/js/sonner.js         Sonner port (toast + Sonner)
 ├── assets/js/modal.js          dialog port (Modal)
-├── assets/js/table.js          grid (DataGrid)
+├── assets/js/table.js          grid (DataGrid, numbered < 1 2 3 4 > pager)
 ├── assets/js/dropdown.js       select (NiceSelect)
 ├── assets/js/jalaali-vendor.js exact jalaali-js build
-├── assets/js/datepicker.js     picker UI (DatePicker)
+├── assets/js/datepicker.js     picker UI (DatePicker, months:1|2)
+├── assets/js/tabs.js           tabs (Tabs)
+├── assets/js/tooltip.js        tooltip docs (CSS-only)
+├── assets/js/carousel.js       carousel (Carousel, 5 types + drag)
+├── assets/js/shop.js           cart store (Shop)
+├── assets/js/tickets.js        ticket store (Tickets)
 ├── assets/js/idle.js           idle + lock (Idle)
 ├── assets/js/app.js            shell wiring + Turbo lifecycle (init/teardown)
 ├── assets/fonts/               Inter + Vazirmatn woff2
 ├── assets/vendor/turbo/        Hotwired Turbo 8 UMD (offline Drive)
 ├── assets/vendor/              Font Awesome css + webfonts
-├── i18n/en.json · fa.json      dictionaries (add languages here)
+├── i18n/en.json · fa.json      dictionaries (273 keys each — add languages here)
 └── _source/                    upstream originals for audit
 ```
 
@@ -549,7 +681,10 @@ adminkit/
 
 | Key | Shape |
 |---|---|
-| `adminkit.settings.v2` | `{theme:'system', primary:'#f59e0b', layout:'vertical', sidebar:'full', footerSticky:true, glass:true, lang:'en', dir:'ltr', dirAuto:true, idleMinutes:15, toasterPosition:'bottom-right'}` |
+| `adminkit.settings.v2` | `{theme:'system', primary:'#f59e0b', layout:'vertical', sidebar:'full', hstyle:'bar', footerSticky:true, glass:true, lang:'en', dir:'ltr', dirAuto:true, idleMinutes:15, toasterPosition:'bottom-right'}` |
+| `adminkit.sidebarMigrated.v1` | `'1'` once old `sidebar:mini` was migrated to `icon` |
+| `adminkit.cart.v1` | `{productId: qty}` shop cart |
+| `adminkit.tickets.v1` | `[{id,title,desc,status,prio,date,replies}]` support desk |
 | `adminkit.seen` | `'1'` once the settings drawer auto-opened |
 
 ## 21. Keyboard shortcuts & accessibility
